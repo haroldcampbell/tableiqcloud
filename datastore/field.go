@@ -1,30 +1,16 @@
 package datastore
 
-type TableFieldType int
-
-const (
-	FieldTypeString TableFieldType = iota // default is string
-	FieldTypeNumber
-	FieldTypeDate
-	FieldTypeText // To hold markdown data
-)
-
-// FieldTypeAttribute keeps the meta data for the field
-// example: String-type
-//
-//	{
-//		AttributeName: "maximum string lenght",
-//		AttributeValue: 64, //the actual maximum string length
-//	}
-type FieldTypeAttribute struct {
-	AttributeName  string
-	AttributeValue interface{}
+type FieldData struct {
+	RecordGUID string
+	DataValue  interface{}
 }
 
-type FieldMetaData struct {
-	FieldType       TableFieldType
-	FieldTypeName   string
-	FieldAttributes map[string]*FieldTypeAttribute
+func NewFieldData(recordGUID string) *FieldData {
+
+	return &FieldData{
+		RecordGUID: recordGUID,
+		DataValue:  nil,
+	}
 }
 
 type TableField struct {
@@ -33,65 +19,40 @@ type TableField struct {
 	FieldName string
 	MetaData  *FieldMetaData
 	// FieldData represents the actaul data values for the field. Each line represents a row of data.
-	FieldData          []interface{}
+	FieldData          []*FieldData
 	CreatedOnTimestamp int64
 	IsDeleted          bool
 	DeletedOnTimestamp int64
-}
-
-func initFieldMetaData(fieldType TableFieldType) *FieldMetaData {
-	metaData := &FieldMetaData{
-		FieldType: fieldType,
-	}
-
-	switch fieldType {
-	case FieldTypeString:
-		metaData.FieldTypeName = "FieldTypeString"
-	case FieldTypeNumber:
-		metaData.FieldTypeName = "FieldTypeNumber"
-	case FieldTypeDate:
-		metaData.FieldTypeName = "FieldTypeDate"
-	case FieldTypeText:
-		metaData.FieldTypeName = "FieldTypeText"
-	}
-
-	return metaData
 }
 
 func (f *TableField) CountValues() int {
 	return len(f.FieldData)
 }
 
-func (f *TableField) SetValues(values []interface{}) {
-
-	f.FieldData = make([]interface{}, len(values))
-	copy(f.FieldData, values)
-}
-
-func (f *TableField) GetValues() []interface{} {
+func (f *TableField) GetValues() []*FieldData {
 	return f.FieldData
 }
 
-// FIXME: This is not efficient
-func (f *TableField) InsertValueAtIndex(targetIndex int, newValue interface{}) {
-	newValues := make([]interface{}, len(f.FieldData)+1)
-
-	cellIndex := 0
-	for index := range f.FieldData {
-
-		if index == targetIndex {
-			newValues[targetIndex] = newValue
-			cellIndex++
-			newValues[cellIndex] = f.FieldData[index]
-		} else {
-			newValues[cellIndex] = f.FieldData[index]
-		}
-		cellIndex++
-	}
-
-	f.FieldData = newValues
+// See article: https://antonio-velazquez-bustamante.medium.com/inserting-an-element-into-a-slice-in-go-golang-97c7120ca7ca
+func insertCellData(list []*FieldData, cell *FieldData, index int) []*FieldData {
+	return append(list[:index],
+		append([]*FieldData{cell}, list[index:]...)...)
 }
 
-func (f *TableField) AppendValue(newValue interface{}) {
-	f.FieldData = append(f.FieldData, newValue)
+func (f *TableField) InsertValueAtIndex(targetIndex int, recordGUID string, newValue interface{}) {
+	data := &FieldData{
+		RecordGUID: recordGUID,
+		DataValue:  newValue,
+	}
+
+	f.FieldData = insertCellData(f.FieldData, data, targetIndex)
+}
+
+func (f *TableField) AppendValue(recordGUID string, newValue interface{}) {
+	data := &FieldData{
+		RecordGUID: recordGUID,
+		DataValue:  newValue,
+	}
+
+	f.FieldData = append(f.FieldData, data)
 }

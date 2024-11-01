@@ -36,8 +36,12 @@ func initSampleDB() {
 	}
 
 	for _, rowData := range data {
-		table.AppendFieldValuesByFieldName("Title", rowData[0])
-		table.AppendFieldValuesByFieldName("Description", rowData[1])
+		table.AppendRecord(func(recordGUID string) {
+			fmt.Printf("[initSampleDB] recordGUID: %v\n", recordGUID)
+
+			table.AppendFieldValuesByFieldName(recordGUID, "Title", rowData[0])
+			table.AppendFieldValuesByFieldName(recordGUID, "Description", rowData[1])
+		})
 	}
 
 	_, err := json.MarshalIndent(table, "", "  ")

@@ -63,23 +63,27 @@ func Test_AppendFieldValuesByFieldName(t *testing.T) {
 	}
 
 	for _, rowData := range data {
-		err1 := table.AppendFieldValuesByFieldName("Title", rowData[0])
-		err2 := table.AppendFieldValuesByFieldName("Description", rowData[1])
+		table.AppendRecord(func(recordGUID string) {
 
-		assert.NoError(t, err1, "1:AppendFieldValuesByFieldName should not have erro")
-		assert.NoError(t, err2, "2:AppendFieldValuesByFieldName should not have erro")
+			_, err1 := table.AppendFieldValuesByFieldName(recordGUID, "Title", rowData[0])
+			_, err2 := table.AppendFieldValuesByFieldName(recordGUID, "Description", rowData[1])
+
+			assert.NotEmpty(t, recordGUID, "0:AppendRecord should generate a recordGUID")
+			assert.NoError(t, err1, "1:AppendFieldValuesByFieldName should not have erro")
+			assert.NoError(t, err2, "2:AppendFieldValuesByFieldName should not have erro")
+		})
 	}
 
 	fields := table.GetFields()
 	column1 := []string{"A1", "A2", "A3"}
 	cellValues := fields[0].GetValues()
 	for index := range column1 {
-		assert.Equal(t, column1[index], cellValues[index], "1:should have correct values")
+		assert.Equal(t, column1[index], cellValues[index].DataValue, "1:should have correct values")
 	}
 
 	column2 := []string{"B1", "B2", "B3"}
 	cellValues = fields[1].GetValues()
 	for index := range column2 {
-		assert.Equal(t, column2[index], cellValues[index], "2:should have correct values")
+		assert.Equal(t, column2[index], cellValues[index].DataValue, "2:should have correct values")
 	}
 }

@@ -15,6 +15,8 @@ type Table struct {
 	CreatedOnTimestamp int64
 	IsDeleted          bool
 	DeletedOnTimestamp int64
+
+	_lastRecordGUID string
 }
 
 func NewTable(name string) *Table {
@@ -27,6 +29,20 @@ func NewTable(name string) *Table {
 		IsDeleted:          false,
 		DeletedOnTimestamp: 0,
 	}
+}
+
+func (t *Table) createNewRecordGUID() string {
+	t._lastRecordGUID = utils.GenerateUUID()
+
+	return t._lastRecordGUID
+}
+
+func (t *Table) GeLastCreatedRecordGUID() string {
+	if t._lastRecordGUID == "" {
+		return t.createNewRecordGUID()
+	}
+
+	return t._lastRecordGUID
 }
 
 func (t *Table) UpdateTableName(name string) {
@@ -42,11 +58,11 @@ func (t *Table) MarkTableForDeletion() {
 	t.IsDeleted = true
 }
 
-func (t *Table) AddTableField(field *TableField) error {
+func (t *Table) AddTableField(field *TableField) (*TableField, error) {
 	// TODO: Ensur that field names are unique
 	_, ok := t.FieldsNameIndex[field.FieldName]
 	if ok {
-		return errors.New("duplicate field name")
+		return nil, errors.New("duplicate field name")
 	}
 
 	// TODO: Fix this so that it can work when fields are added at other locations
@@ -55,24 +71,29 @@ func (t *Table) AddTableField(field *TableField) error {
 	index := len(t.Fields) - 1
 	t.FieldsNameIndex[field.FieldName] = index
 
-	return nil
+	return field, nil
 }
 
 func (t *Table) GetFields() []*TableField {
 	return t.Fields
 }
 
-func (t *Table) AppendFieldValuesByFieldName(fieldName string, fieldValue interface{}) error {
+func (t *Table) AppendFieldValuesByFieldName(recordGUID string, fieldName string, fieldValue interface{}) (*TableField, error) {
 	fieldIndex, ok := t.FieldsNameIndex[fieldName]
 
 	if !ok {
-		return errors.New("field name not found")
+		return nil, errors.New("field name not found")
 	}
 
 	field := t.Fields[fieldIndex]
-	field.AppendValue(fieldValue)
+	field.AppendValue(recordGUID, fieldValue)
 
-	return nil
+	return field, nil
+}
+
+func (t *Table) AppendRecord(newRecordHandler func(recordGUID string)) {
+	recordGUID := t.createNewRecordGUID()
+	newRecordHandler(recordGUID)
 }
 
 // Move the NewField so that the tests would pass. It wasn't finding the Table struct when it was in the field.go file
@@ -84,6 +105,7 @@ func NewField(tableGUID string, name string, fieldType TableFieldType) *TableFie
 		TableGUID:          tableGUID,
 		FieldName:          name,
 		MetaData:           metaData,
+		FieldData:          make([]*FieldData, 0),
 		IsDeleted:          false,
 		CreatedOnTimestamp: time.Now().Unix(),
 		DeletedOnTimestamp: 0,

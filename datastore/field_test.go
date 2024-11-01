@@ -8,13 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func Test_TableField(t *testing.T) {
-	createTableFieldTest(t)
-	// deleteTableFieldTest(t)
-	// updateTableFieldTest(t)
-}
-
-func createTableFieldTest(t *testing.T) {
+func Test_CreateTableField(t *testing.T) {
 	table := datastore.NewTable("Tasks")
 
 	fieldTypes := []datastore.TableFieldType{
@@ -45,58 +39,23 @@ func testCreateFieldWithType(t *testing.T, table *datastore.Table, fieldName str
 	assert.Equal(t, fieldTypeName, field.MetaData.FieldTypeName, "should set field type name")
 }
 
-// Test adding values to a field
-func Test_InsertFieldValues(t *testing.T) {
+func Test_AppendValuesStringToEnd(t *testing.T) {
 	table := datastore.NewTable("Tasks")
-
-	setValuesStringTest(t, table)
-	insertValuesStringTest(t, table)
-	appendValuesStringToEndTest(t, table)
-}
-
-func setValuesStringTest(t *testing.T, table *datastore.Table) {
 	values := []interface{}{"hat", "are", "great", "in", "summer"}
 	field := datastore.NewField(table.GUID, "taskName", datastore.FieldTypeString)
 
-	field.CountValues()
-	assert.Zero(t, field.CountValues(), "CountValues: should not have values")
-
-	field.SetValues(values)
-	assert.Equal(t, len(values), field.CountValues(), "SetValues: should have correct number of values")
-
-	fieldValues := field.GetValues()
+	recordGUIDs := []string{}
 	for index := range values {
-		cellValue := fieldValues[index]
-		assert.Equal(t, values[index], cellValue, "GetValues: should have correct cell value")
+		table.AppendRecord(func(recordGUID string) {
+			field.AppendValue(recordGUID, values[index])
+			recordGUIDs = append(recordGUIDs, recordGUID)
+		})
 	}
-}
-
-func insertValuesStringTest(t *testing.T, table *datastore.Table) {
-	values := []interface{}{"hat", "are", "great", "in", "summer"}
-	field := datastore.NewField(table.GUID, "taskName", datastore.FieldTypeString)
 
 	insertedValue := "some"
-	field.SetValues(values)
-	field.InsertValueAtIndex(0, insertedValue)
-
-	newLen := len(values) + 1
-	assert.Equal(t, newLen, field.CountValues(), "InsertValueAtIndex: should increase the number of values")
-
-	fieldValues := field.GetValues()
-	// fmt.Printf("fieldValues: %v\n", fieldValues)
-	assert.Equal(t, insertedValue, fieldValues[0], "InsertValueAtIndex: should insert are correct location")
-	for index := range values {
-		assert.Equal(t, values[index], fieldValues[index+1], "InsertValueAtIndex: should offset values")
-	}
-}
-
-func appendValuesStringToEndTest(t *testing.T, table *datastore.Table) {
-	values := []interface{}{"hat", "are", "great", "in", "summer"}
-	field := datastore.NewField(table.GUID, "taskName", datastore.FieldTypeString)
-
-	insertedValue := "some"
-	field.SetValues(values)
-	field.AppendValue(insertedValue)
+	table.AppendRecord(func(recordGUID string) {
+		field.AppendValue(recordGUID, insertedValue)
+	})
 
 	newLen := len(values) + 1
 	assert.Equal(t, newLen, field.CountValues(), "AppendValue: should increase the number of values")
@@ -104,10 +63,39 @@ func appendValuesStringToEndTest(t *testing.T, table *datastore.Table) {
 	fieldValues := field.GetValues()
 
 	for index := range values {
-		assert.Equal(t, values[index], fieldValues[index], "AppendValue: should not offset values")
+		assert.Equal(t, values[index], fieldValues[index].DataValue, "AppendValue: should not offset values")
+		assert.Equal(t, recordGUIDs[index], fieldValues[index].RecordGUID, "AppendValue: should update recordGUIDs")
 	}
 
 	lastIndex := len(fieldValues) - 1
-	assert.Equal(t, insertedValue, fieldValues[lastIndex], "AppendValue: should insert are correct location")
+	assert.Equal(t, insertedValue, fieldValues[lastIndex].DataValue, "AppendValue: should insert are correct location")
 
+}
+
+func Test_InsertStringValue(t *testing.T) {
+	table := datastore.NewTable("Tasks")
+	values := []interface{}{"hat", "are", "great", "in", "summer"}
+	field := datastore.NewField(table.GUID, "taskName", datastore.FieldTypeString)
+
+	for index := range values {
+		table.AppendRecord(func(recordGUID string) {
+			field.AppendValue(recordGUID, values[index])
+		})
+	}
+	assert.Equal(t, len(values), field.CountValues(), "AppendRecord+AppendValue: should add records correctly")
+
+	insertedValue := "some"
+	table.AppendRecord(func(recordGUID string) {
+		field.InsertValueAtIndex(0, recordGUID, insertedValue)
+	})
+
+	newLen := len(values) + 1
+	assert.Equal(t, newLen, field.CountValues(), "InsertValueAtIndex: should increase the number of values")
+
+	fieldValues := field.GetValues()
+
+	assert.Equal(t, insertedValue, fieldValues[0].DataValue, "InsertValueAtIndex: should insert are correct location")
+	for index := range values {
+		assert.Equal(t, values[index], fieldValues[index+1].DataValue, "InsertValueAtIndex: should offset values")
+	}
 }
