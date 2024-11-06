@@ -19,6 +19,11 @@ type Table struct {
 	_lastRecordGUID string
 }
 
+type RecordCell struct {
+	MetaData  *FieldMetaData
+	FieldData FieldData
+}
+
 func NewTable(name string) *Table {
 	return &Table{
 		GUID:               utils.GenerateUUID(),
@@ -59,17 +64,19 @@ func (t *Table) MarkTableForDeletion() {
 }
 
 func (t *Table) AddTableField(field *TableField) (*TableField, error) {
-	// TODO: Ensur that field names are unique
-	_, ok := t.FieldsNameIndex[field.FieldName]
+	// TODO: Ensure that field names are unique
+	_, ok := t.FieldsNameIndex[field.MetaData.FieldName]
 	if ok {
 		return nil, errors.New("duplicate field name")
 	}
+
+	field.MetaData.SetTableGUID(t.GUID)
 
 	// TODO: Fix this so that it can work when fields are added at other locations
 	// apart from the end of the list
 	t.Fields = append(t.Fields, field)
 	index := len(t.Fields) - 1
-	t.FieldsNameIndex[field.FieldName] = index
+	t.FieldsNameIndex[field.MetaData.FieldName] = index
 
 	return field, nil
 }
@@ -96,16 +103,53 @@ func (t *Table) AppendRecord(newRecordHandler func(recordGUID string)) {
 	newRecordHandler(recordGUID)
 }
 
+func (t *Table) GetRecordByGUID(recordGUID string) ([]*RecordCell, error) {
+	recordCells := make([]*RecordCell, 0)
+
+	for _, field := range t.Fields {
+		result, ok := field.FieldDataGUIDMap[recordGUID]
+		if !ok {
+			return nil, errors.New("GetRecordByGUID failed. Can't find recordGUID")
+		}
+		cell := &RecordCell{
+			MetaData:  field.MetaData,
+			FieldData: *result,
+		}
+
+		recordCells = append(recordCells, cell)
+	}
+	return recordCells, nil
+}
+
 // Move the NewField so that the tests would pass. It wasn't finding the Table struct when it was in the field.go file
-func NewField(tableGUID string, name string, fieldType TableFieldType) *TableField {
-	metaData := initFieldMetaData(fieldType)
+func NewField(name string, fieldType TableFieldType) *TableField {
+	metaData := initFieldMetaData(name, fieldType)
 
 	return &TableField{
-		GUID:               utils.GenerateUUID(),
-		TableGUID:          tableGUID,
-		FieldName:          name,
 		MetaData:           metaData,
 		FieldData:          make([]*FieldData, 0),
+		FieldDataGUIDMap:   map[string]*FieldData{},
+		IsDeleted:          false,
+		CreatedOnTimestamp: time.Now().Unix(),
+		DeletedOnTimestamp: 0,
+	}
+}
+
+// NewRelationshipField creates a field that is linked to, and pulling data from a childTable
+// @fieldName the name of the field
+// @childTableGuid the source table where the data will be coming from
+// @defaultChildFieldGUID the field(s) from the source table that will be shown in this field
+func NewRelationshipField(fieldName string, childTableGUID, defaultChildFieldGUID string) *TableField {
+	metaData := initFieldMetaData(fieldName, FieldTypeRelationship)
+
+	relationship := metaData.MetaAttributes.(*MetaFieldTypeRelationship)
+	relationship.ChildTableGUID = childTableGUID
+	relationship.DefaultChildFieldGUID = defaultChildFieldGUID
+
+	return &TableField{
+		MetaData:           metaData,
+		FieldData:          make([]*FieldData, 0),
+		FieldDataGUIDMap:   map[string]*FieldData{},
 		IsDeleted:          false,
 		CreatedOnTimestamp: time.Now().Unix(),
 		DeletedOnTimestamp: 0,

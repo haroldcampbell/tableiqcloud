@@ -36,7 +36,7 @@ func Test_deleteTable(t *testing.T) {
 
 func Test_AddTableField(t *testing.T) {
 	table := datastore.NewTable("Tasks")
-	field := datastore.NewField(table.GUID, "taskName", datastore.FieldTypeString)
+	field, _ := table.AddTableField(datastore.NewField("taskName", datastore.FieldTypeString))
 
 	fields := table.GetFields()
 	assert.Zero(t, len(fields), "GetFields: should be zero initially")
@@ -51,8 +51,8 @@ func Test_AddTableField(t *testing.T) {
 
 func Test_AppendFieldValuesByFieldName(t *testing.T) {
 	table := datastore.NewTable("Tasks")
-	table.AddTableField(datastore.NewField(table.GUID, "Title", datastore.FieldTypeString))
-	table.AddTableField(datastore.NewField(table.GUID, "Description", datastore.FieldTypeString))
+	table.AddTableField(datastore.NewField("Title", datastore.FieldTypeString))
+	table.AddTableField(datastore.NewField("Description", datastore.FieldTypeString))
 
 	assert.Equal(t, 2, len(table.GetFields()), "AddTableField: should add correct number of fields")
 
@@ -86,4 +86,47 @@ func Test_AppendFieldValuesByFieldName(t *testing.T) {
 	for index := range column2 {
 		assert.Equal(t, column2[index], cellValues[index].DataValue, "2:should have correct values")
 	}
+}
+
+func Test_GetRecordByGUID(t *testing.T) {
+	table1 := datastore.NewTable("Contacts")
+	f1, _ := table1.AddTableField(datastore.NewField("Name", datastore.FieldTypeString))
+	f2, _ := table1.AddTableField(datastore.NewField("Job Title", datastore.FieldTypeString))
+	f3, _ := table1.AddTableField(datastore.NewField("Age", datastore.FieldTypeNumber))
+
+	table1.AppendRecord(func(recordGUID string) {
+		f1.AppendValue(recordGUID, "Mark Smith")
+		f2.AppendValue(recordGUID, "Student")
+		f3.AppendValue(recordGUID, "23")
+	})
+
+	var savedGUID string
+	var d1, d2, d3 datastore.FieldData
+	table1.AppendRecord(func(recordGUID string) {
+		savedGUID = recordGUID
+		d1 = f1.AppendValue(recordGUID, "Brad Jame")
+		d2 = f2.AppendValue(recordGUID, "Banker")
+		d3 = f3.AppendValue(recordGUID, "34")
+	})
+
+	table1.AppendRecord(func(recordGUID string) {
+		f1.AppendValue(recordGUID, "Jill Gardener")
+		f2.AppendValue(recordGUID, "CEO")
+		f3.AppendValue(recordGUID, "47")
+	})
+
+	table1.AppendRecord(func(recordGUID string) {
+		f1.AppendValue(recordGUID, "Sally Miracle")
+		f2.AppendValue(recordGUID, "Doctor")
+		f3.AppendValue(recordGUID, "35")
+	})
+
+	expected := []*datastore.RecordCell{
+		{MetaData: f1.MetaData, FieldData: d1},
+		{MetaData: f2.MetaData, FieldData: d2},
+		{MetaData: f3.MetaData, FieldData: d3},
+	}
+
+	actual, _ := table1.GetRecordByGUID(savedGUID)
+	assert.Equal(t, expected, actual, "GetRecordByGUID: should return a row of data")
 }

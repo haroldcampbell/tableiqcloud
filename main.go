@@ -17,17 +17,17 @@ import (
 // }
 
 func initSampleDB() {
-	var field *datastore.TableField
+	// var field *datastore.TableField
 
 	base := datastore.NewBase("core")
 	table := datastore.NewTable("Tasks")
 	base.AddTable(table)
 
-	field = datastore.NewField(table.GUID, "Title", datastore.FieldTypeString)
-	table.AddTableField(field)
+	// field, _ =
+	table.AddTableField(datastore.NewField("Title", datastore.FieldTypeString))
 
-	field = datastore.NewField(table.GUID, "Description", datastore.FieldTypeString)
-	table.AddTableField(field)
+	// field, _=
+	table.AddTableField(datastore.NewField("Description", datastore.FieldTypeString))
 
 	var data [][]string = [][]string{
 		{"Select trip", "Where do we want to go"},

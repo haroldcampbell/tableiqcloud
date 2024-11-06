@@ -32,9 +32,9 @@ func Test_CreateTableField(t *testing.T) {
 
 // helper to test field type
 func testCreateFieldWithType(t *testing.T, table *datastore.Table, fieldName string, fieldType datastore.TableFieldType, fieldTypeName string) {
-	field := datastore.NewField(table.GUID, fieldName, fieldType)
+	field := datastore.NewField(fieldName, fieldType)
 
-	assert.Equalf(t, fieldName, field.FieldName, "should set field Name")
+	assert.Equalf(t, fieldName, field.MetaData.FieldName, "should set field Name")
 	assert.Equal(t, fieldType, field.MetaData.FieldType, "should set field type")
 	assert.Equal(t, fieldTypeName, field.MetaData.FieldTypeName, "should set field type name")
 }
@@ -42,7 +42,7 @@ func testCreateFieldWithType(t *testing.T, table *datastore.Table, fieldName str
 func Test_AppendValuesStringToEnd(t *testing.T) {
 	table := datastore.NewTable("Tasks")
 	values := []interface{}{"hat", "are", "great", "in", "summer"}
-	field := datastore.NewField(table.GUID, "taskName", datastore.FieldTypeString)
+	field, _ := table.AddTableField(datastore.NewField("taskName", datastore.FieldTypeString))
 
 	recordGUIDs := []string{}
 	for index := range values {
@@ -75,7 +75,7 @@ func Test_AppendValuesStringToEnd(t *testing.T) {
 func Test_InsertStringValue(t *testing.T) {
 	table := datastore.NewTable("Tasks")
 	values := []interface{}{"hat", "are", "great", "in", "summer"}
-	field := datastore.NewField(table.GUID, "taskName", datastore.FieldTypeString)
+	field, _ := table.AddTableField(datastore.NewField("taskName", datastore.FieldTypeString))
 
 	for index := range values {
 		table.AppendRecord(func(recordGUID string) {

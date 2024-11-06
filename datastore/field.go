@@ -1,12 +1,21 @@
 package datastore
 
+type RelationshipChildData struct {
+	// AllowMultipleRecords bool // Allow 1-to-many
+	ChildRecordGUIDs []string
+}
+
+type HydratedRelationshipChildData struct {
+	ChildRecordGUIDs    []string
+	HydratedRecordCells []*RecordCell
+}
+
 type FieldData struct {
 	RecordGUID string
 	DataValue  interface{}
 }
 
 func NewFieldData(recordGUID string) *FieldData {
-
 	return &FieldData{
 		RecordGUID: recordGUID,
 		DataValue:  nil,
@@ -14,16 +23,18 @@ func NewFieldData(recordGUID string) *FieldData {
 }
 
 type TableField struct {
-	GUID      string
-	TableGUID string // Guid for the parent table
-	FieldName string
-	MetaData  *FieldMetaData
+	MetaData *FieldMetaData
 	// FieldData represents the actaul data values for the field. Each line represents a row of data.
 	FieldData          []*FieldData
+	FieldDataGUIDMap   map[string]*FieldData
 	CreatedOnTimestamp int64
 	IsDeleted          bool
 	DeletedOnTimestamp int64
 }
+
+// type TableFieldRelationship struct {
+// 	*TableField
+// }
 
 func (f *TableField) CountValues() int {
 	return len(f.FieldData)
@@ -39,20 +50,35 @@ func insertCellData(list []*FieldData, cell *FieldData, index int) []*FieldData 
 		append([]*FieldData{cell}, list[index:]...)...)
 }
 
-func (f *TableField) InsertValueAtIndex(targetIndex int, recordGUID string, newValue interface{}) {
-	data := &FieldData{
+func newFieldData(recordGUID string, newValue interface{}) *FieldData {
+	return &FieldData{
 		RecordGUID: recordGUID,
 		DataValue:  newValue,
 	}
-
-	f.FieldData = insertCellData(f.FieldData, data, targetIndex)
 }
 
-func (f *TableField) AppendValue(recordGUID string, newValue interface{}) {
-	data := &FieldData{
-		RecordGUID: recordGUID,
-		DataValue:  newValue,
+func (f *TableField) InsertValueAtIndex(targetIndex int, recordGUID string, newValue interface{}) {
+	data := newFieldData(recordGUID, newValue)
+	f.FieldData = insertCellData(f.FieldData, data, targetIndex)
+	f.FieldDataGUIDMap[recordGUID] = data
+}
+
+func (f *TableField) AppendValue(recordGUID string, newValue interface{}) FieldData {
+	data := newFieldData(recordGUID, newValue)
+	f.FieldData = append(f.FieldData, data)
+	f.FieldDataGUIDMap[recordGUID] = data
+
+	return *data
+}
+
+func (f *TableField) AppendChildRelation(recordGUID string, childRecordGUIDs []string) FieldData {
+	cellValue := RelationshipChildData{
+		ChildRecordGUIDs: childRecordGUIDs,
 	}
 
+	data := newFieldData(recordGUID, cellValue)
 	f.FieldData = append(f.FieldData, data)
+	f.FieldDataGUIDMap[recordGUID] = data
+
+	return *data
 }
