@@ -1,25 +1,24 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { APIBoardRequests } from "../api/api.request";
-import { AuthService } from "./auth.service";
+import { APIRequests } from "../api/api.request";
 
 @Injectable({
 	providedIn: 'root'
 })
-export class TeamService {
+export class APIService {
 	// private peopleRequests: APIPeopleRequests;
 	// private clientsRequests: APIClientsRequests;
 	// private projectRequests: APIProjectRequests;
 
-	boardRequests: APIBoardRequests;
+	apiRequests: APIRequests;
 	// teamRequests: APITeamRequests;
 	// cardRequests: APICardRequests;
 	// accessRequest: APIAccessRequests;
 
 	// private roadmapRequests: APITeamsInitiatives;
 
-	constructor(private http: HttpClient, private authService: AuthService) {
-		this.boardRequests = new APIBoardRequests(http);
+	constructor(private http: HttpClient) {
+		this.apiRequests = new APIRequests(http);
 		// this.teamRequests = new APITeamRequests(http);
 		// this.cardRequests = new APICardRequests(http);
 		// this.accessRequest = new APIAccessRequests(http);

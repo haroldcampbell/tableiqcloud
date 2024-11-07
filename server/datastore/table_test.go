@@ -36,12 +36,10 @@ func Test_deleteTable(t *testing.T) {
 
 func Test_AddTableField(t *testing.T) {
 	table := datastore.NewTable("Tasks")
-	field, _ := table.AddTableField(datastore.NewField("taskName", datastore.FieldTypeString))
-
 	fields := table.GetFields()
 	assert.Zero(t, len(fields), "GetFields: should be zero initially")
 
-	table.AddTableField(field)
+	table.AddTableField(datastore.NewField("taskName", datastore.FieldTypeString))
 
 	fields = table.GetFields()
 	assert.Equal(t, 1, len(fields), "AddTableField: should add a field")

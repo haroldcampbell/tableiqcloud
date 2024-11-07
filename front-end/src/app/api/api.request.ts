@@ -19,20 +19,23 @@ export function provisionBoardAccessList(data: BoardAccessListData) {
 
 
 
-export class APIBoardRequests {
+export class APIRequests {
 	private maxVotesPerUserPerBoard = new Map<string, number>();
 	//private userTotalVotes = new Map<string, number>();
 	constructor(private http: HttpClient) { }
 
-	getUserBoardAccessList() {
-		return this.http.get<APIServerResponse<BoardAccessListData>>(`/api/user-board-access-list`)//, { params: params })
+	getList() {
+		// return this.http.get<APIServerResponse<BoardAccessListData>>(`/api/list`)//, { params: params })
+		return this.http.get<string>(`/api/list`)//, { params: params })
 			.pipe(
 				map(resp => {
-					if (!resp.successStatus || resp.jsonBody === null) {
-						throw resp.message
-					}
+					return resp
+					// if (!resp.successStatus || resp.jsonBody === null) {
+					// 	throw resp.message;
+					// }
 
-					return provisionBoardAccessList(resp.jsonBody)
+					// return resp.jsonBody;
+					// return provisionBoardAccessList(resp.jsonBody)
 				}),
 			);
 	}

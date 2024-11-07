@@ -3,18 +3,13 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"airport-mode/datastore"
 
+	"github.com/gin-gonic/gin"
 	"github.com/haroldcampbell/go_utils/utils"
 )
-
-// func GetIssueCards(c *gin.Context) {
-// 	c.IndentedJSON(http.StatusOK, "test-utput")
-// 	task := datastore.NewTable("Tasks")
-
-// 	fmt.Printf("aaa: %v\n", task)
-// }
 
 func initSampleDB() {
 	// var field *datastore.TableField
@@ -53,14 +48,21 @@ func initSampleDB() {
 	fmt.Printf("table: %v\n", utils.PrettyMongoString(table))
 }
 
+func GetList(c *gin.Context) {
+	c.IndentedJSON(http.StatusOK, "test-utput")
+	// task := datastore.NewTable("Tasks")
+
+	// fmt.Printf("aaa: %v\n", task)
+}
+
 func main() {
-	initSampleDB()
-	// router := gin.Default()
+	// initSampleDB()
+	router := gin.Default()
 	// router.Static("/assets", "./src/assets")
 	// router.StaticFile("/", "./src/index.html")
-	// // router.GET("/project", GetIssueCards)
+	router.GET("/api/list", GetList)
 
-	// router.Run("localhost:8099")
+	router.Run("localhost:8083")
 
 	// fmt.Printf("field: %#v\n", field)
 }
