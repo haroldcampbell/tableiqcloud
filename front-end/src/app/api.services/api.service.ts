@@ -1,6 +1,6 @@
 import { HttpClient } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { APIRequests } from "../api/api.request";
+import { APIRequests } from "../api.requests/api.request";
 
 @Injectable({
 	providedIn: 'root'

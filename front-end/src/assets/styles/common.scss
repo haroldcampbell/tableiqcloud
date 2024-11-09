@@ -1,0 +1,17 @@
+.flow-row {
+    display: flex !important;
+    flex-direction: row;
+}
+
+.flow-col {
+    display: flex !important;
+    flex-direction: column;
+}
+
+.flow-col-gap-10px {
+    column-gap: 10px;
+}
+
+.flow-col-gap-20px {
+    column-gap: 20px;
+}

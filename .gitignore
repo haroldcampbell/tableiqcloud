@@ -1,1 +1,3 @@
 airport-mode
+server/output.json
+**/*.trash

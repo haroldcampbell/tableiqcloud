@@ -31,7 +31,7 @@ func Test_CreateLinkedField(t *testing.T) {
 	lf := datastore.NewRelationshipField(
 		"Managers",
 		table1.GUID,
-		f1.MetaData.GUID,
+		f1.MetaData.FieldGUID,
 	)
 	table2.AddTableField(lf)
 

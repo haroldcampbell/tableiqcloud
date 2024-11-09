@@ -1,0 +1,43 @@
+<div class="app-page">
+  <div class="flow-row flow-col-gap-10px">
+    <a class="link-action" (click)="onNavigateToTable()"><<</a>
+    <h2>{{ tableRecordData?.Name }}</h2>
+  </div>
+
+  <div class="table-container">
+    <!-- ROW HEADER -->
+    <div class="header-container">
+      @for (field of tableRecordData?.FieldsMetaData; track $index) {
+      <ul class="column-container">
+        <li class="row-header-item row-item">
+          <div class="data-item">
+            {{ field.FieldName }}
+          </div>
+        </li>
+      </ul>
+      }
+    </div>
+
+    <!-- BODY -->
+    <div class="body-container">
+      @for (field of tableRecordData?.FieldsMetaData; track $index) {
+      <!--  -->
+      <ul class="column-container">
+        @for (columnData of columnValues(field); track $index) {
+        <!--  -->
+        <li class="row-item">
+          <div class="data-item">{{ columnData.DataValue }} &nbsp;</div>
+        </li>
+        }
+      </ul>
+      }
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer-container">
+      <ul class="actions-container">
+        <li class="action-item">Add Row</li>
+      </ul>
+    </div>
+  </div>
+</div>

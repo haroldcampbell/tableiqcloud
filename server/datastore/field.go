@@ -1,5 +1,9 @@
 package datastore
 
+import (
+	"time"
+)
+
 type RelationshipChildData struct {
 	// AllowMultipleRecords bool // Allow 1-to-many
 	ChildRecordGUIDs []string
@@ -32,9 +36,39 @@ type TableField struct {
 	DeletedOnTimestamp int64
 }
 
-// type TableFieldRelationship struct {
-// 	*TableField
-// }
+func NewField(name string, fieldType TableFieldType) *TableField {
+	metaData := initFieldMetaData(name, fieldType)
+
+	return &TableField{
+		MetaData:           metaData,
+		FieldData:          make([]*FieldData, 0),
+		FieldDataGUIDMap:   map[string]*FieldData{},
+		IsDeleted:          false,
+		CreatedOnTimestamp: time.Now().Unix(),
+		DeletedOnTimestamp: 0,
+	}
+}
+
+// NewRelationshipField creates a field that is linked to, and pulling data from a childTable
+// @fieldName the name of the field
+// @childTableGuid the source table where the data will be coming from
+// @defaultChildFieldGUID the field(s) from the source table that will be shown in this field
+func NewRelationshipField(fieldName string, childTableGUID, defaultChildFieldGUID string) *TableField {
+	metaData := initFieldMetaData(fieldName, FieldTypeRelationship)
+
+	relationship := metaData.MetaAttributes.(*MetaFieldTypeRelationship)
+	relationship.ChildTableGUID = childTableGUID
+	relationship.DefaultChildFieldGUID = defaultChildFieldGUID
+
+	return &TableField{
+		MetaData:           metaData,
+		FieldData:          make([]*FieldData, 0),
+		FieldDataGUIDMap:   map[string]*FieldData{},
+		IsDeleted:          false,
+		CreatedOnTimestamp: time.Now().Unix(),
+		DeletedOnTimestamp: 0,
+	}
+}
 
 func (f *TableField) CountValues() int {
 	return len(f.FieldData)

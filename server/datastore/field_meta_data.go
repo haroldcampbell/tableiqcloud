@@ -9,8 +9,6 @@ const (
 	FieldTypeNumber
 	FieldTypeDate
 	FieldTypeText // To hold markdown data
-
-	// FieldTypeLinkedTable
 	FieldTypeRelationship
 )
 
@@ -27,7 +25,7 @@ type MetaFieldTypeRelationship struct {
 type FieldMetaData struct {
 	tableGUID string // Guid for the parent table
 
-	GUID           string
+	FieldGUID      string
 	FieldName      string
 	FieldType      TableFieldType
 	FieldTypeName  string
@@ -36,7 +34,7 @@ type FieldMetaData struct {
 
 func initFieldMetaData(fieldName string, fieldType TableFieldType) *FieldMetaData {
 	metaData := &FieldMetaData{
-		GUID: utils.GenerateUUID(),
+		FieldGUID: utils.GenerateUUID(),
 		// TableGUID: tableGUID,
 		FieldName: fieldName,
 		FieldType: fieldType,

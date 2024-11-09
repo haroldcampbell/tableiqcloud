@@ -11,6 +11,7 @@ type Table struct {
 	GUID               string
 	Name               string
 	Fields             []*TableField
+	RecordGUIDs        []string       // List of the record guids
 	FieldsNameIndex    map[string]int // Maps the Name to the field Index
 	CreatedOnTimestamp int64
 	IsDeleted          bool
@@ -29,6 +30,7 @@ func NewTable(name string) *Table {
 		GUID:               utils.GenerateUUID(),
 		Name:               name,
 		Fields:             make([]*TableField, 0),
+		RecordGUIDs:        []string{},
 		FieldsNameIndex:    map[string]int{},
 		CreatedOnTimestamp: time.Now().Unix(),
 		IsDeleted:          false,
@@ -101,6 +103,7 @@ func (t *Table) AppendFieldValuesByFieldName(recordGUID string, fieldName string
 func (t *Table) AppendRecord(newRecordHandler func(recordGUID string)) {
 	recordGUID := t.createNewRecordGUID()
 	newRecordHandler(recordGUID)
+	t.RecordGUIDs = append(t.RecordGUIDs, recordGUID)
 }
 
 func (t *Table) GetRecordByGUID(recordGUID string) ([]*RecordCell, error) {
@@ -121,37 +124,47 @@ func (t *Table) GetRecordByGUID(recordGUID string) ([]*RecordCell, error) {
 	return recordCells, nil
 }
 
-// Move the NewField so that the tests would pass. It wasn't finding the Table struct when it was in the field.go file
-func NewField(name string, fieldType TableFieldType) *TableField {
-	metaData := initFieldMetaData(name, fieldType)
-
-	return &TableField{
-		MetaData:           metaData,
-		FieldData:          make([]*FieldData, 0),
-		FieldDataGUIDMap:   map[string]*FieldData{},
-		IsDeleted:          false,
-		CreatedOnTimestamp: time.Now().Unix(),
-		DeletedOnTimestamp: 0,
-	}
+func (t *Table) GetRecordCount() int {
+	return len(t.RecordGUIDs)
 }
 
-// NewRelationshipField creates a field that is linked to, and pulling data from a childTable
-// @fieldName the name of the field
-// @childTableGuid the source table where the data will be coming from
-// @defaultChildFieldGUID the field(s) from the source table that will be shown in this field
-func NewRelationshipField(fieldName string, childTableGUID, defaultChildFieldGUID string) *TableField {
-	metaData := initFieldMetaData(fieldName, FieldTypeRelationship)
+type TableFieldGUID = string
+type TableFieldArray = []*FieldData
+type TableRecordData struct {
+	GUID           string
+	Name           string
+	RecordGUIDs    []string
+	FieldsMetaData []*FieldMetaData
+	ColumnValues   map[TableFieldGUID]TableFieldArray // TableField.GUID -> []FieldData
+}
 
-	relationship := metaData.MetaAttributes.(*MetaFieldTypeRelationship)
-	relationship.ChildTableGUID = childTableGUID
-	relationship.DefaultChildFieldGUID = defaultChildFieldGUID
-
-	return &TableField{
-		MetaData:           metaData,
-		FieldData:          make([]*FieldData, 0),
-		FieldDataGUIDMap:   map[string]*FieldData{},
-		IsDeleted:          false,
-		CreatedOnTimestamp: time.Now().Unix(),
-		DeletedOnTimestamp: 0,
+// GetRecords returns a slice of records
+func (t *Table) GetRecords() TableRecordData {
+	records := TableRecordData{
+		GUID:           t.GUID,
+		Name:           t.Name,
+		RecordGUIDs:    []string{},
+		FieldsMetaData: []*FieldMetaData{},
+		ColumnValues:   map[TableFieldGUID]TableFieldArray{},
 	}
+
+	// recordCount := len(t.RecordGUIDs)
+	// targetSize := startIndex + count
+	// if targetSize <= recordCount {
+	// 	records.RecordGUIDs = t.RecordGUIDs[targetSize:]
+	// } else {
+	// 	//Fix this	``
+	// }
+
+	// Returns the meta data
+	for _, f := range t.Fields {
+		records.FieldsMetaData = append(records.FieldsMetaData, f.MetaData)
+		records.ColumnValues[f.MetaData.FieldGUID] = f.FieldData
+	}
+
+	// TODO: Implement paging
+	// Grab all of the record GUIDs.
+	records.RecordGUIDs = t.RecordGUIDs
+
+	return records
 }

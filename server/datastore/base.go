@@ -1,7 +1,10 @@
 package datastore
 
 import (
+	"encoding/json"
 	"errors"
+	"fmt"
+	"os"
 
 	"github.com/haroldcampbell/go_utils/utils"
 )
@@ -9,9 +12,9 @@ import (
 type Base struct {
 	GUID         string
 	Name         string
-	tables       []*Table
-	tableGUIDMap map[string]*Table
-	tableNameMap map[string]*Table
+	Tables       []*Table
+	TableGUIDMap map[string]*Table
+	TableNameMap map[string]*Table
 }
 
 type TableInfo struct {
@@ -23,38 +26,38 @@ func NewBase(name string) *Base {
 	return &Base{
 		GUID:         utils.GenerateUUID(),
 		Name:         name,
-		tables:       make([]*Table, 0),
-		tableGUIDMap: map[string]*Table{},
-		tableNameMap: map[string]*Table{},
+		Tables:       make([]*Table, 0),
+		TableGUIDMap: map[string]*Table{},
+		TableNameMap: map[string]*Table{},
 	}
 }
 
 func (b *Base) TableCount() int {
-	return len(b.tables)
+	return len(b.Tables)
 }
 
 func (b *Base) AddTable(table *Table) error {
-	_, ok := b.tableGUIDMap[table.GUID]
+	_, ok := b.TableGUIDMap[table.GUID]
 	if ok {
 		return errors.New("duplicate table GUID")
 	}
 
-	_, ok = b.tableNameMap[table.Name]
+	_, ok = b.TableNameMap[table.Name]
 	if ok {
 		return errors.New("duplicate table Name")
 	}
 
-	b.tableGUIDMap[table.GUID] = table
-	b.tableNameMap[table.Name] = table
-	b.tables = append(b.tables, table)
+	b.TableGUIDMap[table.GUID] = table
+	b.TableNameMap[table.Name] = table
+	b.Tables = append(b.Tables, table)
 
 	return nil
 }
 
 func (b *Base) ListTables() []TableInfo {
-	list := make([]TableInfo, len(b.tables))
+	list := make([]TableInfo, len(b.Tables))
 
-	for index, table := range b.tables {
+	for index, table := range b.Tables {
 		list[index] = TableInfo{
 			GUID: table.GUID,
 			Name: table.Name,
@@ -64,7 +67,7 @@ func (b *Base) ListTables() []TableInfo {
 }
 
 func (b *Base) GetTableByGUID(guid string) (*Table, error) {
-	table, ok := b.tableGUIDMap[guid]
+	table, ok := b.TableGUIDMap[guid]
 
 	if !ok {
 		return nil, errors.New("Invalid guid. Table not found")
@@ -104,4 +107,38 @@ func (b *Base) ExpandChildRelationships(recs []*RecordCell) []*RecordCell {
 	}
 
 	return recs
+}
+
+const jsonDumpFile = "output.json"
+
+func (b *Base) DumpDataAsJSON() {
+	fmt.Printf("[DumpDataAsJSON] tables: %v\n", utils.PrettyMongoString(b.Tables))
+
+	jsonData, _ := json.Marshal(b)
+	err := os.WriteFile(jsonDumpFile, jsonData, 0644)
+	if err != nil {
+		fmt.Printf("[DumpDataAsJSON] error saving json data. Err: %v\n", err)
+		return
+	}
+	fmt.Printf("%+v", b)
+}
+
+func NewBaseFromJSON(handler func() (*Base, error)) (*Base, error) {
+	jsonData, err := os.ReadFile(jsonDumpFile)
+	if os.IsNotExist(err) {
+		fmt.Printf("[NewBaseFromJSON] Attempting to create JSON store.\n")
+		return handler()
+	}
+
+	if err != nil {
+		fmt.Printf("[NewBaseFromJSON] error reading json data. Err: %v\n", err)
+		return nil, err
+	}
+
+	fmt.Printf("[NewBaseFromJSON] Attempting to load existing JSON store.\n")
+	b := &Base{}
+	json.Unmarshal(jsonData, b)
+	fmt.Printf("[NewBaseFromJSON] JSON store loaded successfully.\n")
+
+	return b, nil
 }

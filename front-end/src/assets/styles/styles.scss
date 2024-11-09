@@ -1,0 +1,35 @@
+/* You can add global styles to this file, and also import other style files */
+body {
+    font-family: "Roboto", "Open Sans", "PT Serif Caption", sans-serif;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 300px;
+    line-height: 1.8em;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    position: relative;
+
+    color: #271c29;
+    background-color: #fff;
+}
+
+textarea {
+    resize: none;
+}
+
+pre,
+h1,
+h2,
+h3,
+p,
+ul,
+li {
+    padding: 0;
+    margin: 0;
+}
+
+li {
+    list-style: none;
+}

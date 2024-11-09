@@ -1,8 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
-import { APIService } from '../../services/api.service';
-import { provideHttpClient } from '@angular/common/http';
 
 @Component({
 	selector: 'app-root',
@@ -12,23 +10,8 @@ import { provideHttpClient } from '@angular/common/http';
 	templateUrl: './app.component.html',
 	styleUrl: './app.component.sass'
 })
-export class AppComponent implements OnInit {
+export class AppComponent {
 	title = 'front-end';
 
-	constructor(
-		private apiService: APIService
-	) {
 
-	}
-
-	ngOnInit(): void {
-		this.apiService.apiRequests.getList().subscribe({
-			next: (data) => {
-				console.log("[AppComponent] data: ", data);
-			},
-			error: (err) => {
-				console.log("[AppComponent] err: ", err);
-			}
-		})
-	}
 }

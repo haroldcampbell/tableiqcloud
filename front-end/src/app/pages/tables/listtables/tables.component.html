@@ -1,0 +1,10 @@
+<div class="app-page">
+  <h2>Tables</h2>
+  <ul class="card-container">
+    @for(item of tables; track item.GUID) {
+    <li class="card" (click)="didSelectTable(item.GUID)">{{ item.Name }}</li>
+    } @empty {
+    <li>No tables. Create a new table</li>
+    }
+  </ul>
+</div>

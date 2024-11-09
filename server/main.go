@@ -1,66 +1,86 @@
 package main
 
 import (
-	"encoding/json"
+	"airport-mode/datastore"
 	"fmt"
 	"net/http"
-
-	"airport-mode/datastore"
 
 	"github.com/gin-gonic/gin"
 	"github.com/haroldcampbell/go_utils/utils"
 )
 
-func initSampleDB() {
-	// var field *datastore.TableField
+type APIServerResponse struct {
+	Action        string `json:"action"`
+	SuccessStatus bool   `json:"successStatus"`
+	Message       string `json:"message"`
+	SessionKey    string `json:"sessionKey"`
+	ErrorCode     int    `json:"errorCode"`
+	JSONBody      any    `json:"jsonBody"`
+}
 
-	base := datastore.NewBase("core")
-	table := datastore.NewTable("Tasks")
-	base.AddTable(table)
-
-	// field, _ =
-	table.AddTableField(datastore.NewField("Title", datastore.FieldTypeString))
-
-	// field, _=
-	table.AddTableField(datastore.NewField("Description", datastore.FieldTypeString))
-
-	var data [][]string = [][]string{
-		{"Select trip", "Where do we want to go"},
-		{"Do Purcahse", "Buy the ticket"},
-		{"Enjoy vacation", "Go to the place and have fun"},
+func OkResponse(action string, obj any) APIServerResponse {
+	return APIServerResponse{
+		Action:        action,
+		SuccessStatus: true,
+		ErrorCode:     -1,
+		JSONBody:      obj,
 	}
+}
 
-	for _, rowData := range data {
-		table.AppendRecord(func(recordGUID string) {
-			fmt.Printf("[initSampleDB] recordGUID: %v\n", recordGUID)
-
-			table.AppendFieldValuesByFieldName(recordGUID, "Title", rowData[0])
-			table.AppendFieldValuesByFieldName(recordGUID, "Description", rowData[1])
-		})
+func ErrResponse(action string, errCode int, message string) APIServerResponse {
+	return APIServerResponse{
+		Action:        action,
+		SuccessStatus: false,
+		ErrorCode:     errCode,
+		Message:       message,
 	}
+}
 
-	_, err := json.MarshalIndent(table, "", "  ")
+func GetTables(base *datastore.Base) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		c.IndentedJSON(http.StatusOK, OkResponse("get-tables", base.ListTables()))
+	}
+}
+
+func GetTableByGUID(base *datastore.Base) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		tableGUID := c.Param("tableGUID")
+		fmt.Printf("[GetTableByGUID] tableGUID: %v\n", tableGUID)
+
+		table, err := base.GetTableByGUID(tableGUID)
+		if err != nil {
+			// base.DumpTables()
+			// fmt.Printf("[GetTableByGUID] base: %v\n", utils.PrettyMongoString(base))
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("get-table", 404, "Table not found"))
+			return
+		}
+
+		records := table.GetRecords()
+		fmt.Printf("[GetTableByGUID] records:%v\n", utils.PrettyMongoString(records))
+
+		c.IndentedJSON(http.StatusOK, OkResponse("get-table", records))
+	}
+}
+func main() {
+	// base := NewMockDB()
+	// base.DumpDataAsJSON()
+
+	base, err := datastore.NewBaseFromJSON(func() (*datastore.Base, error) {
+		base := NewMockDB()
+		base.DumpDataAsJSON()
+
+		return base, nil
+	})
 	if err != nil {
-		fmt.Printf("Unablet to unMarshal table. Error: %v\n", err)
+		fmt.Printf("Failed to load mock data")
 		return
 	}
 
-	fmt.Printf("table: %v\n", utils.PrettyMongoString(table))
-}
-
-func GetList(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, "test-utput")
-	// task := datastore.NewTable("Tasks")
-
-	// fmt.Printf("aaa: %v\n", task)
-}
-
-func main() {
-	// initSampleDB()
 	router := gin.Default()
 	// router.Static("/assets", "./src/assets")
 	// router.StaticFile("/", "./src/index.html")
-	router.GET("/api/list", GetList)
+	router.GET("/api/tables", GetTables(base))
+	router.GET("/api/table/:tableGUID", GetTableByGUID(base))
 
 	router.Run("localhost:8083")
 
