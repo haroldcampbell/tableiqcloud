@@ -1,9 +1,12 @@
 import { Routes } from '@angular/router';
-import { ListTablesComponent } from '../tables/listtables/tables.component';
-import { ViewTableComponent } from '../tables/viewtable/viewtable.component';
+import { BaseTablesComponent } from '../bases/base-tables/base-tables.component';
+import { ViewTableComponent } from '../../ui/tables/viewtable/viewtable.component';
+import { MainComponent } from '../bases/main/main.component';
 
 export const routes: Routes = [
-	{ path: "", component: ListTablesComponent },
-	{ path: "table/:tableGUID", component: ViewTableComponent },
+	{ path: "", component: MainComponent },
+	{ path: "base/:baseGUID", component: BaseTablesComponent },
+	{ path: "base/:baseGUID/:tableGUID", component: BaseTablesComponent },
+	// { path: "table/:tableGUID", component: ViewTableComponent },
 
 ];

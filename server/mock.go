@@ -2,16 +2,26 @@ package main
 
 import (
 	"airport-mode/datastore"
+	"fmt"
 )
 
-func NewMockDB() *datastore.Base {
-	base := datastore.NewBase("core")
+func MockStore() *datastore.Datastore {
+	store := datastore.NewDatastore()
 
-	createMockTasks(base)
-	createMockContacts(base)
-	createMockAccounts(base)
+	err := datastore.NewBaseFromJSON(store, "core", func(base *datastore.Base) {
+		CreateMockTasks(base)
+		CreateMockContacts(base)
+		CreateMockAccounts(base)
+	})
+	if err != nil {
+		fmt.Printf("Failed to load mock data")
+		return nil
+	}
 
-	return base
+	datastore.NewBaseFromJSON(store, "CRM", func(base *datastore.Base) {})
+	datastore.NewBaseFromJSON(store, "Deliveries", func(base *datastore.Base) {})
+
+	return store
 }
 
 func createModelData(base *datastore.Base, tableName string, fieldNames []string, data [][]string) {
@@ -32,7 +42,7 @@ func createModelData(base *datastore.Base, tableName string, fieldNames []string
 	base.AddTable(table)
 }
 
-func createMockAccounts(base *datastore.Base) {
+func CreateMockAccounts(base *datastore.Base) {
 	fieldNames := []string{"Company", "Address", "Country", "Industry"}
 	data := [][]string{
 		{"UWI Mona", "Mona, Kingston", "Jamaica", "University"},
@@ -43,7 +53,7 @@ func createMockAccounts(base *datastore.Base) {
 	createModelData(base, "Accounts", fieldNames, data)
 }
 
-func createMockContacts(base *datastore.Base) {
+func CreateMockContacts(base *datastore.Base) {
 	fieldNames := []string{"Name", "Company", "City", "Country", "Phone 1", "Phone 2", "Email", "DOB", "Website"}
 	data := [][]string{
 		{"John Snow", "Amazon.com", "The Wall", "Northlands", "", "", "", "1950/12/03", ""},
@@ -61,7 +71,7 @@ func createMockContacts(base *datastore.Base) {
 	createModelData(base, "Contacts", fieldNames, data)
 }
 
-func createMockTasks(base *datastore.Base) {
+func CreateMockTasks(base *datastore.Base) {
 	fieldNames := []string{"Title", "Description"}
 	var data [][]string = [][]string{
 		{"Select trip", "Where do we want to go"},

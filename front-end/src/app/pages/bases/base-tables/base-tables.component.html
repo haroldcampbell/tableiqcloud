@@ -1,0 +1,29 @@
+<div class="app-page-no-padding">
+  <div class="colored-heading">
+    <!-- <div class="flow-row flow-col-gap-10px"> -->
+    <h2>Base: {{ baseName }}</h2>
+    <!-- </div> -->
+
+    <ul class="table-name-container">
+      @for(item of tables; track item.GUID) {
+      <li
+        class="item"
+        (click)="onSelectTable(item.GUID)"
+        [id]="item.GUID"
+        [class.is-selected]="isSelectedTabled(item.GUID)"
+      >
+        {{ item.Name }}
+      </li>
+      } @empty {
+      <li>No tables. Create a new table</li>
+      }
+    </ul>
+  </div>
+
+  @if (selectedTableGUID) {
+  <ui-viewtable
+    [baseGUID]="baseGUID!"
+    [selectedTableGUID]="selectedTableGUID"
+  ></ui-viewtable>
+  }
+</div>

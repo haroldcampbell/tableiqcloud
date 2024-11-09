@@ -27,7 +27,7 @@ type RecordCell struct {
 
 func NewTable(name string) *Table {
 	return &Table{
-		GUID:               utils.GenerateUUID(),
+		GUID:               utils.GenerateSLUG(),
 		Name:               name,
 		Fields:             make([]*TableField, 0),
 		RecordGUIDs:        []string{},
@@ -39,7 +39,7 @@ func NewTable(name string) *Table {
 }
 
 func (t *Table) createNewRecordGUID() string {
-	t._lastRecordGUID = utils.GenerateUUID()
+	t._lastRecordGUID = utils.GenerateSLUG()
 
 	return t._lastRecordGUID
 }

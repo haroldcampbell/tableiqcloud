@@ -1,14 +1,14 @@
 import { HttpClient, HttpRequest } from "@angular/common/http";
 import { EMPTY, map, of, tap } from "rxjs";
 import { APIServerResponse } from "../models/models.server";
-import { TableInfo, TableRecordData } from "../models/models.datastore";
+import { Base, BaseTableInfo, TableInfo, TableRecordData } from "../models/models.datastore";
 
 
 export class APIRequests {
 	constructor(private http: HttpClient) { }
 
-	getTables() {
-		return this.http.get<APIServerResponse<TableInfo[]>>(`/api/tables`)//, { params: params })
+	getBases() {
+		return this.http.get<APIServerResponse<Base[]>>(`/api/bases`)
 			.pipe(
 				map(resp => {
 					if (!resp.successStatus || resp.jsonBody === null) {
@@ -20,8 +20,34 @@ export class APIRequests {
 			);
 	}
 
-	getTableByGUID(tableGUID: string) {
-		return this.http.get<APIServerResponse<TableRecordData>>(`/api/table/${tableGUID}`)
+	// getBaseByGUID(baseGUID: string) {
+	// 	return this.http.get<APIServerResponse<Base>>(`/api/base/${baseGUID}`)
+	// 		.pipe(
+	// 			map(resp => {
+	// 				if (!resp.successStatus || resp.jsonBody === null) {
+	// 					throw resp.message;
+	// 				}
+
+	// 				return resp.jsonBody;
+	// 			}),
+	// 		);
+	// }
+
+	getTables(baseGUID: string) {
+		return this.http.get<APIServerResponse<BaseTableInfo>>(`/api/base/${baseGUID}`)
+			.pipe(
+				map(resp => {
+					if (!resp.successStatus || resp.jsonBody === null) {
+						throw resp.message;
+					}
+
+					return resp.jsonBody;
+				}),
+			);
+	}
+
+	getTableByGUID(baseGUID: string, tableGUID: string) {
+		return this.http.get<APIServerResponse<TableRecordData>>(`/api/table/${baseGUID}/${tableGUID}`)
 			.pipe(
 				map(resp => {
 					if (!resp.successStatus || resp.jsonBody === null) {
