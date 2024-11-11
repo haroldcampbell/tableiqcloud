@@ -5,6 +5,14 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ViewTableComponent } from '../../../ui/tables/viewtable/viewtable.component';
 import { hasString } from '../../../core/utils';
 
+export enum NavItems {
+	Data,
+	Forms,
+	Automations,
+	Workflows,
+	Interfaces,
+	Experiments
+}
 @Component({
 	selector: 'app-tables',
 	standalone: true,
@@ -18,12 +26,18 @@ export class BaseTablesComponent implements OnInit {
 	tables: TableInfo[] = [];
 	info!: BaseTableInfo;
 	selectedTableGUID?: string;
+	selectedNavItem: NavItems = NavItems.Data;
+
+	get NavItemsType() {
+		return NavItems;
+	}
 
 	constructor(
 		private apiService: APIService,
 		public router: Router,
 		private route: ActivatedRoute,
 	) { }
+
 
 	ngOnInit(): void {
 		const routeParams = this.route.snapshot.paramMap;
@@ -68,5 +82,14 @@ export class BaseTablesComponent implements OnInit {
 		}
 
 		return this.selectedTableGUID == tableGUID;
+	}
+
+	onSelectNavItem(item: NavItems) {
+		this.selectedNavItem = item;
+		console.log("[onSelectNavItem] selectedNavItemName:", item)
+	}
+
+	isSelectedNavItem(item: NavItems) {
+		return this.selectedNavItem == item;
 	}
 }

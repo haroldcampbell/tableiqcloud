@@ -1,6 +1,58 @@
 // @import "../../../../assets/styles/app";
 @import "var";
 
+.actions-container {
+    display: flex;
+    flex-direction: row;
+    // column-gap: 30px;
+
+    // grid-template-columns: 200px 1fr 100px;
+    // grid-template-rows: 40px;
+
+    background: $action-container-color;
+    border-bottom: solid 1px $separator-line-color;
+
+    .action-group-separator {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        opacity: 0.5;
+        font-size: 1.2em;
+        margin-top: -5px;
+    }
+
+    .action-group {
+        display: flex;
+        flex-direction: row;
+        padding: 0px 5px;
+        height: 40px;
+        column-gap: 30px;
+        align-items: center;
+
+        color: $neutral-gray-text;
+
+        padding: 0 10px;
+
+        .action-item {
+            display: flex;
+            flex-direction: row;
+            column-gap: 5px;
+            align-items: center;
+        }
+    }
+
+    .right-group {
+        // justify-self: flex-end;
+        // justify-items: flex-end;
+        // border: solid 1px red;
+        // text-align: right;
+    }
+
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+//  table-container
+
 .table-container {
     border: solid 1px #e0e0e0;
     border-top: none;
@@ -10,13 +62,9 @@
         padding: 2px;
 
         .data-item {
-            font-weight: 300;
             width: 150px;
             min-width: 150px;
-
-            // border: solid 1px #f0f0f0;
             border-radius: 2px;
-
             white-space: nowrap;
             overflow: hidden;
             text-overflow: clip;
@@ -30,13 +78,13 @@
 
     .column-container {
         .row-item {
-            background: $selectedTabled-color;
+            background: $selected-table-color;
             border-bottom: solid 1px #9caed5;
 
-            .data-item {
-                color: #333;
+            .field-name {
+                color: $neutral-gray-text;
                 padding: 2px 5px;
-                // font-weight: 700;
+                text-wrap: nowrap;
             }
         }
     }
@@ -61,7 +109,8 @@
             .data-item {
                 color: #666;
                 padding: 2px 5px;
-                // border: solid 1px #f3f3f3;
+                text-wrap: nowrap;
+                font-weight: 300;
             }
         }
 
@@ -82,20 +131,11 @@
 .footer-container {
     display: flex;
     flex-direction: row;
-
-    // padding: 10px 5px;
-    // border-top: solid 1px #f0f0f0;
-    // position: relative;
-
-    // height: 30px;
 }
 
-.actions-container {
-    // position: fixed;
-    // left: 0;
+.end-actions-container {
     display: flex;
     flex-direction: row;
-
 
     margin-top: 20px;
 

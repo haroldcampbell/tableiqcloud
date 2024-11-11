@@ -1,11 +1,50 @@
-<!-- <div class="app-page"> -->
+<div class="actions-container">
+  <ul class="action-group">
+    <li class="action-item">
+      <img class="ico" src="/assets/images/ico-views.png" alt="" /> Views
+    </li>
+    <li class="action-item">
+      <img class="ico" src="/assets/images/ico-projections.png" alt="" />
+      Projections
+    </li>
+    <li class="action-item">
+      <span class="action-group-separator">⎸</span>
+    </li>
+  </ul>
+
+  <ul class="action-group">
+    <li class="action-item">Main View</li>
+    <li class="action-item">
+      <img class="ico" src="/assets/images/ico-hide.png" alt="" /> Hide fields
+    </li>
+    <li class="action-item">
+      <img class="ico" src="/assets/images/ico-filter.png" alt="" /> Filter
+      fields
+    </li>
+    <li class="action-item">
+      <img class="ico" src="/assets/images/ico-sort.png" alt="" /> Sort
+    </li>
+    <!-- <li class="action-item">Color</li> -->
+    <li class="action-item">
+      <img class="ico" src="/assets/images/ico-share.png" alt="" /> Share and
+      sync
+    </li>
+  </ul>
+
+  <ul class="action-group right-group">
+    <li class="action-item">
+      <img class="ico" src="/assets/images/ico-search.png" alt="" /> search
+    </li>
+  </ul>
+</div>
+
 <div class="table-container">
-  <!-- ROW HEADER -->
+  <!-- DATA ROW HEADER -->
   <div class="header-container">
     @for (field of tableRecordData?.FieldsMetaData; track $index) {
     <ul class="column-container">
       <li class="row-header-item row-item">
-        <div class="data-item">
+        <div class="data-item field-name">
           {{ field.FieldName }}
         </div>
       </li>
@@ -31,10 +70,9 @@
   <!-- FOOTER -->
   <div class="footer-container"></div>
 </div>
-<!-- </div> -->
 
 <div>
-  <ul class="actions-container">
+  <ul class="end-actions-container">
     <li class="action-item">Add Row</li>
   </ul>
 </div>

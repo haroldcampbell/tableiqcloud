@@ -1,9 +1,72 @@
 <div class="app-page-no-padding">
   <div class="colored-heading">
-    <!-- <div class="flow-row flow-col-gap-10px"> -->
-    <h2>Base: {{ baseName }}</h2>
-    <!-- </div> -->
+    <div class="base-nagivation-container">
+      <div class="navigation-container">
+        <h2 class="app-page-title">Base: {{ baseName }}</h2>
+        <ul class="navigation-group">
+          <li
+            class="nav-item"
+            (click)="onSelectNavItem(NavItemsType.Data)"
+            [class.is-selected]="isSelectedNavItem(NavItemsType.Data)"
+          >
+            Data
+          </li>
+          <li
+            class="nav-item"
+            (click)="onSelectNavItem(NavItemsType.Forms)"
+            [class.is-selected]="isSelectedNavItem(NavItemsType.Forms)"
+          >
+            Forms
+          </li>
+        </ul>
 
+        <ul class="navigation-group">
+          <li
+            class="nav-item"
+            (click)="onSelectNavItem(NavItemsType.Automations)"
+            [class.is-selected]="isSelectedNavItem(NavItemsType.Automations)"
+          >
+            Automation
+          </li>
+          <li
+            class="nav-item"
+            (click)="onSelectNavItem(NavItemsType.Workflows)"
+            [class.is-selected]="isSelectedNavItem(NavItemsType.Workflows)"
+          >
+            Workflow
+          </li>
+        </ul>
+
+        <ul class="navigation-group">
+          <li
+            class="nav-item"
+            (click)="onSelectNavItem(NavItemsType.Interfaces)"
+            [class.is-selected]="isSelectedNavItem(NavItemsType.Interfaces)"
+          >
+            Interfaces
+          </li>
+          <li
+            class="nav-item"
+            (click)="onSelectNavItem(NavItemsType.Experiments)"
+            [class.is-selected]="isSelectedNavItem(NavItemsType.Experiments)"
+          >
+            Experiments
+          </li>
+        </ul>
+      </div>
+      <ul class="settings-group right">
+        <li class="nav-info">Reconnecting...</li>
+        <!-- <li class="nav-item">Help</li> -->
+        <!-- <li class="nav-item">Share</li> -->
+        <li class="nav-item avatar">H</li>
+      </ul>
+    </div>
+  </div>
+
+  @switch (selectedNavItem) {
+  <!--  -->
+  @case (NavItemsType.Data) {
+  <div class="content-nav-container">
     <ul class="table-name-container">
       @for(item of tables; track item.GUID) {
       <li
@@ -17,13 +80,26 @@
       } @empty {
       <li>No tables. Create a new table</li>
       }
+      <li class="item">
+        <img class="ico" src="/assets/images/ico-add.png" /> Add or Import
+      </li>
     </ul>
   </div>
-
   @if (selectedTableGUID) {
   <ui-viewtable
     [baseGUID]="baseGUID!"
     [selectedTableGUID]="selectedTableGUID"
   ></ui-viewtable>
-  }
+  } }
+  <!--  -->
+  @case (NavItemsType.Forms) {Forms }
+  <!--  -->
+  @case (NavItemsType.Automations) {Aaa }
+  <!--  -->
+  @case (NavItemsType.Workflows) { work}
+  <!--  -->
+  @case (NavItemsType.Interfaces) {inter }
+  <!--  -->
+  @case (NavItemsType.Experiments) {exp } }
+  <!--  -->
 </div>
