@@ -3,3 +3,5 @@ server/output**.json
 **/*.trash
 
 **/.DS_Store
+.vscode
+business
