@@ -1,8 +1,8 @@
 package main
 
 import (
-	"airport-mode/datastore"
 	"fmt"
+	"tableiq/datastore"
 )
 
 func MockStore() *datastore.Datastore {

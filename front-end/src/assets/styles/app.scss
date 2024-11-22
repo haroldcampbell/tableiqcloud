@@ -12,10 +12,11 @@
 }
 
 .app-page-no-padding {
-    // padding: 10px;
     display: flex;
     flex-direction: column;
-    // row-gap: 20px;
+    flex: 1 1 auto;
+    // height: 100%;
+    // border: solid 1px black;
 }
 
 .link-action {
@@ -43,4 +44,56 @@
         background: #f3f3f3;
         border-color: #e0e0e0;
     }
+}
+
+.overlay-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+
+    min-width: 100px;
+    padding: 10px;
+    margin: 0;
+
+    border: solid 1px #ccc;
+    border-radius: 5px;
+    background: #fff;
+    text-align: center;
+
+    .overlay-heading {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+
+        .overlay-title {
+            font-weight: 500;
+        }
+    }
+
+    .overlay-content {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        // justify-content: left;
+    }
+
+    .overlay-footer {
+        display: flex;
+        flex-direction: row;
+        justify-content: flex-end;
+
+        .actions-container {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            column-gap: 10px;
+
+            button {}
+
+            .action-cancel {}
+
+            .action-create {}
+        }
+    }
+
 }

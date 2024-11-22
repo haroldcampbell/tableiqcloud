@@ -1,78 +1,122 @@
-<div class="actions-container">
-  <ul class="action-group">
-    <li class="action-item">
-      <img class="ico" src="/assets/images/ico-views.png" alt="" /> Views
-    </li>
-    <li class="action-item">
-      <img class="ico" src="/assets/images/ico-projections.png" alt="" />
-      Projections
-    </li>
-    <li class="action-item">
-      <span class="action-group-separator">⎸</span>
-    </li>
-  </ul>
+<div class="host-container">
+  <div class="actions-container">
+    <ul class="action-group">
+      <li class="action-item">
+        <img class="ico" src="/assets/images/ico-views.png" alt="" /> Views
+      </li>
+      <li class="action-item">
+        <img class="ico" src="/assets/images/ico-projections.png" alt="" />
+        Projections
+      </li>
+      <li class="action-item">
+        <span class="action-group-separator">⎸</span>
+      </li>
+    </ul>
 
-  <ul class="action-group">
-    <li class="action-item">Main View</li>
-    <li class="action-item">
-      <img class="ico" src="/assets/images/ico-hide.png" alt="" /> Hide fields
-    </li>
-    <li class="action-item">
-      <img class="ico" src="/assets/images/ico-filter.png" alt="" /> Filter
-      fields
-    </li>
-    <li class="action-item">
-      <img class="ico" src="/assets/images/ico-sort.png" alt="" /> Sort
-    </li>
-    <!-- <li class="action-item">Color</li> -->
-    <li class="action-item">
-      <img class="ico" src="/assets/images/ico-share.png" alt="" /> Share and
-      sync
-    </li>
-  </ul>
+    <ul class="action-group">
+      <li class="action-item">Main View</li>
+      <li class="action-item">
+        <img class="ico" src="/assets/images/ico-hide.png" alt="" /> Hide fields
+      </li>
+      <li class="action-item">
+        <img class="ico" src="/assets/images/ico-filter.png" alt="" /> Filter
+        fields
+      </li>
+      <li class="action-item">
+        <img class="ico" src="/assets/images/ico-sort.png" alt="" /> Sort
+      </li>
+      <!-- <li class="action-item">Color</li> -->
+      <li class="action-item">
+        <img class="ico" src="/assets/images/ico-share.png" alt="" /> Share and
+        sync
+      </li>
+    </ul>
 
-  <ul class="action-group right-group">
-    <li class="action-item">
-      <img class="ico" src="/assets/images/ico-search.png" alt="" /> search
-    </li>
-  </ul>
-</div>
+    <ul class="action-group right-group">
+      <li class="action-item">
+        <img class="ico" src="/assets/images/ico-search.png" alt="" /> search
+      </li>
+    </ul>
+  </div>
 
-<div class="table-container">
-  <!-- DATA ROW HEADER -->
-  <div class="header-container">
-    @for (field of tableRecordData?.FieldsMetaData; track $index) {
-    <ul class="column-container">
-      <li class="row-header-item row-item">
-        <div class="data-item field-name">
-          {{ field.FieldName }}
+  <ul class="panels">
+    <li class="child-panel">stuff</li>
+    <li class="content-panel">
+      <div class="table-container">
+        <!-- DATA ROW HEADER -->
+        <div class="header-container">
+          @for (field of tableRecordData?.FieldsMetaData; track $index) {
+          <ul class="column-container">
+            <li class="row-header-item row-item">
+              <div class="data-item field-name">
+                {{ field.FieldName }}
+              </div>
+            </li>
+          </ul>
+          }
+          <!-- Add Filed -->
+          <ul class="column-container">
+            <li class="row-header-item row-item">
+              <div
+                class="data-item field-name action-item"
+                (click)="onAddField()"
+                cdkOverlayOrigin
+                #addFieldOverlay="cdkOverlayOrigin"
+              >
+                <img class="ico" src="/assets/images/ico-add.png" alt="" />Add
+                field
+              </div>
+              <ng-template
+                cdkConnectedOverlay
+                [cdkConnectedOverlayOrigin]="addFieldOverlay"
+                [cdkConnectedOverlayOpen]="isOpen"
+                (detach)="onAddFieldOverlayDetached()"
+                (overlayOutsideClick)="onAddFieldOverlayDetached()"
+              >
+                <app-add-field-overlay
+                  [baseGUID]="baseGUID!"
+                  [tableGUID]="selectedTableGUID!"
+                  (closePanel)="onAddFieldOverlayDetached()"
+                  (didClickCreate)="onCreateField($event)"
+                ></app-add-field-overlay>
+              </ng-template>
+              <!-- [matMenuTriggerFor]="screenView" -->
+              <!-- <mat-menu
+                #screenView="matMenu"
+                yPosition="above"
+                xPosition="before"
+                class="page-context-menu"
+              >
+                <div>This is a container</div>
+              </mat-menu> -->
+            </li>
+          </ul>
         </div>
-      </li>
-    </ul>
-    }
-  </div>
 
-  <!-- BODY -->
-  <div class="body-container">
-    @for (field of tableRecordData?.FieldsMetaData; track $index) {
-    <!--  -->
-    <ul class="column-container">
-      @for (columnData of columnValues(field); track $index) {
-      <!--  -->
-      <li class="row-item">
-        <div class="data-item">{{ columnData.DataValue }} &nbsp;</div>
-      </li>
-      }
-    </ul>
-    }
-  </div>
+        <!-- BODY -->
+        <div class="body-container">
+          @for (field of tableRecordData?.FieldsMetaData; track $index) {
+          <!-- Column  -->
+          <ul class="column-container">
+            @for (columnData of columnValues(field); track $index) {
+            <!--  Row -->
+            <li class="row-item">
+              <div class="data-item">{{ columnData.DataValue }}&nbsp;</div>
+            </li>
+            }
+          </ul>
+          }
+        </div>
 
-  <!-- FOOTER -->
-  <div class="footer-container"></div>
-</div>
-
-<div>
-  <ul class="end-actions-container">
-    <li class="action-item">Add Row</li>
+        <!-- FOOTER -->
+        <div class="footer-container">
+          <div>
+            <ul class="end-actions-container">
+              <li class="action-item">Add Row</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </li>
   </ul>
 </div>

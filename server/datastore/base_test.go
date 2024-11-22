@@ -1,7 +1,7 @@
 package datastore_test
 
 import (
-	"airport-mode/datastore"
+	"tableiq/datastore"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -37,11 +37,11 @@ func Test_ListTables(t *testing.T) {
 	assert.Equal(t, 3, count, "AddTable: should add tables")
 
 	list := base.ListTables()
-	assert.Equal(t, count, len(list), "ListTables: should return list of table info")
+	assert.Equal(t, count, len(list.TableInfoArray), "ListTables: should return list of table info")
 
 	for index, tableName := range tableNames {
-		assert.Equal(t, tableName, list[index].Name, "ListTables: TableInfo should have correct table name")
-		assert.NotEmpty(t, list[index].GUID, "ListTables: TableInfo  should have guid")
+		assert.Equal(t, tableName, list.TableInfoArray[index].Name, "ListTables: TableInfo should have correct table name")
+		assert.NotEmpty(t, list.TableInfoArray[index].GUID, "ListTables: TableInfo  should have guid")
 	}
 }
 

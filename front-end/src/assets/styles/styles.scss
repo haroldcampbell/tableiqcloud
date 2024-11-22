@@ -1,11 +1,18 @@
 /* You can add global styles to this file, and also import other style files */
+html,
 body {
-    font-family: "Roboto", "Open Sans", "PT Serif Caption", sans-serif;
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 300px;
-    line-height: 1.8em;
+    width: 100%;
     height: 100%;
+    display: flex;
+    flex-flow: column;
+}
+
+body {
+    font-family: "Roboto", "Open Sans", "PT Serif Caption", "Helvetica Neue", sans-serif;
+    // font-size: 12px !important;
+    // font-style: normal !important;
+    // font-weight: 300px !important;
+    // line-height: 1.8em !important;
     padding: 0;
     margin: 0;
     box-sizing: border-box;
@@ -14,6 +21,7 @@ body {
     color: #271c29;
     background-color: #fff;
 }
+
 
 textarea {
     resize: none;
@@ -34,6 +42,18 @@ li {
     list-style: none;
 }
 
-h2 {
-    font-size: 1.2em;
+
+.mat-typography-override {
+    font-size: 12px !important;
+    font-style: normal !important;
+    font-weight: 300px !important;
+    line-height: 1.8em !important;
+    letter-spacing: normal !important;
+
+    h2 {
+        font-size: 1.2em !important;
+        font-weight: 500;
+        padding: 0;
+        margin: 0;
+    }
 }

@@ -1,9 +1,9 @@
 package api
 
 import (
-	"airport-mode/datastore"
 	"fmt"
 	"net/http"
+	"tableiq/datastore"
 
 	"github.com/gin-gonic/gin"
 	"github.com/haroldcampbell/go_utils/utils"
@@ -54,5 +54,56 @@ func GetTableByGUID(d *datastore.Datastore) func(c *gin.Context) {
 		fmt.Printf("[GetTableByGUID] records:%v\n", utils.PrettyMongoString(records))
 
 		c.IndentedJSON(http.StatusOK, OkResponse("get-table", records))
+	}
+}
+
+type RequestDataCreateField struct {
+	BaseGUID  string
+	TableGUID string
+	FieldName string
+	FieldType string
+}
+
+func CreateTableField(d *datastore.Datastore) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var data RequestDataCreateField
+		err := c.BindJSON(&data)
+
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("create-table-field", http.StatusBadRequest, "Invalid field data"))
+			return
+		}
+
+		fieldType, err := datastore.StrToFieldType(data.FieldType)
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("create-table-field", http.StatusBadRequest, "Invalid field type"))
+			return
+		}
+
+		base, err := d.GetBaseByGUID(data.BaseGUID)
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("create-table-field", http.StatusBadRequest, "Unknown base"))
+			return
+		}
+
+		table, err := base.GetTableByGUID(data.TableGUID)
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("create-table-field", http.StatusBadRequest, "Unknown table"))
+			return
+		}
+
+		// TODO: validate data.FieldType bounds
+
+		fieldRecords, err := table.CreateTableFieldByName(data.FieldName, fieldType)
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("create-table-field", http.StatusBadRequest, err.Error()))
+			return
+		}
+
+		fmt.Printf("[CreateTableField] data:%v fieldRecords:%v\n", data, fieldRecords)
+		c.IndentedJSON(http.StatusOK, OkResponse("create-table-field", fieldRecords))
+
+		// Save the changes
+		base.DumpDataAsJSON(d)
 	}
 }

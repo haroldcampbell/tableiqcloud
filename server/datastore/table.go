@@ -2,6 +2,8 @@ package datastore
 
 import (
 	"errors"
+	"fmt"
+	"strings"
 	"time"
 
 	"github.com/haroldcampbell/go_utils/utils"
@@ -52,6 +54,14 @@ func (t *Table) GeLastCreatedRecordGUID() string {
 	return t._lastRecordGUID
 }
 
+func (t *Table) getRecordGUIDs() []string {
+	return t.RecordGUIDs
+}
+
+func (t *Table) GetRecordCount() int {
+	return len(t.RecordGUIDs)
+}
+
 func (t *Table) UpdateTableName(name string) {
 	t.Name = name
 }
@@ -65,7 +75,22 @@ func (t *Table) MarkTableForDeletion() {
 	t.IsDeleted = true
 }
 
+func (t *Table) CreateTableFieldByName(fieldName string, fieldType TableFieldType) (TableRecordData, error) {
+	f, err := t.AddTableField(NewField(fieldName, fieldType))
+	if err != nil {
+		return TableRecordData{}, err
+	}
+
+	return t.GetRecordsForField(f), nil
+}
+
 func (t *Table) AddTableField(field *TableField) (*TableField, error) {
+	// TODO: Validate the string name and lenght
+	field.MetaData.FieldName = strings.TrimSpace(field.MetaData.FieldName)
+	if field.MetaData.FieldName == "" {
+		field.MetaData.FieldName = fmt.Sprintf("Column_%d", len(t.FieldsNameIndex)+1)
+	}
+
 	// TODO: Ensure that field names are unique
 	_, ok := t.FieldsNameIndex[field.MetaData.FieldName]
 	if ok {
@@ -79,6 +104,10 @@ func (t *Table) AddTableField(field *TableField) (*TableField, error) {
 	t.Fields = append(t.Fields, field)
 	index := len(t.Fields) - 1
 	t.FieldsNameIndex[field.MetaData.FieldName] = index
+
+	// TODO: this is not efficient
+	// Initialize the records to nil values
+	field.InitFieldWithRecordGUIDs(t.RecordGUIDs)
 
 	return field, nil
 }
@@ -124,10 +153,6 @@ func (t *Table) GetRecordByGUID(recordGUID string) ([]*RecordCell, error) {
 	return recordCells, nil
 }
 
-func (t *Table) GetRecordCount() int {
-	return len(t.RecordGUIDs)
-}
-
 type TableFieldGUID = string
 type TableFieldArray = []*FieldData
 type TableRecordData struct {
@@ -138,23 +163,19 @@ type TableRecordData struct {
 	ColumnValues   map[TableFieldGUID]TableFieldArray // TableField.GUID -> []FieldData
 }
 
-// GetRecords returns a slice of records
-func (t *Table) GetRecords() TableRecordData {
-	records := TableRecordData{
+func (t *Table) NewTableRecordData() TableRecordData {
+	return TableRecordData{
 		GUID:           t.GUID,
 		Name:           t.Name,
-		RecordGUIDs:    []string{},
+		RecordGUIDs:    t.RecordGUIDs, // Grab all of the record GUIDs.
 		FieldsMetaData: []*FieldMetaData{},
 		ColumnValues:   map[TableFieldGUID]TableFieldArray{},
 	}
+}
 
-	// recordCount := len(t.RecordGUIDs)
-	// targetSize := startIndex + count
-	// if targetSize <= recordCount {
-	// 	records.RecordGUIDs = t.RecordGUIDs[targetSize:]
-	// } else {
-	// 	//Fix this	``
-	// }
+// GetRecords returns a slice of records
+func (t *Table) GetRecords() TableRecordData {
+	records := t.NewTableRecordData()
 
 	// Returns the meta data
 	for _, f := range t.Fields {
@@ -162,9 +183,16 @@ func (t *Table) GetRecords() TableRecordData {
 		records.ColumnValues[f.MetaData.FieldGUID] = f.FieldData
 	}
 
-	// TODO: Implement paging
-	// Grab all of the record GUIDs.
-	records.RecordGUIDs = t.RecordGUIDs
+	return records
+}
+
+// GetRecords returns a slice of records
+func (t *Table) GetRecordsForField(f *TableField) TableRecordData {
+	records := t.NewTableRecordData()
+
+	// Returns the meta data
+	records.FieldsMetaData = append(records.FieldsMetaData, f.MetaData)
+	records.ColumnValues[f.MetaData.FieldGUID] = f.FieldData
 
 	return records
 }

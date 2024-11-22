@@ -1,19 +1,25 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../api.services/api.service';
-import { FieldMetaData, TableRecordData } from '../../../models/models.datastore';
+import { FieldMetaData, RequestDataCreateField, TableRecordData } from '../../../models/models.datastore';
 import { hasString } from '../../../core/utils';
+import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { AddFieldOverlayComponent } from '../../../pages/bases/view-data/ui/add-field-overlay/add-field-overlay.component';
+import { CoreModule } from '../../../modules/core.module';
 
 @Component({
 	selector: 'ui-viewtable',
 	standalone: true,
-	imports: [],
+	imports: [
+		CoreModule,
+		AddFieldOverlayComponent
+	],
 	templateUrl: './viewtable.component.html',
 	styleUrl: './viewtable.component.scss'
 })
 export class ViewTableComponent implements OnInit {
 	tableRecordData?: TableRecordData;
-
+	isOpen = false;
 	@Input() baseGUID?: string;
 
 	@Input()
@@ -31,6 +37,7 @@ export class ViewTableComponent implements OnInit {
 		private apiService: APIService,
 		public router: Router,
 		private route: ActivatedRoute,
+		private overlay: Overlay,
 
 	) { }
 
@@ -80,6 +87,40 @@ export class ViewTableComponent implements OnInit {
 
 	onNavigateToTable() {
 		this.router.navigate(['/']);
+	}
 
+	onAddField() {
+		console.log("did click on Add Field")
+		this.isOpen = true;//!this.isOpen
+	}
+
+	onAddFieldOverlayDetached() {
+		this.isOpen = false;
+	}
+
+	onCreateField(data: RequestDataCreateField) {
+		this.isOpen = false;
+		console.log("[onCreateField] data:", data);
+
+		this.apiService.apiRequests.createTableField(data).subscribe({
+			next: (data) => {
+				console.log("[onCreateField] data: ", data);
+				this.updateTableRecord(data);
+			},
+			error: (err) => {
+				console.log("[onCreateField] err: ", err);
+			}
+		});
+	}
+
+	updateTableRecord(data: TableRecordData) {
+		if (this.tableRecordData?.GUID != data.GUID) {
+			// TODO: show data-consistency error
+			return;
+		}
+
+		const metaData = data.FieldsMetaData[0];
+		this.tableRecordData.FieldsMetaData.push(metaData);
+		this.tableRecordData.ColumnValues[metaData.FieldGUID] = data.ColumnValues[metaData.FieldGUID];
 	}
 }

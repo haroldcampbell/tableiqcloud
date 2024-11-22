@@ -1,6 +1,10 @@
 package datastore
 
-import "github.com/haroldcampbell/go_utils/utils"
+import (
+	"errors"
+
+	"github.com/haroldcampbell/go_utils/utils"
+)
 
 type TableFieldType int
 
@@ -11,6 +15,22 @@ const (
 	FieldTypeText // To hold markdown data
 	FieldTypeRelationship
 )
+
+var fieldTypeStrMap = map[string]TableFieldType{
+	`String`:       FieldTypeString,
+	`Number`:       FieldTypeNumber,
+	`Date`:         FieldTypeDate,
+	`Text`:         FieldTypeText,
+	`Relationship`: FieldTypeRelationship,
+}
+
+func StrToFieldType(fieldTypeStr string) (TableFieldType, error) {
+	if t, ok := fieldTypeStrMap[fieldTypeStr]; ok {
+		return t, nil
+	}
+
+	return -1, errors.New("Invalid field type")
+}
 
 type MetaFieldTypeString struct {
 	maxStrLength int

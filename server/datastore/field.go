@@ -91,6 +91,21 @@ func newFieldData(recordGUID string, newValue interface{}) *FieldData {
 	}
 }
 
+// InitFieldWithRecordGUIDs resets the Field's FieldData to n empty values and sets the
+// recordGUID for each empty FieldData
+func (f *TableField) InitFieldWithRecordGUIDs(recordGUIDs []string) {
+	var nilValue interface{}
+
+	f.FieldData = make([]*FieldData, 0)
+	f.FieldDataGUIDMap = map[string]*FieldData{}
+
+	for _, recordGUID := range recordGUIDs {
+		data := newFieldData(recordGUID, nilValue)
+		f.FieldData = append(f.FieldData, data)
+		f.FieldDataGUIDMap[recordGUID] = data
+	}
+}
+
 func (f *TableField) InsertValueAtIndex(targetIndex int, recordGUID string, newValue interface{}) {
 	data := newFieldData(recordGUID, newValue)
 	f.FieldData = insertCellData(f.FieldData, data, targetIndex)

@@ -1,7 +1,7 @@
 import { HttpClient, HttpRequest } from "@angular/common/http";
 import { EMPTY, map, of, tap } from "rxjs";
 import { APIServerResponse } from "../models/models.server";
-import { Base, BaseTableInfo, TableInfo, TableRecordData } from "../models/models.datastore";
+import { Base, BaseTableInfo, RequestDataCreateField, TableInfo, TableRecordData } from "../models/models.datastore";
 
 
 export class APIRequests {
@@ -48,6 +48,19 @@ export class APIRequests {
 
 	getTableByGUID(baseGUID: string, tableGUID: string) {
 		return this.http.get<APIServerResponse<TableRecordData>>(`/api/table/${baseGUID}/${tableGUID}`)
+			.pipe(
+				map(resp => {
+					if (!resp.successStatus || resp.jsonBody === null) {
+						throw resp.message;
+					}
+
+					return resp.jsonBody;
+				}),
+			);
+	}
+
+	createTableField(data: RequestDataCreateField) {
+		return this.http.post<APIServerResponse<TableRecordData>>(`/api/field/new`, data)
 			.pipe(
 				map(resp => {
 					if (!resp.successStatus || resp.jsonBody === null) {

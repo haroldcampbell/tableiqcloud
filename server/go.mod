@@ -1,4 +1,4 @@
-module airport-mode
+module tableiq
 
 go 1.19
 

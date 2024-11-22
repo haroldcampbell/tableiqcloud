@@ -63,43 +63,46 @@
     </div>
   </div>
 
-  @switch (selectedNavItem) {
-  <!--  -->
-  @case (NavItemsType.Data) {
-  <div class="content-nav-container">
-    <ul class="table-name-container">
-      @for(item of tables; track item.GUID) {
-      <li
-        class="item"
-        (click)="onSelectTable(item.GUID)"
-        [id]="item.GUID"
-        [class.is-selected]="isSelectedTabled(item.GUID)"
-      >
-        {{ item.Name }}
-      </li>
-      } @empty {
-      <li>No tables. Create a new table</li>
-      }
-      <li class="item">
-        <img class="ico" src="/assets/images/ico-add.png" /> Add or Import
-      </li>
-    </ul>
+  <div class="content-body">
+    @switch (selectedNavItem) {
+    <!--  -->
+    @case (NavItemsType.Data) {
+    <div class="content-nav-container">
+      <ul class="table-name-container">
+        @for(item of tables; track item.GUID) {
+        <li
+          class="item"
+          (click)="onSelectTable(item.GUID)"
+          [id]="item.GUID"
+          [class.is-selected]="isSelectedTabled(item.GUID)"
+        >
+          {{ item.Name }}
+        </li>
+        } @empty {
+        <li>No tables. Create a new table</li>
+        }
+        <li class="item">
+          <img class="ico" src="/assets/images/ico-add.png" /> Add or Import
+        </li>
+      </ul>
+    </div>
+    @if (selectedTableGUID) {
+    <ui-viewtable
+      [baseGUID]="baseGUID!"
+      [selectedTableGUID]="selectedTableGUID"
+    ></ui-viewtable>
+    } }
+
+    <!--  -->
+    @case (NavItemsType.Forms) {Forms }
+    <!--  -->
+    @case (NavItemsType.Automations) {Aaa }
+    <!--  -->
+    @case (NavItemsType.Workflows) { work}
+    <!--  -->
+    @case (NavItemsType.Interfaces) {inter }
+    <!--  -->
+    @case (NavItemsType.Experiments) {exp } }
+    <!--  -->
   </div>
-  @if (selectedTableGUID) {
-  <ui-viewtable
-    [baseGUID]="baseGUID!"
-    [selectedTableGUID]="selectedTableGUID"
-  ></ui-viewtable>
-  } }
-  <!--  -->
-  @case (NavItemsType.Forms) {Forms }
-  <!--  -->
-  @case (NavItemsType.Automations) {Aaa }
-  <!--  -->
-  @case (NavItemsType.Workflows) { work}
-  <!--  -->
-  @case (NavItemsType.Interfaces) {inter }
-  <!--  -->
-  @case (NavItemsType.Experiments) {exp } }
-  <!--  -->
 </div>

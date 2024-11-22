@@ -29,6 +29,37 @@ export enum TableFieldType {
 	FieldTypeRelationship
 }
 
+// TableFieldType as string
+export enum StringifiedFieldType {
+	FieldTypeString = "String",
+	FieldTypeNumber = "Number",
+	FieldTypeDate = "Date"
+}
+
+
+// TODO: Optimize this so that we can rely on typescript to make this conversion automatically
+export function StringifiedFieldTypeToType(s: StringifiedFieldType): TableFieldType {
+	switch (s) {
+		case StringifiedFieldType.FieldTypeString:
+			return TableFieldType.FieldTypeString;
+
+		case StringifiedFieldType.FieldTypeNumber:
+			return TableFieldType.FieldTypeNumber;
+
+		case StringifiedFieldType.FieldTypeDate:
+			return TableFieldType.FieldTypeDate;
+
+		// case StringifiedFieldType.FieldTypeDate:
+		// 	return TableFieldType.FieldTypeText;
+
+		// case StringifiedFieldType.FieldTypeDate:
+		// 	return TableFieldType.FieldTypeRelationship;
+
+	}
+
+	return TableFieldType.FieldTypeString
+}
+
 export interface FieldMetaData {
 	tableGUID: string; // Guid for the parent table
 
@@ -96,4 +127,13 @@ export interface BaseTableInfo {
 	GUID: string;
 	Name: string;
 	TableInfoArray: TableInfo[];
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+export interface RequestDataCreateField {
+	BaseGUID: string;
+	TableGUID: string;
+	FieldName: string;
+	FieldType: StringifiedFieldType;
 }

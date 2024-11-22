@@ -14,7 +14,7 @@ export enum NavItems {
 	Experiments
 }
 @Component({
-	selector: 'app-tables',
+	selector: 'base-tables',
 	standalone: true,
 	imports: [ViewTableComponent],
 	templateUrl: './base-tables.component.html',

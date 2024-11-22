@@ -1,7 +1,7 @@
 package datastore_test
 
 import (
-	"airport-mode/datastore"
+	"tableiq/datastore"
 	"testing"
 
 	"github.com/stretchr/testify/assert"

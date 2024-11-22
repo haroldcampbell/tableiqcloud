@@ -1,0 +1,84 @@
+<div class="overlay-container">
+  <!-- <div class="overlay-heading"> -->
+  <!-- <div class="overlay-title">Add field</div> -->
+  <!-- </div> -->
+  <div class="overlay-content">
+    <!-- Field name -->
+    <div class="field-item">
+      <!-- [value]="fieldName" -->
+      <input
+        id="field-name"
+        [value]="fieldName"
+        [(ngModel)]="fieldName"
+        type="text"
+        placeholder="Enter field name"
+      />
+    </div>
+
+    <div
+      [class]="disSelectedField == false ? 'field-item-hidden' : 'field-item'"
+    >
+      <mat-select
+        #matSelect
+        name="field-type"
+        class="item-select"
+        [value]="selectedFieldType"
+        (selectionChange)="onFieldTypeChanged(matSelect, $event)"
+      >
+        <mat-option
+          class="mat-option-reset"
+          [value]="FieldType.FieldTypeString"
+          selected
+        >
+          Single line text
+        </mat-option>
+        <mat-option
+          class="mat-option-reset"
+          [value]="FieldType.FieldTypeNumber"
+        >
+          {{ FieldType.FieldTypeNumber }}
+        </mat-option>
+        <mat-option class="mat-option-reset" [value]="FieldType.FieldTypeDate">
+          {{ FieldType.FieldTypeDate }}
+        </mat-option>
+      </mat-select>
+    </div>
+    <!-- Select field type -->
+
+    <ul
+      [class]="disSelectedField == false ? 'field-item' : 'field-item-hidden'"
+    >
+      <li
+        class="list-item"
+        (click)="onSelectFieldType(FieldType.FieldTypeString)"
+      >
+        Single line text
+      </li>
+      <li
+        class="list-item"
+        (click)="onSelectFieldType(FieldType.FieldTypeNumber)"
+      >
+        {{ FieldType.FieldTypeNumber }}
+      </li>
+      <li
+        class="list-item"
+        (click)="onSelectFieldType(FieldType.FieldTypeDate)"
+      >
+        {{ FieldType.FieldTypeDate }}
+      </li>
+    </ul>
+  </div>
+
+  <div class="overlay-footer">
+    <ul class="actions-container">
+      <li>
+        <button class="action-cancel" (click)="onCancel()">Cancel</button>
+      </li>
+      <li>
+        <button class="action-create" (click)="onApplyChanges()">
+          Create field
+        </button>
+      </li>
+    </ul>
+  </div>
+</div>
