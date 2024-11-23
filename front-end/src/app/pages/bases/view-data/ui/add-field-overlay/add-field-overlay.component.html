@@ -47,24 +47,37 @@
     <!-- Select field type -->
 
     <ul
-      [class]="disSelectedField == false ? 'field-item' : 'field-item-hidden'"
+      [class]="
+        disSelectedField == false
+          ? 'field-item narrow-item'
+          : 'field-item-hidden'
+      "
     >
       <li
         class="list-item"
         (click)="onSelectFieldType(FieldType.FieldTypeString)"
       >
+        <span>
+          <img class="ico" src="/assets/images/ico-field-string.png" alt=""
+        /></span>
         Single line text
       </li>
       <li
         class="list-item"
         (click)="onSelectFieldType(FieldType.FieldTypeNumber)"
       >
+        <span>
+          <img class="ico" src="/assets/images/ico-field-number.png" alt=""
+        /></span>
         {{ FieldType.FieldTypeNumber }}
       </li>
       <li
         class="list-item"
         (click)="onSelectFieldType(FieldType.FieldTypeDate)"
       >
+        <span>
+          <img class="ico" src="/assets/images/ico-field-date.png" alt=""
+        /></span>
         {{ FieldType.FieldTypeDate }}
       </li>
     </ul>

@@ -32,6 +32,8 @@ func GetTables(d *datastore.Datastore) func(c *gin.Context) {
 	}
 }
 
+// Continue from here.
+// figure out why the FieldType is not being set
 func GetTableByGUID(d *datastore.Datastore) func(c *gin.Context) {
 	return func(c *gin.Context) {
 		baseGUID := c.Param("baseGUID")

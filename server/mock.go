@@ -24,11 +24,15 @@ func MockStore() *datastore.Datastore {
 	return store
 }
 
-func createModelData(base *datastore.Base, tableName string, fieldNames []string, data [][]string) {
+func createModelData(base *datastore.Base, tableName string, fieldNames []string, fieldTypes []datastore.TableFieldType, data [][]any) {
 	table := datastore.NewTable(tableName)
 
-	for _, name := range fieldNames {
-		table.AddTableField(datastore.NewField(name, datastore.FieldTypeString))
+	if len(fieldTypes) != len(fieldNames) {
+		panic("The length of field type and field names should be the same")
+	}
+
+	for index, name := range fieldNames {
+		table.AddTableField(datastore.NewField(name, fieldTypes[index]))
 	}
 
 	for _, rowData := range data {
@@ -42,20 +46,45 @@ func createModelData(base *datastore.Base, tableName string, fieldNames []string
 	base.AddTable(table)
 }
 
+type fType datastore.TableFieldType
+
+const FieldTypeString = datastore.FieldTypeString
+const FieldTypeText = datastore.FieldTypeText
+const FieldTypeNumber = datastore.FieldTypeNumber
+const FieldTypeDate = datastore.FieldTypeDate
+const FieldTypeRelationship = datastore.FieldTypeRelationship
+
 func CreateMockAccounts(base *datastore.Base) {
+	fieldTypes := []datastore.TableFieldType{
+		FieldTypeString,
+		FieldTypeText,
+		FieldTypeString,
+		FieldTypeString,
+	}
 	fieldNames := []string{"Company", "Address", "Country", "Industry"}
-	data := [][]string{
+	data := [][]any{
 		{"UWI Mona", "Mona, Kingston", "Jamaica", "University"},
 		{"Grace Science Lab", "15 Abby Rd, Bookfield", "Turkey", "Medical Research"},
 		{"Heart Trust", "Apt 22, Court Lane, 9982-1129", "Canada", "GeoScience"},
 	}
 
-	createModelData(base, "Accounts", fieldNames, data)
+	createModelData(base, "Accounts", fieldNames, fieldTypes, data)
 }
 
 func CreateMockContacts(base *datastore.Base) {
+	fieldTypes := []datastore.TableFieldType{
+		FieldTypeString,
+		FieldTypeText,
+		FieldTypeString,
+		FieldTypeString,
+		FieldTypeString,
+		FieldTypeString,
+		FieldTypeString,
+		FieldTypeDate,
+		FieldTypeString,
+	}
 	fieldNames := []string{"Name", "Company", "City", "Country", "Phone 1", "Phone 2", "Email", "DOB", "Website"}
-	data := [][]string{
+	data := [][]any{
 		{"John Snow", "Amazon.com", "The Wall", "Northlands", "", "", "", "1950/12/03", ""},
 		{"Rick Adison", "Bank of Turkey", "15 Abby Rd, Bookfield", "Turkey", "", "", "", "1983/09/23", ""},
 		{"Joy Springland", "Happy Books", "Apt 22, Court Lane, 9982-1129", "Canada", "", "", "", "1995/07/07", ""},
@@ -68,16 +97,21 @@ func CreateMockContacts(base *datastore.Base) {
 		{"Darren Peck", "Lester, Woodard and Mitchell", "Lake Ana", "Pitcairn Islands", "(496)452-6181x3291", "+1-247-266-0963x4995", "tgates@cantrell.com", "24/08/2021", "https://www.le.com/"},
 	}
 
-	createModelData(base, "Contacts", fieldNames, data)
+	createModelData(base, "Contacts", fieldNames, fieldTypes, data)
 }
 
 func CreateMockTasks(base *datastore.Base) {
-	fieldNames := []string{"Title", "Description"}
-	var data [][]string = [][]string{
-		{"Select trip", "Where do we want to go"},
-		{"Do Purcahse", "Buy the ticket"},
-		{"Enjoy vacation", "Go to the place and have fun"},
+	fieldTypes := []datastore.TableFieldType{
+		FieldTypeString,
+		FieldTypeText,
+		FieldTypeNumber,
+	}
+	fieldNames := []string{"Title", "Description", "Priority"}
+	data := [][]any{
+		{"Select trip", "Where do we want to go", 1},
+		{"Do Purcahse", "Buy the ticket", 2},
+		{"Enjoy vacation", "Go to the place and have fun", 5},
 	}
 
-	createModelData(base, "Tasks", fieldNames, data)
+	createModelData(base, "Tasks", fieldNames, fieldTypes, data)
 }

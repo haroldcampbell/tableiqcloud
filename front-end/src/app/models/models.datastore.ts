@@ -21,8 +21,10 @@ export interface TableInfo {
 // 	return data
 // }
 
+const iota = 0;
+
 export enum TableFieldType {
-	FieldTypeString = 1,
+	FieldTypeString = iota,
 	FieldTypeNumber,
 	FieldTypeDate,
 	FieldTypeText, // To hold markdown data

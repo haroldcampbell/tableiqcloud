@@ -179,6 +179,7 @@ func (t *Table) GetRecords() TableRecordData {
 
 	// Returns the meta data
 	for _, f := range t.Fields {
+		fmt.Printf("[GetRecords] f.MetaData: %#v\n", f.MetaData)
 		records.FieldsMetaData = append(records.FieldsMetaData, f.MetaData)
 		records.ColumnValues[f.MetaData.FieldGUID] = f.FieldData
 	}

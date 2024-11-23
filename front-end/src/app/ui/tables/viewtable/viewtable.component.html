@@ -53,7 +53,14 @@
                 cdkOverlayOrigin
                 #fieldContextOverlay="cdkOverlayOrigin"
               >
-                <li class="field-name">{{ field.FieldName }}</li>
+                <li class="field-name">
+                  <img
+                    class="ico"
+                    src="/assets/images/{{ fieldTypeToImg(field) }}.png"
+                    alt=""
+                  />
+                  {{ field.FieldName }}
+                </li>
                 <li
                   class="action-item"
                   (click)="onOpenFieldContextMenu(field.FieldGUID)"

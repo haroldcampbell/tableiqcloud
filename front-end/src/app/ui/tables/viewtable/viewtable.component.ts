@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../api.services/api.service';
-import { FieldMetaData, RequestDataCreateField, TableRecordData } from '../../../models/models.datastore';
+import { FieldMetaData, RequestDataCreateField, TableFieldType, TableRecordData } from '../../../models/models.datastore';
 import { hasString } from '../../../core/utils';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { AddFieldOverlayComponent } from '../../../pages/bases/view-data/ui/add-field-overlay/add-field-overlay.component';
@@ -22,6 +22,7 @@ import { FieldContextMenuOverlayComponent } from '../../../pages/bases/view-data
 export class ViewTableComponent implements OnInit {
 	activeContextMenu = "";
 	tableRecordData?: TableRecordData;
+	private fieldTypeImgMap!: Map<TableFieldType, string>;
 
 	@Input() baseGUID?: string;
 
@@ -30,7 +31,6 @@ export class ViewTableComponent implements OnInit {
 		return this.tableGUID;
 	}
 	set selectedTableGUID(value: string) {
-		console.log("[ViewTableComponent] selectedTableGUID:", value)
 		this.tableGUID = value;
 		this.loadTableData();
 	}
@@ -49,25 +49,13 @@ export class ViewTableComponent implements OnInit {
 	) { }
 
 	ngOnInit(): void {
-		// const routeParams = this.route.snapshot.paramMap;
-		// const baseGUID = routeParams.get("baseGUID");
-		// console.log("[].ngOnInit baseGUID:", baseGUID)
-
-		// if (this.tableGUID == null) {
-		// 	// TODO: Navigate to error if tableGUID is null
-		// 	return
-		// }
-
-		// console.log("[ViewTableComponent] tableGUID:", this.tableGUID);
-		// this.apiService.apiRequests.getTableByGUID(this.tableGUID).subscribe({
-		// 	next: (data) => {
-		// 		console.log("[ViewTableComponent] data: ", data);
-		// 		this.tableRecordData = data;
-		// 	},
-		// 	error: (err) => {
-		// 		console.log("[ViewTableComponent] err: ", err);
-		// 	}
-		// })
+		this.fieldTypeImgMap = new Map<TableFieldType, string>([
+			[TableFieldType.FieldTypeString, "ico-field-string"],
+			[TableFieldType.FieldTypeNumber, "ico-field-number"],
+			[TableFieldType.FieldTypeDate, "ico-field-date"],
+			[TableFieldType.FieldTypeText, "ico-field-text"],
+			[TableFieldType.FieldTypeRelationship, "ico-field-relationship"],
+		]);
 	}
 
 	private loadTableData() {
@@ -76,10 +64,10 @@ export class ViewTableComponent implements OnInit {
 			return
 		}
 
-		console.log("[loadTableData] tableGUID:", this.tableGUID);
+		// console.log("[loadTableData] tableGUID:", this.tableGUID);
 		this.apiService.apiRequests.getTableByGUID(this.baseGUID!, this.tableGUID!).subscribe({
 			next: (data) => {
-				console.log("[ViewTableComponent] data: ", data);
+				// console.log("[ViewTableComponent] data: ", data);
 				this.tableRecordData = data;
 			},
 			error: (err) => {
@@ -90,6 +78,12 @@ export class ViewTableComponent implements OnInit {
 
 	columnValues(field: FieldMetaData) {
 		return this.tableRecordData!.ColumnValues[field.FieldGUID]
+	}
+
+	// return the ico name for the field
+	fieldTypeToImg(f: FieldMetaData) {
+		// console.log("[fieldTypeToImg] f:", f)
+		return this.fieldTypeImgMap.get(f.FieldType) ?? ""
 	}
 
 	onNavigateToTable() {
