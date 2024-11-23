@@ -127,11 +127,21 @@
                 }
 
                 .action-item {
+                    display: flex;
+                    align-items: center;
                     cursor: pointer;
                     border-radius: 2px;
-                    padding: 0 5px;
-                    border: solid 1px #d0d0d0;
-                    opacity: 0;
+                    border: solid 1px transparent;
+                    // opacity: 0;
+
+                    .ico {
+                        padding: 5px;
+                        opacity: 0.25;
+                        width: 10px;
+                        height: 10px;
+                        // width: 0.8em;
+                        // height: 80%;
+                    }
                 }
 
                 .action-item:hover {
@@ -141,15 +151,18 @@
 
             .data-item:hover {
                 .action-item {
-                    opacity: 1;
                     border-color: #d0d0d0;
+
+                    .ico {
+                        opacity: 1;
+                    }
                 }
             }
 
             .action-item {
                 cursor: pointer;
                 border-radius: 2px;
-                border: solid 1px transparent;
+                // border: solid 1px transparent;
             }
 
             .action-item:hover {
