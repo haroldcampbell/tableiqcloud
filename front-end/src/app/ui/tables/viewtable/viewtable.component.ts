@@ -3,23 +3,26 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../api.services/api.service';
 import { FieldMetaData, RequestDataCreateField, TableRecordData } from '../../../models/models.datastore';
 import { hasString } from '../../../core/utils';
-import { Overlay, OverlayRef } from '@angular/cdk/overlay';
+import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { AddFieldOverlayComponent } from '../../../pages/bases/view-data/ui/add-field-overlay/add-field-overlay.component';
 import { CoreModule } from '../../../modules/core.module';
+import { FieldContextMenuOverlayComponent } from '../../../pages/bases/view-data/ui/field-context-menu-overlay/field-context-menu-overlay.component';
 
 @Component({
 	selector: 'ui-viewtable',
 	standalone: true,
 	imports: [
 		CoreModule,
-		AddFieldOverlayComponent
+		AddFieldOverlayComponent,
+		FieldContextMenuOverlayComponent
 	],
 	templateUrl: './viewtable.component.html',
 	styleUrl: './viewtable.component.scss'
 })
 export class ViewTableComponent implements OnInit {
+	activeContextMenu = "";
 	tableRecordData?: TableRecordData;
-	isOpen = false;
+
 	@Input() baseGUID?: string;
 
 	@Input()
@@ -32,6 +35,10 @@ export class ViewTableComponent implements OnInit {
 		this.loadTableData();
 	}
 	private tableGUID?: string;
+
+	get AddFieldAction() {
+		return "__add-field-action";
+	}
 
 	constructor(
 		private apiService: APIService,
@@ -89,17 +96,22 @@ export class ViewTableComponent implements OnInit {
 		this.router.navigate(['/']);
 	}
 
-	onAddField() {
+	isFieldContextMenuOpen(conextID: string) {
+		return this.activeContextMenu == conextID;
+	}
+
+	// @conextID either the fieldID or the value '__add-field-action'
+	onOpenFieldContextMenu(conextID: string) {
 		console.log("did click on Add Field")
-		this.isOpen = true;//!this.isOpen
+		this.activeContextMenu = conextID;
 	}
 
 	onAddFieldOverlayDetached() {
-		this.isOpen = false;
+		this.activeContextMenu = "";
 	}
 
 	onCreateField(data: RequestDataCreateField) {
-		this.isOpen = false;
+		this.onAddFieldOverlayDetached();
 		console.log("[onCreateField] data:", data);
 
 		this.apiService.apiRequests.createTableField(data).subscribe({
@@ -122,5 +134,12 @@ export class ViewTableComponent implements OnInit {
 		const metaData = data.FieldsMetaData[0];
 		this.tableRecordData.FieldsMetaData.push(metaData);
 		this.tableRecordData.ColumnValues[metaData.FieldGUID] = data.ColumnValues[metaData.FieldGUID];
+	}
+
+	onEditField(e: FieldMetaData) {
+		console.log("[onEditField] event:", e)
+	}
+	onDeleteField(e: FieldMetaData) {
+		console.log("[onDeleteField] event:", e)
 	}
 }

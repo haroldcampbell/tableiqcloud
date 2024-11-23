@@ -1,0 +1,34 @@
+.overlay-content {
+    row-gap: 5px;
+    min-width: 200px;
+
+    &>::ng-deep div {
+        display: flex;
+        flex-direction: row;
+        flex: 1 1 auto;
+        padding: 2px 5px;
+    }
+
+    &>::ng-deep div:hover {
+        background-color: #d1d1d1;
+    }
+
+    ::ng-deep hr {
+        padding: 0;
+        margin: 0;
+        border: none;
+        width: 100%;
+        border-top: solid 1px #d1d1d1;
+    }
+
+    ::ng-deep hr:hover {
+        background-color: unset;
+    }
+}
+
+.mat-option-reset {
+    padding: 5px 5px !important;
+    font-size: 14px !important;
+    min-height: unset !important;
+    height: unset !important;
+}

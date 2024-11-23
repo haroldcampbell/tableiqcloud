@@ -1,0 +1,11 @@
+<div class="overlay-container">
+  <div class="overlay-content">
+    <div (click)="editField.emit(field)">Edit field</div>
+    <ng-content></ng-content>
+    <!-- <hr /> -->
+    <!-- <div>Sort field</div> -->
+    <!-- <div>Hide field</div> -->
+    <hr />
+    <div (click)="deleteField.emit(field)">Delete field</div>
+  </div>
+</div>

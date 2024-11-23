@@ -48,47 +48,57 @@
           @for (field of tableRecordData?.FieldsMetaData; track $index) {
           <ul class="column-container">
             <li class="row-header-item row-item">
-              <div class="data-item field-name">
-                {{ field.FieldName }}
-              </div>
+              <ul
+                class="data-item"
+                cdkOverlayOrigin
+                #fieldContextOverlay="cdkOverlayOrigin"
+              >
+                <li class="field-name">{{ field.FieldName }}</li>
+                <li
+                  class="action-item"
+                  (click)="onOpenFieldContextMenu(field.FieldGUID)"
+                >
+                  v
+                </li>
+              </ul>
             </li>
           </ul>
+
+          <!-- Field context menu template -->
+          <ng-template
+            cdkConnectedOverlay
+            [cdkConnectedOverlayOrigin]="fieldContextOverlay"
+            [cdkConnectedOverlayOpen]="isFieldContextMenuOpen(field.FieldGUID)"
+            (detach)="onAddFieldOverlayDetached()"
+            (overlayOutsideClick)="onAddFieldOverlayDetached()"
+          >
+            <app-field-context-menu-overlay
+              [field]="field"
+              (editField)="onEditField($event)"
+              (deleteField)="onDeleteField($event)"
+            >
+              <hr />
+              <div>stuff 1</div>
+              <div>stuff 2</div>
+              <div>stuff 3</div>
+            </app-field-context-menu-overlay>
+          </ng-template>
+
           }
           <!-- Add Filed -->
           <ul class="column-container">
-            <li class="row-header-item row-item">
-              <div
-                class="data-item field-name action-item"
-                (click)="onAddField()"
+            <li class="row-item">
+              <ul
+                class="data-item action-item"
+                (click)="onOpenFieldContextMenu(AddFieldAction)"
                 cdkOverlayOrigin
                 #addFieldOverlay="cdkOverlayOrigin"
               >
-                <img class="ico" src="/assets/images/ico-add.png" alt="" />Add
-                field
-              </div>
-              <ng-template
-                cdkConnectedOverlay
-                [cdkConnectedOverlayOrigin]="addFieldOverlay"
-                [cdkConnectedOverlayOpen]="isOpen"
-                (detach)="onAddFieldOverlayDetached()"
-                (overlayOutsideClick)="onAddFieldOverlayDetached()"
-              >
-                <app-add-field-overlay
-                  [baseGUID]="baseGUID!"
-                  [tableGUID]="selectedTableGUID!"
-                  (closePanel)="onAddFieldOverlayDetached()"
-                  (didClickCreate)="onCreateField($event)"
-                ></app-add-field-overlay>
-              </ng-template>
-              <!-- [matMenuTriggerFor]="screenView" -->
-              <!-- <mat-menu
-                #screenView="matMenu"
-                yPosition="above"
-                xPosition="before"
-                class="page-context-menu"
-              >
-                <div>This is a container</div>
-              </mat-menu> -->
+                <li class="field-name">
+                  <img class="ico" src="/assets/images/ico-add.png" alt="" />Add
+                  field
+                </li>
+              </ul>
             </li>
           </ul>
         </div>
@@ -120,3 +130,19 @@
     </li>
   </ul>
 </div>
+
+<!-- Add Field Template -->
+<ng-template
+  cdkConnectedOverlay
+  [cdkConnectedOverlayOrigin]="addFieldOverlay"
+  [cdkConnectedOverlayOpen]="isFieldContextMenuOpen(AddFieldAction)"
+  (detach)="onAddFieldOverlayDetached()"
+  (overlayOutsideClick)="onAddFieldOverlayDetached()"
+>
+  <app-add-field-overlay
+    [baseGUID]="baseGUID!"
+    [tableGUID]="selectedTableGUID!"
+    (closePanel)="onAddFieldOverlayDetached()"
+    (didClickCreate)="onCreateField($event)"
+  ></app-add-field-overlay>
+</ng-template>
