@@ -68,9 +68,8 @@ export class ViewTableComponent implements OnInit {
 		// console.log("[loadTableData] tableGUID:", this.tableGUID);
 		this.apiService.apiRequests.getTableByGUID(this.baseGUID!, this.tableGUID!).subscribe({
 			next: (data) => {
-				console.log("[ViewTableComponent] data: ", data);
+				// console.log("[ViewTableComponent] data: ", data);
 				this.tableRecordData = data;
-				// this.tableRecordData.ColumnValues = new Map(Object.entries(this.tableRecordData.ColumnValues!))
 			},
 			error: (err) => {
 				console.log("[ViewTableComponent] err: ", err);
@@ -98,7 +97,7 @@ export class ViewTableComponent implements OnInit {
 
 	// @conextID either the fieldID or the value '__add-field-action'
 	onOpenFieldContextMenu(conextID: string) {
-		console.log("did click on Add Field")
+		// console.log("did click on Add Field")
 		this.activeContextMenu = conextID;
 	}
 
@@ -108,11 +107,11 @@ export class ViewTableComponent implements OnInit {
 
 	onCreateField(data: RequestDataCreateField) {
 		this.onFieldOverlayDetached();
-		console.log("[onCreateField] data:", data);
+		// console.log("[onCreateField] data:", data);
 
 		this.apiService.apiRequests.createTableField(data).subscribe({
 			next: (data) => {
-				console.log("[onCreateField] data: ", data);
+				// console.log("[onCreateField] data: ", data);
 				this.updateTableRecord(data);
 			},
 			error: (err) => {
@@ -134,14 +133,8 @@ export class ViewTableComponent implements OnInit {
 
 	deleteTableRecordField(fieldGUID: string) {
 		if (this.tableRecordData) {
-			console.log("[deleteTableRecordField] before delete FieldsMetaData:", this.tableRecordData.FieldsMetaData)
-			console.log("[deleteTableRecordField] before delete ColumnValues:", this.tableRecordData.ColumnValues)
-
 			this.tableRecordData.FieldsMetaData = this.tableRecordData.FieldsMetaData.filter(f => f.FieldGUID != fieldGUID);
 			delete this.tableRecordData.ColumnValues[fieldGUID];
-
-			console.log("[deleteTableRecordField] after delete FieldsMetaData:", this.tableRecordData.FieldsMetaData)
-			console.log("[deleteTableRecordField] after delete ColumnValues:", this.tableRecordData.ColumnValues)
 		}
 	}
 
@@ -150,7 +143,6 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	onDeleteField(e: FieldMetaData) {
-		console.log("[onDeleteField] event:", e)
 		this.onFieldOverlayDetached();
 
 		const data: ReqestDataDeleteField = {
@@ -161,7 +153,7 @@ export class ViewTableComponent implements OnInit {
 
 		this.apiService.apiRequests.deleteTableField(data).subscribe({
 			next: (fieldGUID) => {
-				console.log("[onDeleteField] fieldGUID: ", fieldGUID);
+				// console.log("[onDeleteField] fieldGUID: ", fieldGUID);
 				this.deleteTableRecordField(fieldGUID);
 			},
 			error: (err) => {
