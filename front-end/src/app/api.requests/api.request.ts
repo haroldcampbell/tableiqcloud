@@ -1,7 +1,7 @@
 import { HttpClient, HttpRequest } from "@angular/common/http";
 import { EMPTY, map, of, tap } from "rxjs";
 import { APIServerResponse } from "../models/models.server";
-import { Base, BaseTableInfo, RequestDataCreateField, TableInfo, TableRecordData } from "../models/models.datastore";
+import { Base, BaseTableInfo, ReqestDataDeleteField, RequestDataCreateField, TableInfo, TableRecordData } from "../models/models.datastore";
 
 
 export class APIRequests {
@@ -72,4 +72,16 @@ export class APIRequests {
 			);
 	}
 
+	deleteTableField(data: ReqestDataDeleteField) {
+		return this.http.post<APIServerResponse<string>>(`/api/field/delete`, data)
+			.pipe(
+				map(resp => {
+					if (!resp.successStatus || resp.jsonBody === null) {
+						throw resp.message;
+					}
+
+					return resp.jsonBody;
+				}),
+			);
+	}
 }

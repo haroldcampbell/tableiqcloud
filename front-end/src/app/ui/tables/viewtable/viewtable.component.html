@@ -80,8 +80,8 @@
             cdkConnectedOverlay
             [cdkConnectedOverlayOrigin]="fieldContextOverlay"
             [cdkConnectedOverlayOpen]="isFieldContextMenuOpen(field.FieldGUID)"
-            (detach)="onAddFieldOverlayDetached()"
-            (overlayOutsideClick)="onAddFieldOverlayDetached()"
+            (detach)="onFieldOverlayDetached()"
+            (overlayOutsideClick)="onFieldOverlayDetached()"
           >
             <app-field-context-menu-overlay
               [field]="field"
@@ -147,13 +147,13 @@
   cdkConnectedOverlay
   [cdkConnectedOverlayOrigin]="addFieldOverlay"
   [cdkConnectedOverlayOpen]="isFieldContextMenuOpen(AddFieldAction)"
-  (detach)="onAddFieldOverlayDetached()"
-  (overlayOutsideClick)="onAddFieldOverlayDetached()"
+  (detach)="onFieldOverlayDetached()"
+  (overlayOutsideClick)="onFieldOverlayDetached()"
 >
   <app-add-field-overlay
     [baseGUID]="baseGUID!"
     [tableGUID]="selectedTableGUID!"
-    (closePanel)="onAddFieldOverlayDetached()"
+    (closePanel)="onFieldOverlayDetached()"
     (didClickCreate)="onCreateField($event)"
   ></app-add-field-overlay>
 </ng-template>

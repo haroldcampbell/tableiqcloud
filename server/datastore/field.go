@@ -78,12 +78,6 @@ func (f *TableField) GetValues() []*FieldData {
 	return f.FieldData
 }
 
-// See article: https://antonio-velazquez-bustamante.medium.com/inserting-an-element-into-a-slice-in-go-golang-97c7120ca7ca
-func insertCellData(list []*FieldData, cell *FieldData, index int) []*FieldData {
-	return append(list[:index],
-		append([]*FieldData{cell}, list[index:]...)...)
-}
-
 func newFieldData(recordGUID string, newValue interface{}) *FieldData {
 	return &FieldData{
 		RecordGUID: recordGUID,

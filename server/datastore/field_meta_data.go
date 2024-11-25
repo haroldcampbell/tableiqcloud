@@ -43,7 +43,7 @@ type MetaFieldTypeRelationship struct {
 }
 
 type FieldMetaData struct {
-	tableGUID string // Guid for the parent table
+	TableGUID string // Guid for the parent table
 
 	FieldGUID      string
 	FieldName      string
@@ -80,7 +80,7 @@ func initFieldMetaData(fieldName string, fieldType TableFieldType) *FieldMetaDat
 }
 
 func (m *FieldMetaData) SetTableGUID(tableGUID string) {
-	m.tableGUID = tableGUID
+	m.TableGUID = tableGUID
 	if m.FieldType == FieldTypeRelationship {
 		relationship := m.MetaAttributes.(*MetaFieldTypeRelationship)
 		relationship.ParentTableGUID = tableGUID
@@ -88,5 +88,5 @@ func (m *FieldMetaData) SetTableGUID(tableGUID string) {
 }
 
 func (m *FieldMetaData) GetTableGUID() string {
-	return m.tableGUID
+	return m.TableGUID
 }

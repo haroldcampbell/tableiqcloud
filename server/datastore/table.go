@@ -40,6 +40,19 @@ func NewTable(name string) *Table {
 	}
 }
 
+func (t *Table) UpdateTableName(name string) {
+	t.Name = name
+}
+
+func (t *Table) MarkTableForDeletion() {
+	if t.IsDeleted {
+		// exit if table already marked for deletion
+		return
+	}
+	t.DeletedOnTimestamp = time.Now().Unix()
+	t.IsDeleted = true
+}
+
 func (t *Table) createNewRecordGUID() string {
 	t._lastRecordGUID = utils.GenerateSLUG()
 
@@ -60,73 +73,6 @@ func (t *Table) getRecordGUIDs() []string {
 
 func (t *Table) GetRecordCount() int {
 	return len(t.RecordGUIDs)
-}
-
-func (t *Table) UpdateTableName(name string) {
-	t.Name = name
-}
-
-func (t *Table) MarkTableForDeletion() {
-	if t.IsDeleted {
-		// exit if table already marked for deletion
-		return
-	}
-	t.DeletedOnTimestamp = time.Now().Unix()
-	t.IsDeleted = true
-}
-
-func (t *Table) CreateTableFieldByName(fieldName string, fieldType TableFieldType) (TableRecordData, error) {
-	f, err := t.AddTableField(NewField(fieldName, fieldType))
-	if err != nil {
-		return TableRecordData{}, err
-	}
-
-	return t.GetRecordsForField(f), nil
-}
-
-func (t *Table) AddTableField(field *TableField) (*TableField, error) {
-	// TODO: Validate the string name and lenght
-	field.MetaData.FieldName = strings.TrimSpace(field.MetaData.FieldName)
-	if field.MetaData.FieldName == "" {
-		field.MetaData.FieldName = fmt.Sprintf("Column_%d", len(t.FieldsNameIndex)+1)
-	}
-
-	// TODO: Ensure that field names are unique
-	_, ok := t.FieldsNameIndex[field.MetaData.FieldName]
-	if ok {
-		return nil, errors.New("duplicate field name")
-	}
-
-	field.MetaData.SetTableGUID(t.GUID)
-
-	// TODO: Fix this so that it can work when fields are added at other locations
-	// apart from the end of the list
-	t.Fields = append(t.Fields, field)
-	index := len(t.Fields) - 1
-	t.FieldsNameIndex[field.MetaData.FieldName] = index
-
-	// TODO: this is not efficient
-	// Initialize the records to nil values
-	field.InitFieldWithRecordGUIDs(t.RecordGUIDs)
-
-	return field, nil
-}
-
-func (t *Table) GetFields() []*TableField {
-	return t.Fields
-}
-
-func (t *Table) AppendFieldValuesByFieldName(recordGUID string, fieldName string, fieldValue interface{}) (*TableField, error) {
-	fieldIndex, ok := t.FieldsNameIndex[fieldName]
-
-	if !ok {
-		return nil, errors.New("field name not found")
-	}
-
-	field := t.Fields[fieldIndex]
-	field.AppendValue(recordGUID, fieldValue)
-
-	return field, nil
 }
 
 func (t *Table) AppendRecord(newRecordHandler func(recordGUID string)) {
@@ -196,4 +142,81 @@ func (t *Table) GetRecordsForField(f *TableField) TableRecordData {
 	records.ColumnValues[f.MetaData.FieldGUID] = f.FieldData
 
 	return records
+}
+
+/// Functions related to table fields
+
+func (t *Table) CreateTableFieldByName(fieldName string, fieldType TableFieldType) (TableRecordData, error) {
+	f, err := t.AddTableField(NewField(fieldName, fieldType))
+	if err != nil {
+		return TableRecordData{}, err
+	}
+
+	return t.GetRecordsForField(f), nil
+}
+
+func (t *Table) AddTableField(field *TableField) (*TableField, error) {
+	// TODO: Validate the string name and lenght
+	field.MetaData.FieldName = strings.TrimSpace(field.MetaData.FieldName)
+	if field.MetaData.FieldName == "" {
+		field.MetaData.FieldName = fmt.Sprintf("Column_%d", len(t.FieldsNameIndex)+1)
+	}
+
+	// TODO: Ensure that field names are unique
+	_, ok := t.FieldsNameIndex[field.MetaData.FieldName]
+	if ok {
+		return nil, errors.New("duplicate field name")
+	}
+
+	field.MetaData.SetTableGUID(t.GUID)
+
+	// TODO: Fix this so that it can work when fields are added at other locations
+	// apart from the end of the list
+	t.Fields = append(t.Fields, field)
+	index := len(t.Fields) - 1
+	t.FieldsNameIndex[field.MetaData.FieldName] = index
+
+	// TODO: this is not efficient
+	// Initialize the records to nil values
+	field.InitFieldWithRecordGUIDs(t.RecordGUIDs)
+
+	return field, nil
+}
+
+func (t *Table) GetFields() []*TableField {
+	return t.Fields
+}
+
+func (t *Table) AppendFieldValuesByFieldName(recordGUID string, fieldName string, fieldValue interface{}) (*TableField, error) {
+	fieldIndex, ok := t.FieldsNameIndex[fieldName]
+
+	if !ok {
+		return nil, errors.New("field name not found")
+	}
+
+	field := t.Fields[fieldIndex]
+	field.AppendValue(recordGUID, fieldValue)
+
+	return field, nil
+}
+
+func (t *Table) findTableFieldIndexByGUID(tableFieldGUID string) (int, error) {
+	for index, field := range t.Fields {
+		if field.MetaData.FieldGUID == tableFieldGUID {
+			return index, nil
+		}
+	}
+
+	return -1, errors.New(fmt.Sprintf("tableFieldGUID: '%s' not found", tableFieldGUID))
+}
+func (t *Table) DeleteTableField(tableFieldGUID string) error {
+
+	targetIndex, err := t.findTableFieldIndexByGUID(tableFieldGUID)
+	if err != nil {
+		return err
+	}
+
+	t.Fields = removeIndex(t.Fields, targetIndex)
+
+	return nil
 }

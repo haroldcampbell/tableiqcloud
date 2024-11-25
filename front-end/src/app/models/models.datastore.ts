@@ -63,7 +63,7 @@ export function StringifiedFieldTypeToType(s: StringifiedFieldType): TableFieldT
 }
 
 export interface FieldMetaData {
-	tableGUID: string; // Guid for the parent table
+	TableGUID: string; // Guid for the parent table
 
 	FieldGUID: string;
 	FieldName: string;
@@ -88,6 +88,7 @@ export interface TableField {
 	IsDeleted: boolean;
 	DeletedOnTimestamp: number;
 }
+
 
 export interface TableRecordData {
 	GUID: string;
@@ -138,4 +139,10 @@ export interface RequestDataCreateField {
 	TableGUID: string;
 	FieldName: string;
 	FieldType: StringifiedFieldType;
+}
+
+export interface ReqestDataDeleteField {
+	BaseGUID: string;
+	TableGUID: string;
+	TableFieldGUID: string;
 }

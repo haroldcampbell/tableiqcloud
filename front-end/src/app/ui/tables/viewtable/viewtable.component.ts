@@ -1,12 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../api.services/api.service';
-import { FieldMetaData, RequestDataCreateField, TableFieldType, TableRecordData } from '../../../models/models.datastore';
+import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData } from '../../../models/models.datastore';
 import { hasString } from '../../../core/utils';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { AddFieldOverlayComponent } from '../../../pages/bases/view-data/ui/add-field-overlay/add-field-overlay.component';
 import { CoreModule } from '../../../modules/core.module';
 import { FieldContextMenuOverlayComponent } from '../../../pages/bases/view-data/ui/field-context-menu-overlay/field-context-menu-overlay.component';
+
 
 @Component({
 	selector: 'ui-viewtable',
@@ -23,6 +24,7 @@ export class ViewTableComponent implements OnInit {
 	activeContextMenu = "";
 	tableRecordData?: TableRecordData;
 	private fieldTypeImgMap!: Map<TableFieldType, string>;
+
 
 	@Input() baseGUID?: string;
 
@@ -43,9 +45,8 @@ export class ViewTableComponent implements OnInit {
 	constructor(
 		private apiService: APIService,
 		public router: Router,
-		private route: ActivatedRoute,
-		private overlay: Overlay,
-
+		// private route: ActivatedRoute,
+		// private overlay: Overlay,
 	) { }
 
 	ngOnInit(): void {
@@ -67,8 +68,9 @@ export class ViewTableComponent implements OnInit {
 		// console.log("[loadTableData] tableGUID:", this.tableGUID);
 		this.apiService.apiRequests.getTableByGUID(this.baseGUID!, this.tableGUID!).subscribe({
 			next: (data) => {
-				// console.log("[ViewTableComponent] data: ", data);
+				console.log("[ViewTableComponent] data: ", data);
 				this.tableRecordData = data;
+				// this.tableRecordData.ColumnValues = new Map(Object.entries(this.tableRecordData.ColumnValues!))
 			},
 			error: (err) => {
 				console.log("[ViewTableComponent] err: ", err);
@@ -77,7 +79,7 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	columnValues(field: FieldMetaData) {
-		return this.tableRecordData!.ColumnValues[field.FieldGUID]
+		return this.tableRecordData!.ColumnValues[field.FieldGUID];//.get(field.FieldGUID)
 	}
 
 	// return the ico name for the field
@@ -100,12 +102,12 @@ export class ViewTableComponent implements OnInit {
 		this.activeContextMenu = conextID;
 	}
 
-	onAddFieldOverlayDetached() {
+	onFieldOverlayDetached() {
 		this.activeContextMenu = "";
 	}
 
 	onCreateField(data: RequestDataCreateField) {
-		this.onAddFieldOverlayDetached();
+		this.onFieldOverlayDetached();
 		console.log("[onCreateField] data:", data);
 
 		this.apiService.apiRequests.createTableField(data).subscribe({
@@ -130,10 +132,41 @@ export class ViewTableComponent implements OnInit {
 		this.tableRecordData.ColumnValues[metaData.FieldGUID] = data.ColumnValues[metaData.FieldGUID];
 	}
 
+	deleteTableRecordField(fieldGUID: string) {
+		if (this.tableRecordData) {
+			console.log("[deleteTableRecordField] before delete FieldsMetaData:", this.tableRecordData.FieldsMetaData)
+			console.log("[deleteTableRecordField] before delete ColumnValues:", this.tableRecordData.ColumnValues)
+
+			this.tableRecordData.FieldsMetaData = this.tableRecordData.FieldsMetaData.filter(f => f.FieldGUID != fieldGUID);
+			delete this.tableRecordData.ColumnValues[fieldGUID];
+
+			console.log("[deleteTableRecordField] after delete FieldsMetaData:", this.tableRecordData.FieldsMetaData)
+			console.log("[deleteTableRecordField] after delete ColumnValues:", this.tableRecordData.ColumnValues)
+		}
+	}
+
 	onEditField(e: FieldMetaData) {
 		console.log("[onEditField] event:", e)
 	}
+
 	onDeleteField(e: FieldMetaData) {
 		console.log("[onDeleteField] event:", e)
+		this.onFieldOverlayDetached();
+
+		const data: ReqestDataDeleteField = {
+			BaseGUID: this.baseGUID!,
+			TableGUID: e.TableGUID,
+			TableFieldGUID: e.FieldGUID
+		}
+
+		this.apiService.apiRequests.deleteTableField(data).subscribe({
+			next: (fieldGUID) => {
+				console.log("[onDeleteField] fieldGUID: ", fieldGUID);
+				this.deleteTableRecordField(fieldGUID);
+			},
+			error: (err) => {
+				console.log("[onDeleteField] err: ", err);
+			}
+		});
 	}
 }

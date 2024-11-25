@@ -17,6 +17,7 @@ func main() {
 	router.GET("/api/base/:baseGUID", api.GetTables(d))
 	router.GET("/api/table/:baseGUID/:tableGUID", api.GetTableByGUID(d))
 	router.POST("/api/field/new", api.CreateTableField(d))
+	router.POST("/api/field/delete", api.DeleteTableField(d))
 
 	router.Run("localhost:8083")
 

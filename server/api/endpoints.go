@@ -109,3 +109,47 @@ func CreateTableField(d *datastore.Datastore) func(c *gin.Context) {
 		base.DumpDataAsJSON(d)
 	}
 }
+
+type ReqestDataDeleteField struct {
+	BaseGUID       string
+	TableGUID      string
+	TableFieldGUID string
+}
+
+func DeleteTableField(d *datastore.Datastore) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var data ReqestDataDeleteField
+		err := c.BindJSON(&data)
+
+		fmt.Printf("[DeleteTableField] data:%#v\n", data)
+
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("delete-table-field", http.StatusBadRequest, "Invalid field data"))
+			return
+		}
+
+		base, err := d.GetBaseByGUID(data.BaseGUID)
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("delete-table-field", http.StatusBadRequest, "Unknown base"))
+			return
+		}
+
+		table, err := base.GetTableByGUID(data.TableGUID)
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("delete-table-field", http.StatusBadRequest, "Unknown table"))
+			return
+		}
+
+		err = table.DeleteTableField(data.TableFieldGUID)
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("delete-table-field", http.StatusBadRequest, err.Error()))
+			return
+		}
+
+		fmt.Printf("[DeleteTableField] data:%v \n", data)
+		c.IndentedJSON(http.StatusOK, OkResponse("delete-table-field", data.TableFieldGUID))
+
+		// Save the changes
+		base.DumpDataAsJSON(d)
+	}
+}
