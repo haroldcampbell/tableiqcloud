@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../../api.services/api.service';
-import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData } from '../../../../models/models.datastore';
+import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField } from '../../../../models/models.datastore';
 import { hasString } from '../../../../core/utils';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { AddFieldOverlayComponent } from '../ui/add-field-overlay/add-field-overlay.component';
@@ -49,8 +49,6 @@ export class ViewTableComponent implements OnInit {
 	constructor(
 		private apiService: APIService,
 		public router: Router,
-		// private route: ActivatedRoute,
-		// private overlay: Overlay,
 	) { }
 
 	ngOnInit(): void {
@@ -112,7 +110,6 @@ export class ViewTableComponent implements OnInit {
 
 	onCreateField(data: RequestDataCreateField) {
 		this.onFieldOverlayDetached();
-		// console.log("[onCreateField] data:", data);
 
 		this.apiService.apiRequests.createTableField(data).subscribe({
 			next: (data) => {
@@ -123,6 +120,31 @@ export class ViewTableComponent implements OnInit {
 				console.log("[onCreateField] err: ", err);
 			}
 		});
+	}
+
+	onUpdateField(r: RequestDataUpdateField) {
+		this.onFieldOverlayDetached();
+
+		this.apiService.apiRequests.updateTableField(r).subscribe({
+			next: (data) => {
+				// console.log("[onCreateField] data: ", data);
+				this.updateTableFieldType(data);
+			},
+			error: (err) => {
+				console.log("[onUpdateField] err: ", err);
+			}
+		});
+	}
+
+	updateTableFieldType(data: FieldMetaData) {
+		const results = this.tableRecordData?.FieldsMetaData.filter(f => f.FieldGUID == data.FieldGUID);
+		if (results == undefined) {
+			return;
+		}
+
+		let field = results[0];
+		field.FieldName = data.FieldName;
+		field.FieldType = data.FieldType;
 	}
 
 	updateTableRecord(data: TableRecordData) {
@@ -144,7 +166,6 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	onEditField(e: FieldMetaData) {
-		console.log("[onEditField] event:", e)
 		this.showEditFieldOverlay = true; // Show the edit context
 	}
 

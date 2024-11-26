@@ -58,8 +58,29 @@ export function StringifiedFieldTypeToType(s: StringifiedFieldType): TableFieldT
 		// 	return TableFieldType.FieldTypeRelationship;
 
 	}
-
 	return TableFieldType.FieldTypeString
+}
+
+export function FieldTypeToStringifiedFieldType(t: TableFieldType): StringifiedFieldType {
+	switch (t) {
+		case TableFieldType.FieldTypeDate:
+			return StringifiedFieldType.FieldTypeDate;
+
+		case TableFieldType.FieldTypeNumber:
+			return StringifiedFieldType.FieldTypeNumber;
+
+		case TableFieldType.FieldTypeString:
+			return StringifiedFieldType.FieldTypeString;
+
+		// case TableFieldType.FieldTypeText:
+		// 	return StringifiedFieldType.FieldTypeString;
+
+		// case TableFieldType.FieldTypeRelationship:
+		// 	return StringifiedFieldType.FieldTypeString;
+
+	}
+
+	return StringifiedFieldType.FieldTypeString
 }
 
 export interface FieldMetaData {
@@ -145,4 +166,13 @@ export interface ReqestDataDeleteField {
 	BaseGUID: string;
 	TableGUID: string;
 	TableFieldGUID: string;
+}
+
+export interface RequestDataUpdateField {
+	BaseGUID: string;
+	TableGUID: string;
+	TableFieldGUID: string;
+
+	FieldName: string;
+	FieldType: TableFieldType;
 }

@@ -1,1 +1,91 @@
-<p>edit-field-context-menu-overlay works!</p>
+<div class="overlay-container">
+  <!-- <div class="overlay-heading"> -->
+  <!-- <div class="overlay-title">Add field</div> -->
+  <!-- </div> -->
+  <div class="overlay-content">
+    <!-- Field name -->
+    <div class="field-item">
+      <!-- [value]="fieldName" -->
+      <input
+        id="field-name"
+        [value]="field"
+        [(ngModel)]="fieldName"
+        autocomplete="off"
+        type="text"
+        placeholder="Enter field name"
+      />
+    </div>
+
+    <div
+      [class]="disSelectedField == false ? 'field-item-hidden' : 'field-item'"
+    >
+      <ul
+        name="selected-field-type"
+        class="selected-field-type"
+        (click)="onShowFieldTypeOptions()"
+      >
+        <li>
+          {{ selectedFieldTypeText }}
+        </li>
+        <li>
+          <img class="ico" src="/assets/images/ico-drop-down.png" alt="" />
+        </li>
+      </ul>
+    </div>
+    <!-- Select field type -->
+
+    <ul
+      [class]="
+        disSelectedField == false
+          ? 'field-item narrow-item'
+          : 'field-item-hidden'
+      "
+    >
+      <li
+        class="list-item"
+        [class.selected-list-item]="
+          isSelectedListItem(FieldType.FieldTypeString)
+        "
+        (click)="onSelectFieldType(FieldType.FieldTypeString)"
+      >
+        <span>
+          <img class="ico" src="/assets/images/ico-field-string.png" alt=""
+        /></span>
+        Single line text
+      </li>
+      <li
+        class="list-item"
+        [class.selected-list-item]="
+          isSelectedListItem(FieldType.FieldTypeNumber)
+        "
+        (click)="onSelectFieldType(FieldType.FieldTypeNumber)"
+      >
+        <span>
+          <img class="ico" src="/assets/images/ico-field-number.png" alt=""
+        /></span>
+        {{ FieldType.FieldTypeNumber }}
+      </li>
+      <li
+        class="list-item"
+        [class.selected-list-item]="isSelectedListItem(FieldType.FieldTypeDate)"
+        (click)="onSelectFieldType(FieldType.FieldTypeDate)"
+      >
+        <span>
+          <img class="ico" src="/assets/images/ico-field-date.png" alt=""
+        /></span>
+        {{ FieldType.FieldTypeDate }}
+      </li>
+    </ul>
+  </div>
+
+  <div class="overlay-footer">
+    <ul class="actions-container">
+      <li>
+        <button class="action-cancel" (click)="onCancel()">Discard</button>
+      </li>
+      <li>
+        <button class="action-create" (click)="onApplyChanges()">Save</button>
+      </li>
+    </ul>
+  </div>
+</div>

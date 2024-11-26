@@ -28,10 +28,6 @@ export class AddFieldOverlayComponent implements OnInit {
 	}
 
 	ngOnInit(): void {
-		// this.dialogRef.backdropClick()
-		//     .subscribe(_ => {
-		//         this.dialogRef.close();
-		//     });
 	}
 
 	onCancel() {

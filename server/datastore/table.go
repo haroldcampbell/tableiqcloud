@@ -209,6 +209,7 @@ func (t *Table) findTableFieldIndexByGUID(tableFieldGUID string) (int, error) {
 
 	return -1, errors.New(fmt.Sprintf("tableFieldGUID: '%s' not found", tableFieldGUID))
 }
+
 func (t *Table) DeleteTableField(tableFieldGUID string) error {
 
 	targetIndex, err := t.findTableFieldIndexByGUID(tableFieldGUID)
@@ -219,4 +220,34 @@ func (t *Table) DeleteTableField(tableFieldGUID string) error {
 	t.Fields = removeIndex(t.Fields, targetIndex)
 
 	return nil
+}
+
+func (t *Table) findTableFieldByGUID(tableFieldGUID string) (*TableField, error) {
+	for _, field := range t.Fields {
+		if field.MetaData.FieldGUID == tableFieldGUID {
+			return field, nil
+		}
+	}
+
+	return nil, errors.New(fmt.Sprintf("tableFieldGUID: '%s' not found", tableFieldGUID))
+}
+
+// RawFieldMetaData differs from FieldMetaData by not including the GUIDs. This prevents accidental overwrites.
+type RawFieldMetaData struct {
+	FieldName string
+	FieldType TableFieldType
+	// FieldTypeName  string
+	// MetaAttributes interface{}
+}
+
+func (t *Table) UpdateTableFiledMetaData(tableFieldGUID string, metaData RawFieldMetaData) (*FieldMetaData, error) {
+	f, err := t.findTableFieldByGUID(tableFieldGUID)
+	if err != nil {
+		return nil, err
+	}
+
+	f.MetaData.FieldName = metaData.FieldName
+	f.MetaData.FieldType = metaData.FieldType
+
+	return f.MetaData, nil
 }

@@ -153,3 +153,55 @@ func DeleteTableField(d *datastore.Datastore) func(c *gin.Context) {
 		base.DumpDataAsJSON(d)
 	}
 }
+
+type ReqestDataUpdateField struct {
+	BaseGUID       string
+	TableGUID      string
+	TableFieldGUID string
+	FieldName      string
+	FieldType      datastore.TableFieldType
+}
+
+func UpdateTableField(d *datastore.Datastore) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		var data ReqestDataUpdateField
+		err := c.BindJSON(&data)
+
+		fmt.Printf("[UpdateTableField] data:%#v\n", data)
+
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("update-table-field", http.StatusBadRequest, "Invalid field data"))
+			return
+		}
+
+		base, err := d.GetBaseByGUID(data.BaseGUID)
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("update-table-field", http.StatusBadRequest, "Unknown base"))
+			return
+		}
+
+		table, err := base.GetTableByGUID(data.TableGUID)
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("update-table-field", http.StatusBadRequest, "Unknown table"))
+			return
+		}
+
+		rawWetaData := datastore.RawFieldMetaData{
+			FieldName: data.FieldName,
+			FieldType: data.FieldType,
+		}
+
+		fieldMetaData, err := table.UpdateTableFiledMetaData(data.TableFieldGUID, rawWetaData)
+
+		if err != nil {
+			c.IndentedJSON(http.StatusNotFound, ErrResponse("update-table-field", http.StatusBadRequest, err.Error()))
+			return
+		}
+
+		fmt.Printf("[UpdateTableField] data:%v fieldMetaData: %v\n", data, fieldMetaData)
+		c.IndentedJSON(http.StatusOK, OkResponse("update-table-field", fieldMetaData))
+
+		// Save the changes
+		base.DumpDataAsJSON(d)
+	}
+}

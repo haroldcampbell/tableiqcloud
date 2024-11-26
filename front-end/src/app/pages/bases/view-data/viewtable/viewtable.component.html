@@ -86,7 +86,13 @@
             @switch (showEditFieldOverlay) {
             <!--  -->
             @case (true) {
-            <app-edit-field-context-menu-overlay></app-edit-field-context-menu-overlay>
+            <app-edit-field-context-menu-overlay
+              [field]="field"
+              [baseGUID]="baseGUID!"
+              [tableGUID]="selectedTableGUID!"
+              (closePanel)="onFieldOverlayDetached()"
+              (didClickSave)="onUpdateField($event)"
+            ></app-edit-field-context-menu-overlay>
             <!-- <ng-container [ngTemplateOutlet]="edittemplate"></ng-container> -->
             }
 

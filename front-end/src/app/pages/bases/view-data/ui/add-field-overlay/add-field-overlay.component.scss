@@ -5,7 +5,6 @@
     .field-item {
         display: flex;
         flex-direction: column;
-        // align-items: flex-start;
         flex: 1 1 auto;
 
         border-radius: 3px;
@@ -22,20 +21,14 @@
             display: flex;
             flex-direction: column;
             flex: 1 1 auto;
-            // border: solid 1px red;
             text-align: left;
             font-size: 14px;
         }
 
         &>input {
             border: none;
-            // border-bottom: solid 1px red;
             padding: 4px 5px;
             outline: none;
-        }
-
-        .item-select {
-            // padding: 2px 5px;
         }
 
         .list-item {
@@ -45,7 +38,6 @@
             column-gap: 5px;
             font-size: 14px;
             color: #333;
-            // padding: 2px 0px;
             font-weight: 400;
             letter-spacing: 0.496px;
             line-height: 24px;
