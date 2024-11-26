@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { APIService } from '../../../api.services/api.service';
 import { BaseTableInfo, TableInfo } from '../../../models/models.datastore';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ViewTableComponent } from '../../../ui/tables/viewtable/viewtable.component';
+import { ViewTableComponent } from '../view-data/viewtable/viewtable.component';
 import { hasString } from '../../../core/utils';
 
 export enum NavItems {

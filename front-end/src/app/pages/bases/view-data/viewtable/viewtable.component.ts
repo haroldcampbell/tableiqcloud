@@ -1,12 +1,13 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { APIService } from '../../../api.services/api.service';
-import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData } from '../../../models/models.datastore';
-import { hasString } from '../../../core/utils';
+import { APIService } from '../../../../api.services/api.service';
+import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData } from '../../../../models/models.datastore';
+import { hasString } from '../../../../core/utils';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
-import { AddFieldOverlayComponent } from '../../../pages/bases/view-data/ui/add-field-overlay/add-field-overlay.component';
-import { CoreModule } from '../../../modules/core.module';
-import { FieldContextMenuOverlayComponent } from '../../../pages/bases/view-data/ui/field-context-menu-overlay/field-context-menu-overlay.component';
+import { AddFieldOverlayComponent } from '../ui/add-field-overlay/add-field-overlay.component';
+import { CoreModule } from '../../../../modules/core.module';
+import { FieldContextMenuOverlayComponent } from '../ui/field-context-menu-overlay/field-context-menu-overlay.component';
+import { EditFieldContextMenuOverlayComponent } from '../ui/edit-field-context-menu-overlay/edit-field-context-menu-overlay.component';
 
 
 @Component({
@@ -15,6 +16,7 @@ import { FieldContextMenuOverlayComponent } from '../../../pages/bases/view-data
 	imports: [
 		CoreModule,
 		AddFieldOverlayComponent,
+		EditFieldContextMenuOverlayComponent,
 		FieldContextMenuOverlayComponent
 	],
 	templateUrl: './viewtable.component.html',
@@ -22,6 +24,8 @@ import { FieldContextMenuOverlayComponent } from '../../../pages/bases/view-data
 })
 export class ViewTableComponent implements OnInit {
 	activeContextMenu = "";
+	showEditFieldOverlay = false;
+
 	tableRecordData?: TableRecordData;
 	private fieldTypeImgMap!: Map<TableFieldType, string>;
 
@@ -99,6 +103,7 @@ export class ViewTableComponent implements OnInit {
 	onOpenFieldContextMenu(conextID: string) {
 		// console.log("did click on Add Field")
 		this.activeContextMenu = conextID;
+		this.showEditFieldOverlay = false; // Automatically exit edit mode
 	}
 
 	onFieldOverlayDetached() {
@@ -140,6 +145,7 @@ export class ViewTableComponent implements OnInit {
 
 	onEditField(e: FieldMetaData) {
 		console.log("[onEditField] event:", e)
+		this.showEditFieldOverlay = true; // Show the edit context
 	}
 
 	onDeleteField(e: FieldMetaData) {

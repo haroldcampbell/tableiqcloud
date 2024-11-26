@@ -83,6 +83,15 @@
             (detach)="onFieldOverlayDetached()"
             (overlayOutsideClick)="onFieldOverlayDetached()"
           >
+            @switch (showEditFieldOverlay) {
+            <!--  -->
+            @case (true) {
+            <app-edit-field-context-menu-overlay></app-edit-field-context-menu-overlay>
+            <!-- <ng-container [ngTemplateOutlet]="edittemplate"></ng-container> -->
+            }
+
+            <!--  -->
+            @case (false) {
             <app-field-context-menu-overlay
               [field]="field"
               (editField)="onEditField($event)"
@@ -93,6 +102,7 @@
               <!-- <div>stuff 2</div> -->
               <!-- <div>stuff 3</div> -->
             </app-field-context-menu-overlay>
+            } }
           </ng-template>
 
           }
@@ -141,6 +151,8 @@
     </li>
   </ul>
 </div>
+
+<!-- <ng-template #edittemplate> things </ng-template> -->
 
 <!-- Add Field Template -->
 <ng-template
