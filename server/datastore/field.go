@@ -125,3 +125,7 @@ func (f *TableField) AppendChildRelation(recordGUID string, childRecordGUIDs []s
 
 	return *data
 }
+
+// func (f *TableField) GetDataByRecordGUID(recordGUID string) *FieldData {
+// 	return f.FieldDataGUIDMap[recordGUID]
+// }

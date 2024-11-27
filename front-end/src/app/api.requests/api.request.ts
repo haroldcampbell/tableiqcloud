@@ -1,7 +1,7 @@
 import { HttpClient, HttpRequest } from "@angular/common/http";
 import { EMPTY, map, of, tap } from "rxjs";
-import { APIServerResponse } from "../models/models.server";
-import { Base, BaseTableInfo, FieldMetaData, ReqestDataDeleteField, RequestDataCreateField, RequestDataUpdateField, TableInfo, TableRecordData } from "../models/models.datastore";
+import { APIServerResponse, RequestDataCreateRecordResponse } from "../models/models.server";
+import { Base, BaseTableInfo, FieldMetaData, RecordCell, ReqestDataDeleteField, RequestDataCreateField, RequestDataCreateRecord, RequestDataUpdateField, TableInfo, TableRecordData } from "../models/models.datastore";
 
 
 export class APIRequests {
@@ -98,4 +98,16 @@ export class APIRequests {
 			);
 	}
 
+	createTableRecord(data: RequestDataCreateRecord) {
+		return this.http.post<APIServerResponse<RequestDataCreateRecordResponse>>(`/api/table-record/new`, data)
+			.pipe(
+				map(resp => {
+					if (!resp.successStatus || resp.jsonBody === null) {
+						throw resp.message;
+					}
+
+					return resp.jsonBody;
+				}),
+			);
+	}
 }

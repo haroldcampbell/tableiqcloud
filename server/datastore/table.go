@@ -75,10 +75,12 @@ func (t *Table) GetRecordCount() int {
 	return len(t.RecordGUIDs)
 }
 
-func (t *Table) AppendRecord(newRecordHandler func(recordGUID string)) {
+func (t *Table) AppendRecord(newRecordHandler func(recordGUID string)) string {
 	recordGUID := t.createNewRecordGUID()
 	newRecordHandler(recordGUID)
 	t.RecordGUIDs = append(t.RecordGUIDs, recordGUID)
+
+	return recordGUID
 }
 
 func (t *Table) GetRecordByGUID(recordGUID string) ([]*RecordCell, error) {
@@ -143,6 +145,19 @@ func (t *Table) GetRecordsForField(f *TableField) TableRecordData {
 
 	return records
 }
+
+// func (t *Table) GetRecordByGUID(recordGUID string) TableRecordData {
+// 	records := t.NewTableRecordData()
+
+// 	// Returns the meta data
+// 	for _, f := range t.Fields {
+// 		fmt.Printf("[GetRecordByGUID] f.MetaData: %#v\n", f.MetaData)
+// 		records.FieldsMetaData = append(records.FieldsMetaData, f.MetaData)
+// 		records.ColumnValues[f.MetaData.FieldGUID] = []*FieldData{f.GetDataByRecordGUID(recordGUID)}
+// 	}
+
+// 	return records
+// }
 
 /// Functions related to table fields
 

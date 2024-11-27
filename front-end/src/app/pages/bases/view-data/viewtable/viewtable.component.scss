@@ -231,14 +231,21 @@
         display: flex;
         flex-direction: row;
 
-        .action-item {
+        button.action-item {
+            cursor: pointer;
             font-size: 0.8em;
             padding: 0px 10px;
             border: solid 1px #f3f3f3;
             border-radius: 5px;
+            min-height: 25px;
 
             background-color: $button1-color;
             color: $button1-text-color;
+        }
+
+        button:active {
+            top: 1px;
+            transform: scale(0.95);
         }
     }
 }

@@ -98,7 +98,7 @@ export interface FieldData {
 	DataValue: any;
 }
 
-type TableFieldArray = FieldData[];
+export type TableFieldArray = FieldData[];
 
 export interface TableField {
 	MetaData: FieldMetaData;
@@ -117,6 +117,12 @@ export interface TableRecordData {
 	RecordGUIDs: string[];
 	FieldsMetaData: FieldMetaData[];
 	ColumnValues: { [TableFieldGUID: string]: TableFieldArray };
+}
+
+
+export interface RecordCell {
+	MetaData: FieldMetaData;
+	FieldData: FieldData;
 }
 
 
@@ -175,4 +181,9 @@ export interface RequestDataUpdateField {
 
 	FieldName: string;
 	FieldType: TableFieldType;
+}
+
+export interface RequestDataCreateRecord {
+	BaseGUID: string
+	TableGUID: string
 }

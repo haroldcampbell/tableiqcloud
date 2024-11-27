@@ -1,3 +1,4 @@
+import { RecordCell } from "./models.datastore";
 
 
 export interface APIServerResponse<T> {
@@ -7,4 +8,9 @@ export interface APIServerResponse<T> {
 	sessionKey: string;
 	errorCode: number;
 	jsonBody: T
+}
+
+export interface RequestDataCreateRecordResponse {
+	RecordGUID: string
+	Cells: RecordCell[]
 }

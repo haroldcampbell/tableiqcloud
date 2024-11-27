@@ -1,7 +1,7 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../../api.services/api.service';
-import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField } from '../../../../models/models.datastore';
+import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray } from '../../../../models/models.datastore';
 import { hasString } from '../../../../core/utils';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { AddFieldOverlayComponent } from '../ui/add-field-overlay/add-field-overlay.component';
@@ -187,5 +187,30 @@ export class ViewTableComponent implements OnInit {
 				console.log("[onDeleteField] err: ", err);
 			}
 		});
+	}
+
+	onAddRow() {
+		const data: RequestDataCreateRecord = {
+			BaseGUID: this.baseGUID!,
+			TableGUID: this.tableGUID!
+		}
+
+		this.apiService.apiRequests.createTableRecord(data).subscribe({
+			next: (result) => {
+				this.appendTableRecord(result.RecordGUID, result.Cells);
+			},
+			error: (err) => {
+				console.log("[onAddRow] err: ", err);
+			}
+		});
+	}
+
+	appendTableRecord(recordGUID: string, cells: RecordCell[]) {
+		this.tableRecordData!.RecordGUIDs.push(recordGUID);
+
+		cells.forEach(c => {
+			let values = this.tableRecordData!.ColumnValues[c.MetaData.FieldGUID];
+			values.push(c.FieldData)
+		})
 	}
 }
