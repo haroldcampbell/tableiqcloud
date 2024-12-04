@@ -128,8 +128,10 @@ func (b *Base) ExpandChildRelationships(recs []*RecordCell) []*RecordCell {
 
 const jsonDumpFile = "output.%v.json"
 
-func (b *Base) DumpDataAsJSON(store *Datastore) error {
-	fmt.Printf("[DumpDataAsJSON] tables: %v\n", utils.PrettyMongoString(b.Tables))
+func (b *Base) DumpDataAsJSON(store *Datastore, isSilent bool) error {
+	if !isSilent {
+		fmt.Printf("[DumpDataAsJSON] tables: %v\n", utils.PrettyMongoString(b.Tables))
+	}
 
 	jsonData, _ := json.Marshal(b)
 	err := os.WriteFile(fmt.Sprintf(jsonDumpFile, b.Name), jsonData, 0644)
@@ -137,11 +139,17 @@ func (b *Base) DumpDataAsJSON(store *Datastore) error {
 		fmt.Printf("[DumpDataAsJSON] error saving json data. Err: %v\n", err)
 		return err
 	}
-	fmt.Printf("%+v", b)
+
+	if !isSilent {
+		fmt.Printf("%+v", b)
+	}
 
 	store.RegisterBase(b)
 
 	return nil
+}
+func (b *Base) SilentDumpDataAsJSON(store *Datastore) error {
+	return b.DumpDataAsJSON(store, true)
 }
 
 func NewBaseFromJSON(store *Datastore, baseName string, handler func(base *Base)) error {
@@ -151,7 +159,7 @@ func NewBaseFromJSON(store *Datastore, baseName string, handler func(base *Base)
 		base := NewBase(baseName)
 		handler(base)
 
-		return base.DumpDataAsJSON(store)
+		return base.DumpDataAsJSON(store, false)
 	}
 
 	if err != nil {

@@ -1,7 +1,7 @@
 import { HttpClient, HttpRequest } from "@angular/common/http";
 import { EMPTY, map, of, tap } from "rxjs";
 import { APIServerResponse, RequestDataCreateRecordResponse } from "../models/models.server";
-import { Base, BaseTableInfo, FieldMetaData, RecordCell, ReqestDataDeleteField, RequestDataCreateField, RequestDataCreateRecord, RequestDataUpdateField, TableInfo, TableRecordData } from "../models/models.datastore";
+import { Base, BaseTableInfo, FieldMetaData, RecordCell, ReqestDataDeleteField, RequestDataCreateField, RequestDataCreateRecord, RequestDataDeleteRecord, RequestDataUpdateField, TableInfo, TableRecordData } from "../models/models.datastore";
 
 
 export class APIRequests {
@@ -109,5 +109,22 @@ export class APIRequests {
 					return resp.jsonBody;
 				}),
 			);
+	}
+
+	private postRequest<Request, Response>(action: string, data: Request) {
+		return this.http.post<APIServerResponse<Response>>(action, data)
+			.pipe(
+				map(resp => {
+					if (!resp.successStatus || resp.jsonBody === null) {
+						throw resp.message;
+					}
+
+					return resp.jsonBody;
+				}),
+			);
+	}
+
+	deleteTableRecord(data: RequestDataDeleteRecord) {
+		return this.postRequest<RequestDataDeleteRecord, string>(`/api/table-record/delete`, data)
 	}
 }

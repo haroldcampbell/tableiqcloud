@@ -20,6 +20,7 @@ func main() {
 	router.POST("/api/field/delete", api.DeleteTableField(d))
 	router.POST("/api/field/update", api.UpdateTableField(d))
 	router.POST("/api/table-record/new", api.CreateTableRecord(d))
+	router.POST("/api/table-record/delete", api.DeleteTableRecord(d))
 
 	router.Run("localhost:8083")
 

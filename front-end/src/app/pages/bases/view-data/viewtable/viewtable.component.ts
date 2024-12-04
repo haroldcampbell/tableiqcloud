@@ -1,13 +1,14 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../../api.services/api.service';
-import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray } from '../../../../models/models.datastore';
+import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord } from '../../../../models/models.datastore';
 import { hasString } from '../../../../core/utils';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { AddFieldOverlayComponent } from '../ui/add-field-overlay/add-field-overlay.component';
 import { CoreModule } from '../../../../modules/core.module';
 import { FieldContextMenuOverlayComponent } from '../ui/field-context-menu-overlay/field-context-menu-overlay.component';
 import { EditFieldContextMenuOverlayComponent } from '../ui/edit-field-context-menu-overlay/edit-field-context-menu-overlay.component';
+import { TableCellContextMenuComponent } from '../ui/table-cell-context-menu/table-cell-context-menu.component';
 
 
 @Component({
@@ -17,13 +18,15 @@ import { EditFieldContextMenuOverlayComponent } from '../ui/edit-field-context-m
 		CoreModule,
 		AddFieldOverlayComponent,
 		EditFieldContextMenuOverlayComponent,
-		FieldContextMenuOverlayComponent
+		FieldContextMenuOverlayComponent,
+		TableCellContextMenuComponent,
 	],
 	templateUrl: './viewtable.component.html',
 	styleUrl: './viewtable.component.scss'
 })
 export class ViewTableComponent implements OnInit {
 	activeContextMenu = "";
+	activeTableCellContextMenu = "";
 	showEditFieldOverlay = false;
 
 	tableRecordData?: TableRecordData;
@@ -97,6 +100,9 @@ export class ViewTableComponent implements OnInit {
 		return this.activeContextMenu == conextID;
 	}
 
+	isTableCellContextMenuOpen(contextID: string) {
+		return this.activeTableCellContextMenu == contextID
+	}
 	// @conextID either the fieldID or the value '__add-field-action'
 	onOpenFieldContextMenu(conextID: string) {
 		// console.log("did click on Add Field")
@@ -106,6 +112,7 @@ export class ViewTableComponent implements OnInit {
 
 	onFieldOverlayDetached() {
 		this.activeContextMenu = "";
+		this.activeTableCellContextMenu = "";
 	}
 
 	onCreateField(data: RequestDataCreateField) {
@@ -212,5 +219,42 @@ export class ViewTableComponent implements OnInit {
 			let values = this.tableRecordData!.ColumnValues[c.MetaData.FieldGUID];
 			values.push(c.FieldData)
 		})
+	}
+
+	onShowTableCellContextMenu(contextID: string) {
+		console.log("[onRowClicked] contextID:", contextID);
+		this.activeTableCellContextMenu = contextID;
+		return false
+	}
+
+	onDeleteRecord(e: any, recordGUID: string) {
+		this.onFieldOverlayDetached();
+		console.log("[onDeleteRecord] e:", e, " recordGUID:", recordGUID);
+
+		const data: RequestDataDeleteRecord = {
+			BaseGUID: this.baseGUID!,
+			TableGUID: this.tableGUID!,
+			RecordGUID: recordGUID,
+		}
+
+		this.apiService.apiRequests.deleteTableRecord(data).subscribe({
+			next: (deletedRecordGUID) => {
+				console.log("[onDeleteRecord] deletedRecordGUID:", deletedRecordGUID)
+				this.removeTableRecord(deletedRecordGUID);
+			},
+			error: (err) => {
+				console.log("[onDeleteRecord] err: ", err);
+			}
+		});
+	}
+
+	removeTableRecord(recordGUID: string) {
+		this.tableRecordData?.FieldsMetaData.forEach(f => {
+			let records = this.tableRecordData?.ColumnValues[f.FieldGUID];
+			records = records?.filter(r => r.RecordGUID != recordGUID) || [];
+			this.tableRecordData!.ColumnValues![f.FieldGUID]! = records;
+		})
+
+		this.tableRecordData!.RecordGUIDs = this.tableRecordData!.RecordGUIDs.filter(r => r != recordGUID)
 	}
 }

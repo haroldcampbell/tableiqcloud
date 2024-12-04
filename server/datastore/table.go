@@ -146,18 +146,22 @@ func (t *Table) GetRecordsForField(f *TableField) TableRecordData {
 	return records
 }
 
-// func (t *Table) GetRecordByGUID(recordGUID string) TableRecordData {
-// 	records := t.NewTableRecordData()
+func (t *Table) deleteRecordGUID(recordGUID string) {
+	for index, guid := range t.RecordGUIDs {
+		if guid == recordGUID {
+			t.RecordGUIDs = removeIndex(t.RecordGUIDs, index)
+			return
+		}
+	}
+}
 
-// 	// Returns the meta data
-// 	for _, f := range t.Fields {
-// 		fmt.Printf("[GetRecordByGUID] f.MetaData: %#v\n", f.MetaData)
-// 		records.FieldsMetaData = append(records.FieldsMetaData, f.MetaData)
-// 		records.ColumnValues[f.MetaData.FieldGUID] = []*FieldData{f.GetDataByRecordGUID(recordGUID)}
-// 	}
+func (t *Table) DeleteRecordByRecordGUID(recordGUID string) {
+	for _, f := range t.Fields {
+		f.DeleteRecordByRecordGUID(recordGUID)
+	}
 
-// 	return records
-// }
+	t.deleteRecordGUID(recordGUID)
+}
 
 /// Functions related to table fields
 

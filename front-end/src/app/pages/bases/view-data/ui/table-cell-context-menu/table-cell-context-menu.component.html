@@ -1,0 +1,16 @@
+<div class="overlay-container">
+  <div class="overlay-content">
+    <!-- <div>Insert record above</div> -->
+    <!-- <div>Insert record below</div> -->
+    <!-- <hr /> -->
+    <!-- <div>Duplicate record</div> -->
+    <!-- <div>Expand record</div> -->
+    <!-- <hr /> -->
+    <div class="context-menu" (click)="deleteRecord.emit(field)">
+      <span>
+        <img class="ico" src="/assets/images/ico-trash.png" alt="" />
+      </span>
+      Delete record
+    </div>
+  </div>
+</div>

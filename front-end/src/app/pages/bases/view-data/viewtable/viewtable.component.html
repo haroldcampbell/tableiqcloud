@@ -137,9 +137,29 @@
           <ul class="column-container">
             @for (columnData of columnValues(field); track $index) {
             <!--  Row -->
-            <li class="row-item">
+            <li
+              class="row-item"
+              (contextmenu)="onShowTableCellContextMenu(columnData.GUID)"
+              cdkOverlayOrigin
+              #tableCellContextMenu="cdkOverlayOrigin"
+            >
               <div class="data-item">{{ columnData.DataValue }}&nbsp;</div>
             </li>
+            <ng-template
+              cdkConnectedOverlay
+              [cdkConnectedOverlayOrigin]="tableCellContextMenu"
+              [cdkConnectedOverlayOpen]="
+                isTableCellContextMenuOpen(columnData.GUID)
+              "
+              (detach)="onFieldOverlayDetached()"
+              (overlayOutsideClick)="onFieldOverlayDetached()"
+            >
+              <app-table-cell-context-menu
+                [field]="field"
+                (deleteRecord)="onDeleteRecord($event, columnData.RecordGUID)"
+              ></app-table-cell-context-menu>
+            </ng-template>
+
             }
           </ul>
           }

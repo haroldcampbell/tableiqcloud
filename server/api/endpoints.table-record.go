@@ -19,6 +19,12 @@ type RequestDataCreateRecordResponse struct {
 	Cells      []*datastore.RecordCell
 }
 
+type RequestDataDeleteRecord struct {
+	BaseGUID   string
+	TableGUID  string
+	RecordGUID string
+}
+
 type Context struct {
 	GinContext *gin.Context
 	Datastore  *datastore.Datastore
@@ -88,11 +94,44 @@ func CreateTableRecord(d *datastore.Datastore) func(c *gin.Context) {
 					RecordGUID: recordGUID,
 					Cells:      result,
 				}
+
 				fmt.Printf("[%s] data:%v result:%v\n", ctx.Action, data, result)
 				c.IndentedJSON(http.StatusOK, OkResponse(ctx.Action, resp))
 
 				// Save the changes
-				base.DumpDataAsJSON(d)
+				base.SilentDumpDataAsJSON(d)
+			})
+		})
+	}
+}
+
+func withData[T any](ctx *Context, handler func(ctx *Context, data T)) {
+	var data T
+
+	err := ctx.GinContext.BindJSON(&data)
+	if err != nil {
+		ctx.ErrResponseStatusNotFound("Invalid field data")
+		return
+	}
+	handler(ctx, data)
+}
+
+func DeleteTableRecord(d *datastore.Datastore) func(c *gin.Context) {
+	return func(c *gin.Context) {
+		ctx := NewContext(c, d, "delete-table-record")
+
+		withData(ctx, func(ctx *Context, data RequestDataDeleteRecord) {
+			withValidBase(ctx, data.BaseGUID, func(ctx *Context, base datastore.Base) {
+				withValidTable(ctx, base, data.TableGUID, func(ctx *Context, table *datastore.Table) {
+
+					table.DeleteRecordByRecordGUID(data.RecordGUID)
+
+					// fmt.Printf("[DeleteTableRecord] Got Data:%v", data)
+					c.IndentedJSON(http.StatusOK, OkResponse(ctx.Action, data.RecordGUID))
+
+					// Save the changes
+					base.SilentDumpDataAsJSON(d)
+				})
 			})
 		})
 	}

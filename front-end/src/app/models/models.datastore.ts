@@ -94,6 +94,7 @@ export interface FieldMetaData {
 }
 
 export interface FieldData {
+	GUID: string;
 	RecordGUID: string;
 	DataValue: any;
 }
@@ -186,4 +187,10 @@ export interface RequestDataUpdateField {
 export interface RequestDataCreateRecord {
 	BaseGUID: string
 	TableGUID: string
+}
+
+export interface RequestDataDeleteRecord {
+	BaseGUID: string;
+	TableGUID: string;
+	RecordGUID: string;
 }

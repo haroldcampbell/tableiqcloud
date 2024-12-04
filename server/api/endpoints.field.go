@@ -69,7 +69,7 @@ func CreateTableField(d *datastore.Datastore) func(c *gin.Context) {
 		c.IndentedJSON(http.StatusOK, OkResponse("create-table-field", fieldRecords))
 
 		// Save the changes
-		base.DumpDataAsJSON(d)
+		base.DumpDataAsJSON(d, false)
 	}
 }
 
@@ -107,7 +107,7 @@ func DeleteTableField(d *datastore.Datastore) func(c *gin.Context) {
 		c.IndentedJSON(http.StatusOK, OkResponse("delete-table-field", data.TableFieldGUID))
 
 		// Save the changes
-		base.DumpDataAsJSON(d)
+		base.SilentDumpDataAsJSON(d)
 	}
 }
 
@@ -151,6 +151,6 @@ func UpdateTableField(d *datastore.Datastore) func(c *gin.Context) {
 		c.IndentedJSON(http.StatusOK, OkResponse("update-table-field", fieldMetaData))
 
 		// Save the changes
-		base.DumpDataAsJSON(d)
+		base.SilentDumpDataAsJSON(d)
 	}
 }
