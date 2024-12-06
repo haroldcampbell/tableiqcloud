@@ -257,4 +257,49 @@ export class ViewTableComponent implements OnInit {
 
 		this.tableRecordData!.RecordGUIDs = this.tableRecordData!.RecordGUIDs.filter(r => r != recordGUID)
 	}
+
+	activeCellGUID: string = ""
+	// testCellText = "Chile"
+	isActiveCell(field: FieldMetaData, selectedCell: FieldData) {
+		return this.activeCellGUID == selectedCell.GUID;
+		// return selectedCell.DataValue == this.testCellText
+	}
+
+	onSelectCell(field: FieldMetaData, selectedCell: FieldData) {
+		console.log("[onSelectCell] selectedCell:", selectedCell);
+
+		this.activeCellGUID = selectedCell.GUID;
+	}
+	onSelectCellInput(event: any, field: FieldMetaData, selectedCell: FieldData) {
+		console.log("[onSelectCellInput] $event:", event, " selectedCell:", selectedCell);
+
+		// this.activeCell = selectedCell;
+	}
+	onSelectCellFocus(field: FieldMetaData, selectedCell: FieldData) {
+		console.log("[onSelectCellFocus] selectedCell:", selectedCell);
+
+		// this.activeCell = selectedCell;
+	}
+	onSelectCellBlur(field: FieldMetaData, selectedCell: FieldData) {
+		console.log("[onSelectCellBlur] selectedCell:", selectedCell);
+
+		// this.activeCell = selectedCell;
+	}
+	onSelectCellKeydown(event: KeyboardEvent, field: FieldMetaData, selectedCell: FieldData) {
+		console.log("[onSelectCellKeydown] event:", event, " selectedCell:", selectedCell);
+	}
+	onSelectCellKeyup(event: KeyboardEvent, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
+		console.log("[onSelectCellKeyup] event:", event, " selectedCell:", selectedCell);
+		if (event.key == "Escape") {
+			event.preventDefault();
+
+			const cellId = `cell-${colIndex}-${rowIndex}`;
+			const cell = document.querySelector(`[data-cell-id="${cellId}"]`) as HTMLElement;
+			if (cell) {
+				this.activeCellGUID = "";
+				cell.blur();
+				console.log("[onSelectCellKeyup] set activeCell == null");
+			}
+		}
+	}
 }

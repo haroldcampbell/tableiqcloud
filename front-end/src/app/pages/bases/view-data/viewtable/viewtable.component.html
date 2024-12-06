@@ -132,18 +132,36 @@
 
         <!-- BODY -->
         <div class="body-container">
-          @for (field of tableRecordData?.FieldsMetaData; track $index) {
+          @for (field of tableRecordData?.FieldsMetaData; track $index; let
+          colIndex = $index) {
           <!-- Column  -->
           <ul class="column-container">
-            @for (columnData of columnValues(field); track $index) {
+            @for (columnData of columnValues(field); track $index; let rowIndex
+            = $index) {
             <!--  Row -->
+            <!-- (contextmenu)="onShowTableCellContextMenu(columnData.GUID)" -->
             <li
               class="row-item"
-              (contextmenu)="onShowTableCellContextMenu(columnData.GUID)"
               cdkOverlayOrigin
               #tableCellContextMenu="cdkOverlayOrigin"
             >
-              <div class="data-item">{{ columnData.DataValue }}&nbsp;</div>
+              <div
+                class="data-item"
+                contenteditable="true"
+                [attr.data-cell-id]="'cell-' + colIndex + '-' + rowIndex"
+                [class.active-data-item]="isActiveCell(field, columnData)"
+                (click)="onSelectCell(field, columnData)"
+                (input)="onSelectCellInput($event, field, columnData)"
+                (focus)="onSelectCellFocus(field, columnData)"
+                (blur)="onSelectCellBlur(field, columnData)"
+                (keydown)="onSelectCellKeydown($event, field, columnData)"
+                (keyup)="onSelectCellKeyup($event, field, columnData, colIndex, rowIndex)"
+              >
+                {{ columnData.DataValue }}
+              </div>
+              @if(isActiveCell(field, columnData)) {
+              <div class="data-item">&nbsp;</div>
+              }
             </li>
             <ng-template
               cdkConnectedOverlay
