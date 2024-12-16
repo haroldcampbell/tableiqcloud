@@ -10,6 +10,13 @@ import { FieldContextMenuOverlayComponent } from '../ui/field-context-menu-overl
 import { EditFieldContextMenuOverlayComponent } from '../ui/edit-field-context-menu-overlay/edit-field-context-menu-overlay.component';
 import { TableCellContextMenuComponent } from '../ui/table-cell-context-menu/table-cell-context-menu.component';
 
+interface KeyboardData {
+	event: KeyboardEvent
+	field: FieldMetaData;
+	selectedCell: FieldData;
+	colIndex: number;
+	rowIndex: number;
+}
 
 @Component({
 	selector: 'ui-viewtable',
@@ -270,36 +277,89 @@ export class ViewTableComponent implements OnInit {
 
 		this.activeCellGUID = selectedCell.GUID;
 	}
+
 	onSelectCellInput(event: any, field: FieldMetaData, selectedCell: FieldData) {
 		console.log("[onSelectCellInput] $event:", event, " selectedCell:", selectedCell);
 
 		// this.activeCell = selectedCell;
 	}
+
 	onSelectCellFocus(field: FieldMetaData, selectedCell: FieldData) {
 		console.log("[onSelectCellFocus] selectedCell:", selectedCell);
 
 		// this.activeCell = selectedCell;
 	}
+
 	onSelectCellBlur(field: FieldMetaData, selectedCell: FieldData) {
 		console.log("[onSelectCellBlur] selectedCell:", selectedCell);
-
+		// TODO: Auto-save
 		// this.activeCell = selectedCell;
 	}
-	onSelectCellKeydown(event: KeyboardEvent, field: FieldMetaData, selectedCell: FieldData) {
-		console.log("[onSelectCellKeydown] event:", event, " selectedCell:", selectedCell);
-	}
-	onSelectCellKeyup(event: KeyboardEvent, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
-		console.log("[onSelectCellKeyup] event:", event, " selectedCell:", selectedCell);
-		if (event.key == "Escape") {
-			event.preventDefault();
 
-			const cellId = `cell-${colIndex}-${rowIndex}`;
-			const cell = document.querySelector(`[data-cell-id="${cellId}"]`) as HTMLElement;
-			if (cell) {
-				this.activeCellGUID = "";
-				cell.blur();
-				console.log("[onSelectCellKeyup] set activeCell == null");
+	onSelectCellKeydown(event: KeyboardEvent, field: FieldMetaData, selectedCell: FieldData) {
+		// console.log("[onSelectCellKeydown] event:", event, " selectedCell:", selectedCell);
+	}
+
+	onSelectCellKeyup(event: KeyboardEvent, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
+		// console.log("[onSelectCellKeyup] event:", event, " selectedCell:", selectedCell);
+
+		let cell = this.getCell(colIndex, rowIndex);
+		if (cell == null) {
+			this.activeCellGUID = "";
+			return;
+		}
+
+		let data: KeyboardData = {
+			event: event,
+			field: field,
+			selectedCell: selectedCell,
+			colIndex: colIndex,
+			rowIndex: rowIndex,
+		}
+
+		switch (event.key) {
+			case "Escape": {
+				this.keyHandlerEscape(data, cell);
+				break;
+			}
+
+			case "Enter": {
+				this.keyHandlerEnter(data, cell);
+				break;
+			}
+
+			default: {
+
 			}
 		}
+	}
+
+	private getCell(colIndex: number, rowIndex: number): HTMLElement | null {
+		const cellId = `cell-${colIndex}-${rowIndex}`;
+		const cell = document.querySelector(`[data-cell-id="${cellId}"]`) as HTMLElement;
+
+		return cell
+	}
+
+	keyHandlerEscape(data: KeyboardData, cell: HTMLElement) {
+		data.event.preventDefault();
+
+		this.activeCellGUID = "";
+		cell.blur();
+		// console.log("[keyHandlerEscape] set activeCell == null");
+	}
+
+	keyHandlerEnter(data: KeyboardData, cell: HTMLElement) {
+		data.event.preventDefault();
+		this.activeCellGUID = "";
+		cell.blur();
+		cell.innerHTML = cell.innerText;
+		// console.log("[keyHandlerEnter] set activeCell == null", data.field, cell.innerText);
+
+	}
+
+	keyHandlerDefault(data: KeyboardData, cell: HTMLElement) {
+		console.log("[keyHandlerDefault] set activeCell == null");
+
 	}
 }
