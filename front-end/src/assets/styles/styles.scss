@@ -8,7 +8,7 @@ body {
 }
 
 body {
-    font-family: "Roboto", "Open Sans", "PT Serif Caption", "Helvetica Neue", sans-serif;
+    font-family: "Roboto", "Open Sans", "PT Serif Caption", "Helvetica Neue", sans-serif !important;
     // font-size: 12px !important;
     // font-style: normal !important;
     // font-weight: 300px !important;
@@ -22,6 +22,9 @@ body {
     background-color: #fff;
 }
 
+input {
+    font-family: "Roboto", "Open Sans", "PT Serif Caption", "Helvetica Neue", sans-serif !important;
+}
 
 textarea {
     resize: none;

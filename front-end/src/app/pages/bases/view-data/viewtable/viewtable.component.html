@@ -48,30 +48,32 @@
           @for (field of tableRecordData?.FieldsMetaData; track $index) {
           <ul class="column-container">
             <li class="row-header-item row-item">
-              <ul
-                class="data-item"
-                cdkOverlayOrigin
-                #fieldContextOverlay="cdkOverlayOrigin"
-              >
-                <li class="field-name">
-                  <img
-                    class="ico"
-                    src="/assets/images/{{ fieldTypeToImg(field) }}.png"
-                    alt=""
-                  />
-                  {{ field.FieldName }}
-                </li>
-                <li
-                  class="action-item"
-                  (click)="onOpenFieldContextMenu(field.FieldGUID)"
+              <div class="header-item-wrapper">
+                <ul
+                  class="data-item"
+                  cdkOverlayOrigin
+                  #fieldContextOverlay="cdkOverlayOrigin"
                 >
-                  <img
-                    class="ico"
-                    src="/assets/images/ico-context.png"
-                    alt=""
-                  />
-                </li>
-              </ul>
+                  <li class="field-name">
+                    <img
+                      class="ico"
+                      src="/assets/images/{{ fieldTypeToImg(field) }}.png"
+                      alt=""
+                    />
+                    {{ field.FieldName }}
+                  </li>
+                  <li
+                    class="action-item"
+                    (click)="onOpenFieldContextMenu(field.FieldGUID)"
+                  >
+                    <img
+                      class="ico"
+                      src="/assets/images/ico-context.png"
+                      alt=""
+                    />
+                  </li>
+                </ul>
+              </div>
             </li>
           </ul>
 
@@ -115,17 +117,22 @@
           <!-- Add Filed -->
           <ul class="column-container">
             <li class="row-item">
-              <ul
-                class="data-item action-item"
-                (click)="onOpenFieldContextMenu(AddFieldAction)"
-                cdkOverlayOrigin
-                #addFieldOverlay="cdkOverlayOrigin"
-              >
-                <li class="field-name">
-                  <img class="ico" src="/assets/images/ico-add.png" alt="" />Add
-                  field
-                </li>
-              </ul>
+              <div class="header-item-wrapper">
+                <ul
+                  class="data-item action-item"
+                  (click)="onOpenFieldContextMenu(AddFieldAction)"
+                  cdkOverlayOrigin
+                  #addFieldOverlay="cdkOverlayOrigin"
+                >
+                  <li class="field-name">
+                    <img
+                      class="ico"
+                      src="/assets/images/ico-add.png"
+                      alt=""
+                    />Add field
+                  </li>
+                </ul>
+              </div>
             </li>
           </ul>
         </div>
@@ -139,12 +146,8 @@
             @for (columnData of columnValues(field); track $index; let rowIndex
             = $index) {
             <!--  Row -->
-            <li
-              class="row-item"
-              cdkOverlayOrigin
-              #tableCellContextMenu="cdkOverlayOrigin"
-            >
-              <div
+
+            <!-- <div
                 class="data-item"
                 contenteditable="true"
                 [attr.data-cell-id]="'cell-' + colIndex + '-' + rowIndex"
@@ -157,10 +160,47 @@
                 (keyup)="onSelectCellKeyup($event, field, columnData, colIndex, rowIndex)"
               >
                 {{ columnData.DataValue }}
+              </div> -->
+            @if(isActiveCell(field, columnData)) {
+            <li class="active-row-item" cdkOverlayOrigin>
+              <div class="active-data-item">
+                <div class="value-item-container">
+                  <div #gridWrapperElement class="input-wrapper">
+                    <input
+                      #gridInputElement
+                      class="input-elm"
+                      type="text"
+                      [attr.data-cell-id]="'cell-' + colIndex + '-' + rowIndex"
+                      (focus)="onSelectCellFocus(field, columnData)"
+                      (blur)="onSelectCellBlur(field, columnData)"
+                      (keyup)="
+                        onSelectCellKeyup(
+                          $event,
+                          field,
+                          columnData,
+                          colIndex,
+                          rowIndex
+                        )
+                      "
+                      [(ngModel)]="dirtyDataValue"
+                    />
+                  </div>
+                </div>
               </div>
-              @if(isActiveCell(field, columnData)) {
-              <div class="data-item">&nbsp;</div>
-              }
+            </li>
+
+            } @else {
+            <!-- (contextmenu)="onShowTableCellContextMenu(columnData.GUID)" -->
+            <li
+              class="row-item"
+              cdkOverlayOrigin
+              #tableCellContextMenu="cdkOverlayOrigin"
+            >
+              <div class="data-item" (click)="onSelectCell(field, columnData)">
+                <div class="value-item-container">
+                  {{ columnData.DataValue }}
+                </div>
+              </div>
             </li>
             <ng-template
               cdkConnectedOverlay
@@ -176,8 +216,7 @@
                 (deleteRecord)="onDeleteRecord($event, columnData.RecordGUID)"
               ></app-table-cell-context-menu>
             </ng-template>
-
-            }
+            } }
           </ul>
           }
         </div>

@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../../api.services/api.service';
 import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord } from '../../../../models/models.datastore';
@@ -39,6 +39,8 @@ export class ViewTableComponent implements OnInit {
 	tableRecordData?: TableRecordData;
 	private fieldTypeImgMap!: Map<TableFieldType, string>;
 
+	@ViewChild('gridInputElement') gridInputElementRef!: ElementRef;
+	@ViewChild('gridWrapperElement') gridWrapperElementRef!: ElementRef;
 
 	@Input() baseGUID?: string;
 
@@ -70,6 +72,14 @@ export class ViewTableComponent implements OnInit {
 			[TableFieldType.FieldTypeRelationship, "ico-field-relationship"],
 		]);
 	}
+
+	// ngAfterViewChecked() {
+	// 	if (this.activeCellGUID != "" && this.gridInputElementRef) {
+	// 		let inputElm = this.gridInputElementRef.nativeElement as HTMLInputElement;
+	// 		let wrapperElm = this.gridWrapperElementRef.nativeElement as HTMLElement;
+	// 		// console.log('Element has been added to the DOM', this.activeCellGUID, wrapperElm, inputElm.value);
+	// 	}
+	// }
 
 	private loadTableData() {
 		if (!hasString(this.baseGUID) || !hasString(this.tableGUID)) {
@@ -107,7 +117,10 @@ export class ViewTableComponent implements OnInit {
 		return this.activeContextMenu == conextID;
 	}
 
+
 	isTableCellContextMenuOpen(contextID: string) {
+		// console.log("[isTableCellContextMenuOpen]")
+
 		return this.activeTableCellContextMenu == contextID
 	}
 	// @conextID either the fieldID or the value '__add-field-action'
@@ -228,6 +241,9 @@ export class ViewTableComponent implements OnInit {
 		})
 	}
 
+	// TODO: Fix context menu to delete a row is not showing
+
+
 	onShowTableCellContextMenu(contextID: string) {
 		console.log("[onRowClicked] contextID:", contextID);
 		this.activeTableCellContextMenu = contextID;
@@ -266,15 +282,20 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	activeCellGUID: string = ""
-	// testCellText = "Chile"
+	// testCellText = "Heart Trust"
+	// testCellText = "Jamaica"
+	// testCellText = "UWI Mona"
+	dirtyDataValue: string = "";
+
 	isActiveCell(field: FieldMetaData, selectedCell: FieldData) {
 		return this.activeCellGUID == selectedCell.GUID;
 		// return selectedCell.DataValue == this.testCellText
 	}
 
+	/** Fired when the cell is first clicked. This set the outline indicating that it is selected. */
 	onSelectCell(field: FieldMetaData, selectedCell: FieldData) {
 		console.log("[onSelectCell] selectedCell:", selectedCell);
-
+		this.dirtyDataValue = selectedCell.DataValue
 		this.activeCellGUID = selectedCell.GUID;
 	}
 
@@ -284,9 +305,12 @@ export class ViewTableComponent implements OnInit {
 		// this.activeCell = selectedCell;
 	}
 
+	/** Fired when the input element has focus.
+	 * This happens after the select is select, then clicked again to gain focus */
 	onSelectCellFocus(field: FieldMetaData, selectedCell: FieldData) {
 		console.log("[onSelectCellFocus] selectedCell:", selectedCell);
 
+		// this.dirtyDataValue = selectedCell.DataValue
 		// this.activeCell = selectedCell;
 	}
 
@@ -294,6 +318,10 @@ export class ViewTableComponent implements OnInit {
 		console.log("[onSelectCellBlur] selectedCell:", selectedCell);
 		// TODO: Auto-save
 		// this.activeCell = selectedCell;
+		// data.event.preventDefault();
+
+		this.activeCellGUID = "";
+		// cell.blur();
 	}
 
 	onSelectCellKeydown(event: KeyboardEvent, field: FieldMetaData, selectedCell: FieldData) {
@@ -305,7 +333,9 @@ export class ViewTableComponent implements OnInit {
 
 		let cell = this.getCell(colIndex, rowIndex);
 		if (cell == null) {
-			this.activeCellGUID = "";
+			// console.log("[onSelectCellKeyup] cell==null", colIndex, rowIndex);
+
+			// this.activeCellGUID = "";
 			return;
 		}
 
@@ -342,20 +372,21 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	keyHandlerEscape(data: KeyboardData, cell: HTMLElement) {
+		console.log("[keyHandlerEscape]");
 		data.event.preventDefault();
 
 		this.activeCellGUID = "";
 		cell.blur();
-		// console.log("[keyHandlerEscape] set activeCell == null");
+		cell.innerHTML = data.selectedCell.DataValue;
 	}
 
 	keyHandlerEnter(data: KeyboardData, cell: HTMLElement) {
+		console.log("[keyHandlerEnter] ", data.field, cell.innerText);
+
 		data.event.preventDefault();
 		this.activeCellGUID = "";
 		cell.blur();
 		cell.innerHTML = cell.innerText;
-		// console.log("[keyHandlerEnter] set activeCell == null", data.field, cell.innerText);
-
 	}
 
 	keyHandlerDefault(data: KeyboardData, cell: HTMLElement) {
