@@ -187,7 +187,9 @@ $grid-cell-background-color: #fff;
     flex: 1 1 auto;
 
     .column-container {
-        // margin-top: 1px;
+        .row-item-wrapper {
+            outline: none;
+        }
 
         .row-item,
         .active-row-item {
@@ -240,6 +242,7 @@ $grid-cell-background-color: #fff;
 
         .active-row-item {
             z-index: 100;
+            padding-bottom: 1px;
 
             .active-data-item {
                 display: flex;

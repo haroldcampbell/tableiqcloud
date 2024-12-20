@@ -18,6 +18,12 @@ interface KeyboardData {
 	rowIndex: number;
 }
 
+enum CellEditMode {
+	CellEditModeNone,
+	CellEditModeSelected,
+	CellEditModeEditing
+}
+
 @Component({
 	selector: 'ui-viewtable',
 	standalone: true,
@@ -40,7 +46,6 @@ export class ViewTableComponent implements OnInit {
 	private fieldTypeImgMap!: Map<TableFieldType, string>;
 
 	@ViewChild('gridInputElement') gridInputElementRef!: ElementRef;
-	@ViewChild('gridWrapperElement') gridWrapperElementRef!: ElementRef;
 
 	@Input() baseGUID?: string;
 
@@ -73,13 +78,22 @@ export class ViewTableComponent implements OnInit {
 		]);
 	}
 
-	// ngAfterViewChecked() {
-	// 	if (this.activeCellGUID != "" && this.gridInputElementRef) {
-	// 		let inputElm = this.gridInputElementRef.nativeElement as HTMLInputElement;
-	// 		let wrapperElm = this.gridWrapperElementRef.nativeElement as HTMLElement;
-	// 		// console.log('Element has been added to the DOM', this.activeCellGUID, wrapperElm, inputElm.value);
-	// 	}
-	// }
+	ngAfterViewChecked() {
+		// if (this.activeCellGUID != "" && this.gridInputElementRef) {
+		// 	let inputElm = this.gridInputElementRef.nativeElement as HTMLInputElement;
+		// 	let wrapperElm = this.gridWrapperElementRef.nativeElement as HTMLElement;
+
+		// 	if (this.cellEditMode == CellEditMode.CellEditModeNone) {
+		// 		wrapperElm.addEventListener("keyup", this.keyupListener)
+		// 		this.cellEditMode = CellEditMode.CellEditModeSelected;
+		// 		wrapperElm.focus();
+		// 	}
+
+		// 	// wrapperElm.onkeyup = this.onSelectedCellKeyUp
+		// 	// inputElm.focus();
+		// 	console.log('Element has been added to the DOM', this.activeCellGUID, wrapperElm, inputElm.value);
+		// }
+	}
 
 	private loadTableData() {
 		if (!hasString(this.baseGUID) || !hasString(this.tableGUID)) {
@@ -241,18 +255,15 @@ export class ViewTableComponent implements OnInit {
 		})
 	}
 
-	// TODO: Fix context menu to delete a row is not showing
-
-
 	onShowTableCellContextMenu(contextID: string) {
-		console.log("[onRowClicked] contextID:", contextID);
+		// console.log("[onRowClicked] contextID:", contextID);
 		this.activeTableCellContextMenu = contextID;
 		return false
 	}
 
 	onDeleteRecord(e: any, recordGUID: string) {
 		this.onFieldOverlayDetached();
-		console.log("[onDeleteRecord] e:", e, " recordGUID:", recordGUID);
+		// console.log("[onDeleteRecord] e:", e, " recordGUID:", recordGUID);
 
 		const data: RequestDataDeleteRecord = {
 			BaseGUID: this.baseGUID!,
@@ -262,7 +273,7 @@ export class ViewTableComponent implements OnInit {
 
 		this.apiService.apiRequests.deleteTableRecord(data).subscribe({
 			next: (deletedRecordGUID) => {
-				console.log("[onDeleteRecord] deletedRecordGUID:", deletedRecordGUID)
+				// console.log("[onDeleteRecord] deletedRecordGUID:", deletedRecordGUID)
 				this.removeTableRecord(deletedRecordGUID);
 			},
 			error: (err) => {
@@ -286,56 +297,93 @@ export class ViewTableComponent implements OnInit {
 	// testCellText = "Jamaica"
 	// testCellText = "UWI Mona"
 	dirtyDataValue: string = "";
+	cellEditMode = CellEditMode.CellEditModeNone;
 
-	isActiveCell(field: FieldMetaData, selectedCell: FieldData) {
+	keyUpListenerSelectedRowItem = (e: KeyboardEvent) => this.onSelectRowItemKeyUp(e);
+	blurListenerSelectedRowItem = () => this.onSelectRowItemBlur();
+
+	isActiveCell(selectedCell: FieldData) {
 		return this.activeCellGUID == selectedCell.GUID;
-		// return selectedCell.DataValue == this.testCellText
 	}
 
+	clearCellGUID() {
+		this.cellEditMode = CellEditMode.CellEditModeNone;
+		this.activeCellGUID = "";
+	}
+
+	private rowItemWrapperElm!: HTMLElement;
 	/** Fired when the cell is first clicked. This set the outline indicating that it is selected. */
-	onSelectCell(field: FieldMetaData, selectedCell: FieldData) {
-		console.log("[onSelectCell] selectedCell:", selectedCell);
+	onSelectRowItem(event: MouseEvent, selectedCell: FieldData, colIndex: number, rowIndex: number) {
+		// console.log("[onSelectRowItem] selectedCell:", selectedCell, event);
 		this.dirtyDataValue = selectedCell.DataValue
 		this.activeCellGUID = selectedCell.GUID;
+
+		const cellId = `row-item-wrapper-${colIndex}-${rowIndex}`;
+		this.rowItemWrapperElm = document.querySelector(`[data-cell-id="${cellId}"]`) as HTMLElement;
+
+		if (this.rowItemWrapperElm == null) {
+			return;
+		}
+
+		this.rowItemWrapperElm.addEventListener("keyup", this.keyUpListenerSelectedRowItem)
+		this.rowItemWrapperElm.addEventListener("blur", this.blurListenerSelectedRowItem)
+		this.cellEditMode = CellEditMode.CellEditModeSelected;
 	}
 
-	onSelectCellInput(event: any, field: FieldMetaData, selectedCell: FieldData) {
-		console.log("[onSelectCellInput] $event:", event, " selectedCell:", selectedCell);
+	/** Fired when the cell has a KeyUp event, however we haven't gotten to the cell input
+	 */
+	onSelectRowItemKeyUp(event: KeyboardEvent) {
+		// console.log("[onSelectRowItemKeyUp]");
+		event.preventDefault();
 
-		// this.activeCell = selectedCell;
+		switch (event.key) {
+			case "Escape": {
+				if (this.activeCellGUID != "" && this.cellEditMode == CellEditMode.CellEditModeSelected) {
+					this.activeCellGUID = "";
+					this.cellEditMode = CellEditMode.CellEditModeNone;
+					this.rowItemWrapperElm.blur();
+				}
+
+				break;
+			}
+
+			case "Enter": {
+				/** Handle the case when the user presses enter on a selected cell to enter edit-mode */
+				this.cellEditMode = CellEditMode.CellEditModeEditing;
+				let inputElm = this.gridInputElementRef.nativeElement as HTMLInputElement;
+				inputElm.focus();
+
+				break;
+			}
+		}
+	}
+
+	private onSelectRowItemBlur() {
+		this.rowItemWrapperElm.removeEventListener("keyup", this.keyUpListenerSelectedRowItem);
+		this.rowItemWrapperElm.removeEventListener("blur", this.blurListenerSelectedRowItem);
 	}
 
 	/** Fired when the input element has focus.
 	 * This happens after the select is select, then clicked again to gain focus */
-	onSelectCellFocus(field: FieldMetaData, selectedCell: FieldData) {
-		console.log("[onSelectCellFocus] selectedCell:", selectedCell);
-
-		// this.dirtyDataValue = selectedCell.DataValue
-		// this.activeCell = selectedCell;
+	onInputCellFocus() {
+		// console.log("[onInputCellFocus] selectedCell:", selectedCell);
+		this.cellEditMode = CellEditMode.CellEditModeEditing;
 	}
 
-	onSelectCellBlur(field: FieldMetaData, selectedCell: FieldData) {
-		console.log("[onSelectCellBlur] selectedCell:", selectedCell);
+	onInputCellBlur() {
+		// console.log("[onInputCellBlur] selectedCell:", selectedCell);
 		// TODO: Auto-save
 		// this.activeCell = selectedCell;
 		// data.event.preventDefault();
 
-		this.activeCellGUID = "";
-		// cell.blur();
+		this.clearCellGUID();
 	}
 
-	onSelectCellKeydown(event: KeyboardEvent, field: FieldMetaData, selectedCell: FieldData) {
-		// console.log("[onSelectCellKeydown] event:", event, " selectedCell:", selectedCell);
-	}
-
-	onSelectCellKeyup(event: KeyboardEvent, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
+	onInputCellKeyup(event: KeyboardEvent, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
 		// console.log("[onSelectCellKeyup] event:", event, " selectedCell:", selectedCell);
 
 		let cell = this.getCell(colIndex, rowIndex);
 		if (cell == null) {
-			// console.log("[onSelectCellKeyup] cell==null", colIndex, rowIndex);
-
-			// this.activeCellGUID = "";
 			return;
 		}
 
@@ -365,31 +413,31 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	private getCell(colIndex: number, rowIndex: number): HTMLElement | null {
-		const cellId = `cell-${colIndex}-${rowIndex}`;
+		const cellId = `input-${colIndex}-${rowIndex}`;
 		const cell = document.querySelector(`[data-cell-id="${cellId}"]`) as HTMLElement;
 
 		return cell
 	}
 
-	keyHandlerEscape(data: KeyboardData, cell: HTMLElement) {
+	private keyHandlerEscape(data: KeyboardData, cell: HTMLElement) {
 		console.log("[keyHandlerEscape]");
 		data.event.preventDefault();
 
-		this.activeCellGUID = "";
+		this.clearCellGUID();
 		cell.blur();
 		cell.innerHTML = data.selectedCell.DataValue;
 	}
 
-	keyHandlerEnter(data: KeyboardData, cell: HTMLElement) {
+	private keyHandlerEnter(data: KeyboardData, cell: HTMLElement) {
 		console.log("[keyHandlerEnter] ", data.field, cell.innerText);
 
 		data.event.preventDefault();
-		this.activeCellGUID = "";
+		this.clearCellGUID();
 		cell.blur();
 		cell.innerHTML = cell.innerText;
 	}
 
-	keyHandlerDefault(data: KeyboardData, cell: HTMLElement) {
+	private keyHandlerDefault(data: KeyboardData, cell: HTMLElement) {
 		console.log("[keyHandlerDefault] set activeCell == null");
 
 	}

@@ -142,82 +142,80 @@
           @for (field of tableRecordData?.FieldsMetaData; track $index; let
           colIndex = $index) {
           <!-- Column  -->
-          <ul class="column-container">
+          <div class="column-container">
             @for (columnData of columnValues(field); track $index; let rowIndex
             = $index) {
             <!--  Row -->
 
-            <!-- <div
-                class="data-item"
-                contenteditable="true"
-                [attr.data-cell-id]="'cell-' + colIndex + '-' + rowIndex"
-                [class.active-data-item]="isActiveCell(field, columnData)"
-                (click)="onSelectCell(field, columnData)"
-                (input)="onSelectCellInput($event, field, columnData)"
-                (focus)="onSelectCellFocus(field, columnData)"
-                (blur)="onSelectCellBlur(field, columnData)"
-                (keydown)="onSelectCellKeydown($event, field, columnData)"
-                (keyup)="onSelectCellKeyup($event, field, columnData, colIndex, rowIndex)"
-              >
-                {{ columnData.DataValue }}
-              </div> -->
-            @if(isActiveCell(field, columnData)) {
-            <li class="active-row-item" cdkOverlayOrigin>
-              <div class="active-data-item">
-                <div class="value-item-container">
-                  <div #gridWrapperElement class="input-wrapper">
-                    <input
-                      #gridInputElement
-                      class="input-elm"
-                      type="text"
-                      [attr.data-cell-id]="'cell-' + colIndex + '-' + rowIndex"
-                      (focus)="onSelectCellFocus(field, columnData)"
-                      (blur)="onSelectCellBlur(field, columnData)"
-                      (keyup)="
-                        onSelectCellKeyup(
-                          $event,
-                          field,
-                          columnData,
-                          colIndex,
-                          rowIndex
-                        )
-                      "
-                      [(ngModel)]="dirtyDataValue"
-                    />
+            <div
+              class="row-item-wrapper"
+              tabindex="0"
+              [attr.data-cell-id]="
+                'row-item-wrapper-' + colIndex + '-' + rowIndex
+              "
+              (click)="onSelectRowItem($event, columnData, colIndex, rowIndex)"
+            >
+              @if(isActiveCell(columnData)) {
+              <div class="active-row-item" cdkOverlayOrigin>
+                <div class="active-data-item">
+                  <div class="value-item-container">
+                    <div class="input-wrapper">
+                      <input
+                        #gridInputElement
+                        class="input-elm"
+                        type="text"
+                        [attr.data-cell-id]="
+                          'input-' + colIndex + '-' + rowIndex
+                        "
+                        (focus)="onInputCellFocus()"
+                        (blur)="onInputCellBlur()"
+                        (keyup)="
+                          onInputCellKeyup(
+                            $event,
+                            field,
+                            columnData,
+                            colIndex,
+                            rowIndex
+                          )
+                        "
+                        [(ngModel)]="dirtyDataValue"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
-            </li>
 
-            } @else {
-            <!-- (contextmenu)="onShowTableCellContextMenu(columnData.GUID)" -->
-            <li
-              class="row-item"
-              cdkOverlayOrigin
-              #tableCellContextMenu="cdkOverlayOrigin"
-            >
-              <div class="data-item" (click)="onSelectCell(field, columnData)">
-                <div class="value-item-container">
-                  {{ columnData.DataValue }}
+              } @else {
+              <div
+                class="row-item"
+                cdkOverlayOrigin
+                #tableCellContextMenu="cdkOverlayOrigin"
+                (contextmenu)="onShowTableCellContextMenu(columnData.GUID)"
+              >
+                <div class="data-item">
+                  <div class="value-item-container">
+                    {{ columnData.DataValue }}
+                  </div>
                 </div>
               </div>
-            </li>
-            <ng-template
-              cdkConnectedOverlay
-              [cdkConnectedOverlayOrigin]="tableCellContextMenu"
-              [cdkConnectedOverlayOpen]="
-                isTableCellContextMenuOpen(columnData.GUID)
-              "
-              (detach)="onFieldOverlayDetached()"
-              (overlayOutsideClick)="onFieldOverlayDetached()"
-            >
-              <app-table-cell-context-menu
-                [field]="field"
-                (deleteRecord)="onDeleteRecord($event, columnData.RecordGUID)"
-              ></app-table-cell-context-menu>
-            </ng-template>
-            } }
-          </ul>
+              <ng-template
+                cdkConnectedOverlay
+                [cdkConnectedOverlayOrigin]="tableCellContextMenu"
+                [cdkConnectedOverlayOpen]="
+                  isTableCellContextMenuOpen(columnData.GUID)
+                "
+                (detach)="onFieldOverlayDetached()"
+                (overlayOutsideClick)="onFieldOverlayDetached()"
+              >
+                <app-table-cell-context-menu
+                  [field]="field"
+                  (deleteRecord)="onDeleteRecord($event, columnData.RecordGUID)"
+                ></app-table-cell-context-menu>
+              </ng-template>
+              }
+            </div>
+            }
+          </div>
           }
         </div>
 
