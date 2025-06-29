@@ -55,7 +55,6 @@ type FieldMetaData struct {
 func initFieldMetaData(fieldName string, fieldType TableFieldType) *FieldMetaData {
 	metaData := &FieldMetaData{
 		FieldGUID: utils.GenerateUUID(),
-		// TableGUID: tableGUID,
 		FieldName: fieldName,
 		FieldType: fieldType,
 	}

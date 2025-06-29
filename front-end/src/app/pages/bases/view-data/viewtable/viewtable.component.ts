@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../../api.services/api.service';
-import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord } from '../../../../models/models.datastore';
+import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord, RequestDataUpdateFieldDataValue } from '../../../../models/models.datastore';
 import { hasString } from '../../../../core/utils';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { AddFieldOverlayComponent } from '../ui/add-field-overlay/add-field-overlay.component';
@@ -166,7 +166,7 @@ export class ViewTableComponent implements OnInit {
 	onUpdateField(r: RequestDataUpdateField) {
 		this.onFieldOverlayDetached();
 
-		this.apiService.apiRequests.updateTableField(r).subscribe({
+		this.apiService.apiRequests.updateTableFieldInfo(r).subscribe({
 			next: (data) => {
 				// console.log("[onCreateField] data: ", data);
 				this.updateTableFieldType(data);
@@ -303,7 +303,7 @@ export class ViewTableComponent implements OnInit {
 	blurListenerSelectedRowItem = () => this.onSelectRowItemBlur();
 
 	isActiveCell(selectedCell: FieldData) {
-		return this.activeCellGUID == selectedCell.GUID;
+		return this.activeCellGUID == selectedCell.CellGUID;
 	}
 
 	clearCellGUID() {
@@ -316,7 +316,7 @@ export class ViewTableComponent implements OnInit {
 	onSelectRowItem(event: MouseEvent, selectedCell: FieldData, colIndex: number, rowIndex: number) {
 		// console.log("[onSelectRowItem] selectedCell:", selectedCell, event);
 		this.dirtyDataValue = selectedCell.DataValue
-		this.activeCellGUID = selectedCell.GUID;
+		this.activeCellGUID = selectedCell.CellGUID;
 
 		const cellId = `row-item-wrapper-${colIndex}-${rowIndex}`;
 		this.rowItemWrapperElm = document.querySelector(`[data-cell-id="${cellId}"]`) as HTMLElement;
@@ -334,6 +334,7 @@ export class ViewTableComponent implements OnInit {
 	 */
 	onSelectRowItemKeyUp(event: KeyboardEvent) {
 		// console.log("[onSelectRowItemKeyUp]");
+		console.log("[onSelectRowItemKeyUp] event:", event);
 		event.preventDefault();
 
 		switch (event.key) {
@@ -349,6 +350,11 @@ export class ViewTableComponent implements OnInit {
 
 			case "Enter": {
 				/** Handle the case when the user presses enter on a selected cell to enter edit-mode */
+				if (this.gridInputElementRef == null) {
+					console.warn("[onSelectRowItemKeyUp] gridInputElementRef is null, cannot enter edit mode");
+					return
+				}
+
 				this.cellEditMode = CellEditMode.CellEditModeEditing;
 				let inputElm = this.gridInputElementRef.nativeElement as HTMLInputElement;
 				inputElm.focus();
@@ -381,6 +387,8 @@ export class ViewTableComponent implements OnInit {
 
 	onInputCellKeyup(event: KeyboardEvent, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
 		// console.log("[onSelectCellKeyup] event:", event, " selectedCell:", selectedCell);
+		event.preventDefault();
+		event.stopPropagation
 
 		let cell = this.getCell(colIndex, rowIndex);
 		if (cell == null) {
@@ -429,12 +437,39 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	private keyHandlerEnter(data: KeyboardData, cell: HTMLElement) {
-		console.log("[keyHandlerEnter] ", data.field, cell.innerText);
+		console.log("[keyHandlerEnter] data.field:", data.field);
 
 		data.event.preventDefault();
+		data.event.stopImmediatePropagation();
+		// data.event.stopPropagation();
+
 		this.clearCellGUID();
 		cell.blur();
-		cell.innerHTML = cell.innerText;
+		cell.innerHTML = this.dirtyDataValue;
+
+		const request: RequestDataUpdateFieldDataValue = {
+			BaseGUID: this.baseGUID!,
+			TableGUID: this.tableGUID!,
+			FieldGUID: data.field.FieldGUID,
+			FieldData: {
+				CellGUID: data.selectedCell.CellGUID,
+				RecordGUID: data.selectedCell.RecordGUID,
+				DataValue: this.dirtyDataValue,
+			}
+		}
+
+		// console.log("[keyHandlerEnter:updateTableFieldDataValue] selectedCell:", data.selectedCell);
+
+		this.apiService.apiRequests.updateTableFieldDataValue(request)
+			.subscribe({
+				next: (result: FieldData) => {
+					data.selectedCell.DataValue = result.DataValue
+					// console.log("[keyHandlerEnter] result: ", result);
+				},
+				error: (err) => {
+					console.log("[keyHandlerEnter] err: ", err);
+				}
+			})
 	}
 
 	private keyHandlerDefault(data: KeyboardData, cell: HTMLElement) {

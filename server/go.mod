@@ -37,6 +37,6 @@ require (
 )
 
 require (
-	github.com/stretchr/testify v1.9.0
 	github.com/haroldcampbell/go_utils v0.0.0-20230721063127-a8238e983839
+	github.com/stretchr/testify v1.9.0
 )

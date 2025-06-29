@@ -87,13 +87,27 @@ func (t *Table) GetRecordByGUID(recordGUID string) ([]*RecordCell, error) {
 	recordCells := make([]*RecordCell, 0)
 
 	for _, field := range t.Fields {
-		result, ok := field.FieldDataGUIDMap[recordGUID]
+		_, ok := field.FieldDataGUIDMap[recordGUID]
 		if !ok {
 			return nil, errors.New("GetRecordByGUID failed. Can't find recordGUID")
 		}
+
+		var fieldData *FieldData
+
+		for _, fd := range field.FieldData {
+			if fd.RecordGUID == recordGUID {
+				fieldData = fd
+				break
+			}
+		}
+
+		if fieldData == nil {
+			return nil, fmt.Errorf("GetRecordByGUID failed. Can't find field data for record")
+		}
+
 		cell := &RecordCell{
 			MetaData:  field.MetaData,
-			FieldData: *result,
+			FieldData: *fieldData,
 		}
 
 		recordCells = append(recordCells, cell)
@@ -226,7 +240,7 @@ func (t *Table) findTableFieldIndexByGUID(tableFieldGUID string) (int, error) {
 		}
 	}
 
-	return -1, errors.New(fmt.Sprintf("tableFieldGUID: '%s' not found", tableFieldGUID))
+	return -1, fmt.Errorf("tableFieldGUID: '%s' not found", tableFieldGUID)
 }
 
 func (t *Table) DeleteTableField(tableFieldGUID string) error {
@@ -243,12 +257,15 @@ func (t *Table) DeleteTableField(tableFieldGUID string) error {
 
 func (t *Table) findTableFieldByGUID(tableFieldGUID string) (*TableField, error) {
 	for _, field := range t.Fields {
+		fmt.Printf("[table.findTableFieldByGUID] searching '%s'\n", field.MetaData.FieldGUID)
+
 		if field.MetaData.FieldGUID == tableFieldGUID {
 			return field, nil
 		}
 	}
+	fmt.Printf("[table.findTableFieldByGUID] not found %s\n", tableFieldGUID)
 
-	return nil, errors.New(fmt.Sprintf("tableFieldGUID: '%s' not found", tableFieldGUID))
+	return nil, fmt.Errorf("tableFieldGUID: '%s' not found", tableFieldGUID)
 }
 
 // RawFieldMetaData differs from FieldMetaData by not including the GUIDs. This prevents accidental overwrites.
@@ -259,7 +276,7 @@ type RawFieldMetaData struct {
 	// MetaAttributes interface{}
 }
 
-func (t *Table) UpdateTableFiledMetaData(tableFieldGUID string, metaData RawFieldMetaData) (*FieldMetaData, error) {
+func (t *Table) UpdateTableFieldMetaData(tableFieldGUID string, metaData RawFieldMetaData) (*FieldMetaData, error) {
 	f, err := t.findTableFieldByGUID(tableFieldGUID)
 	if err != nil {
 		return nil, err
@@ -269,4 +286,34 @@ func (t *Table) UpdateTableFiledMetaData(tableFieldGUID string, metaData RawFiel
 	f.MetaData.FieldType = metaData.FieldType
 
 	return f.MetaData, nil
+}
+
+func (t *Table) UpdateTableFieldValue(fieldGUID string, cellGUID string, recordGUID string, newFieldData FieldData) (*FieldData, error) {
+	f, err := t.findTableFieldByGUID(fieldGUID)
+	if err != nil {
+		return nil, err
+	}
+
+	// TODO: Validate the field type
+	// if f.MetaData.FieldType != fieldData.FieldType {
+	// 	return nil, fmt.Errorf("field type mismatch: expected %s, got %s", f.MetaData.FieldType, fieldData.FieldType)
+	// }
+
+	// fmt.Printf("[table.UpdateTableFieldValue] f.FieldDataGUIDMap: %s\n", utils.PrettyPrintString(f.FieldDataGUIDMap))
+	_, ok := f.FieldDataGUIDMap[recordGUID]
+	if !ok {
+		return nil, fmt.Errorf("record GUID '%s' not found in field data", recordGUID)
+	}
+
+	for _, fd := range f.FieldData {
+		if fd.RecordGUID == recordGUID && fd.CellGUID == cellGUID {
+			// TODO: Do data validation here
+			// Update the existing field data
+			fd.DataValue = newFieldData.DataValue
+			// TODO: Update the timestamp and apply formating if needed
+			return fd, nil
+		}
+	}
+
+	return nil, fmt.Errorf("recordGUID '%s' and CellGUID '%s' not found in field data", recordGUID, cellGUID)
 }

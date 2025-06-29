@@ -190,7 +190,7 @@
                 class="row-item"
                 cdkOverlayOrigin
                 #tableCellContextMenu="cdkOverlayOrigin"
-                (contextmenu)="onShowTableCellContextMenu(columnData.GUID)"
+                (contextmenu)="onShowTableCellContextMenu(columnData.CellGUID)"
               >
                 <div class="data-item">
                   <div class="value-item-container">
@@ -202,7 +202,7 @@
                 cdkConnectedOverlay
                 [cdkConnectedOverlayOrigin]="tableCellContextMenu"
                 [cdkConnectedOverlayOpen]="
-                  isTableCellContextMenuOpen(columnData.GUID)
+                  isTableCellContextMenuOpen(columnData.CellGUID)
                 "
                 (detach)="onFieldOverlayDetached()"
                 (overlayOutsideClick)="onFieldOverlayDetached()"

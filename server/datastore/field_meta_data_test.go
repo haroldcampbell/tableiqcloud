@@ -68,7 +68,7 @@ func Test_CreateLinkedField(t *testing.T) {
 
 	expectedChildFields := expectedRecord
 	expectedChildFields[1].FieldData = datastore.FieldData{
-		GUID:       utils.GenerateUUID(),
+		CellGUID:   utils.GenerateUUID(),
 		RecordGUID: fd2.RecordGUID,
 		DataValue: datastore.HydratedRelationshipChildData{
 			ChildRecordGUIDs: fd2.DataValue.(datastore.RelationshipChildData).ChildRecordGUIDs,

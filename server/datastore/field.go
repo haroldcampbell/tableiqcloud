@@ -17,21 +17,38 @@ type HydratedRelationshipChildData struct {
 }
 
 type FieldData struct {
-	GUID       string
+	// FieldGUID  string
+	CellGUID   string
 	RecordGUID string
 	DataValue  interface{}
 }
 
-func newFieldData(recordGUID string, newValue interface{}) *FieldData {
+// FieldDataGUIDInfo Keeps track of the GUIDs for the field, cell, and record.
+type FieldDataGUIDInfo struct {
+	// FieldGUID  string
+	CellGUID   string
+	RecordGUID string
+}
+
+func (f *FieldData) toFieldDataGUIDInfo() FieldDataGUIDInfo {
+	return FieldDataGUIDInfo{
+		// FieldGUID:  f.FieldGUID,
+		CellGUID:   f.CellGUID,
+		RecordGUID: f.RecordGUID,
+	}
+}
+
+func newFieldData(fieldGUID string, recordGUID string, newValue interface{}) *FieldData {
 	return &FieldData{
-		GUID:       utils.GenerateUUID(),
+		// FieldGUID:  fieldGUID,
+		CellGUID:   utils.GenerateUUID(),
 		RecordGUID: recordGUID,
 		DataValue:  newValue,
 	}
 }
 
-func NewFieldData(recordGUID string) *FieldData {
-	return newFieldData(recordGUID, nil)
+func NewFieldData(fieldGUID string, recordGUID string) *FieldData {
+	return newFieldData(fieldGUID, recordGUID, nil)
 }
 
 type RecordGUID = string
@@ -39,7 +56,7 @@ type TableField struct {
 	MetaData *FieldMetaData
 	// FieldData represents the actaul data values for the field. Each line represents a row of data.
 	FieldData          []*FieldData
-	FieldDataGUIDMap   map[RecordGUID]*FieldData
+	FieldDataGUIDMap   map[RecordGUID]FieldDataGUIDInfo
 	CreatedOnTimestamp int64
 	IsDeleted          bool
 	DeletedOnTimestamp int64
@@ -51,7 +68,7 @@ func NewField(name string, fieldType TableFieldType) *TableField {
 	return &TableField{
 		MetaData:           metaData,
 		FieldData:          make([]*FieldData, 0),
-		FieldDataGUIDMap:   map[RecordGUID]*FieldData{},
+		FieldDataGUIDMap:   map[RecordGUID]FieldDataGUIDInfo{},
 		IsDeleted:          false,
 		CreatedOnTimestamp: time.Now().Unix(),
 		DeletedOnTimestamp: 0,
@@ -72,7 +89,7 @@ func NewRelationshipField(fieldName string, childTableGUID, defaultChildFieldGUI
 	return &TableField{
 		MetaData:           metaData,
 		FieldData:          make([]*FieldData, 0),
-		FieldDataGUIDMap:   map[RecordGUID]*FieldData{},
+		FieldDataGUIDMap:   map[RecordGUID]FieldDataGUIDInfo{},
 		IsDeleted:          false,
 		CreatedOnTimestamp: time.Now().Unix(),
 		DeletedOnTimestamp: 0,
@@ -93,25 +110,25 @@ func (f *TableField) InitFieldWithRecordGUIDs(recordGUIDs []string) {
 	var nilValue interface{}
 
 	f.FieldData = make([]*FieldData, 0)
-	f.FieldDataGUIDMap = map[RecordGUID]*FieldData{}
+	f.FieldDataGUIDMap = map[RecordGUID]FieldDataGUIDInfo{}
 
 	for _, recordGUID := range recordGUIDs {
-		data := newFieldData(recordGUID, nilValue)
+		data := newFieldData(f.MetaData.FieldGUID, recordGUID, nilValue)
 		f.FieldData = append(f.FieldData, data)
-		f.FieldDataGUIDMap[recordGUID] = data
+		f.FieldDataGUIDMap[recordGUID] = data.toFieldDataGUIDInfo()
 	}
 }
 
 func (f *TableField) InsertValueAtIndex(targetIndex int, recordGUID string, newValue interface{}) {
-	data := newFieldData(recordGUID, newValue)
+	data := newFieldData(f.MetaData.FieldGUID, recordGUID, newValue)
 	f.FieldData = insertCellData(f.FieldData, data, targetIndex)
-	f.FieldDataGUIDMap[recordGUID] = data
+	f.FieldDataGUIDMap[recordGUID] = data.toFieldDataGUIDInfo()
 }
 
 func (f *TableField) AppendValue(recordGUID string, newValue interface{}) FieldData {
-	data := newFieldData(recordGUID, newValue)
+	data := newFieldData(f.MetaData.FieldGUID, recordGUID, newValue)
 	f.FieldData = append(f.FieldData, data)
-	f.FieldDataGUIDMap[recordGUID] = data
+	f.FieldDataGUIDMap[recordGUID] = data.toFieldDataGUIDInfo()
 
 	return *data
 }
@@ -121,9 +138,9 @@ func (f *TableField) AppendChildRelation(recordGUID string, childRecordGUIDs []s
 		ChildRecordGUIDs: childRecordGUIDs,
 	}
 
-	data := newFieldData(recordGUID, cellValue)
+	data := newFieldData(f.MetaData.FieldGUID, recordGUID, cellValue)
 	f.FieldData = append(f.FieldData, data)
-	f.FieldDataGUIDMap[recordGUID] = data
+	f.FieldDataGUIDMap[recordGUID] = data.toFieldDataGUIDInfo()
 
 	return *data
 }

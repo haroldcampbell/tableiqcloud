@@ -94,7 +94,7 @@ export interface FieldMetaData {
 }
 
 export interface FieldData {
-	GUID: string;
+	CellGUID: string;
 	RecordGUID: string;
 	DataValue: any;
 }
@@ -105,7 +105,7 @@ export interface TableField {
 	MetaData: FieldMetaData;
 	// FieldData represents the actaul data values for the field. Each line represents a row of data.
 	FieldData: TableFieldArray;
-	FieldDataGUIDMap: { [GUID: string]: FieldData };
+	FieldDataGUIDMap: { [CellGUID: string]: FieldData };
 	CreatedOnTimestamp: number;
 	IsDeleted: boolean;
 	DeletedOnTimestamp: number;
@@ -193,4 +193,11 @@ export interface RequestDataDeleteRecord {
 	BaseGUID: string;
 	TableGUID: string;
 	RecordGUID: string;
+}
+
+export interface RequestDataUpdateFieldDataValue {
+	BaseGUID: string;
+	TableGUID: string;
+	FieldGUID: string;
+	FieldData: FieldData;
 }

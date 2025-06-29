@@ -1,7 +1,7 @@
 import { HttpClient, HttpRequest } from "@angular/common/http";
 import { EMPTY, map, of, tap } from "rxjs";
 import { APIServerResponse, RequestDataCreateRecordResponse } from "../models/models.server";
-import { Base, BaseTableInfo, FieldMetaData, RecordCell, ReqestDataDeleteField, RequestDataCreateField, RequestDataCreateRecord, RequestDataDeleteRecord, RequestDataUpdateField, TableInfo, TableRecordData } from "../models/models.datastore";
+import { Base, BaseTableInfo, FieldData, FieldMetaData, ReqestDataDeleteField, RequestDataCreateField, RequestDataCreateRecord, RequestDataDeleteRecord, RequestDataUpdateField, RequestDataUpdateFieldDataValue, TableInfo, TableRecordData } from "../models/models.datastore";
 
 
 export class APIRequests {
@@ -85,8 +85,8 @@ export class APIRequests {
 			);
 	}
 
-	updateTableField(data: RequestDataUpdateField) {
-		return this.http.post<APIServerResponse<FieldMetaData>>(`/api/field/update`, data)
+	updateTableFieldInfo(data: RequestDataUpdateField) {
+		return this.http.post<APIServerResponse<FieldMetaData>>(`/api/field/update-info`, data)
 			.pipe(
 				map(resp => {
 					if (!resp.successStatus || resp.jsonBody === null) {
@@ -96,6 +96,10 @@ export class APIRequests {
 					return resp.jsonBody;
 				}),
 			);
+	}
+
+	updateTableFieldDataValue(data: RequestDataUpdateFieldDataValue) {
+		return this.postRequest<RequestDataUpdateFieldDataValue, FieldData>(`/api/field/update-value`, data)
 	}
 
 	createTableRecord(data: RequestDataCreateRecord) {
@@ -111,6 +115,13 @@ export class APIRequests {
 			);
 	}
 
+
+	deleteTableRecord(data: RequestDataDeleteRecord) {
+		return this.postRequest<RequestDataDeleteRecord, string>(`/api/table-record/delete`, data)
+	}
+
+
+
 	private postRequest<Request, Response>(action: string, data: Request) {
 		return this.http.post<APIServerResponse<Response>>(action, data)
 			.pipe(
@@ -124,7 +135,4 @@ export class APIRequests {
 			);
 	}
 
-	deleteTableRecord(data: RequestDataDeleteRecord) {
-		return this.postRequest<RequestDataDeleteRecord, string>(`/api/table-record/delete`, data)
-	}
 }
