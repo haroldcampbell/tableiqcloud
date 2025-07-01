@@ -40,183 +40,196 @@
   </div>
 
   <ul class="panels">
-    <li class="child-panel">stuff</li>
+    <!-- <li class="child-panel">stuff</li> -->
     <li class="content-panel">
       <div class="table-container">
-        <!-- DATA ROW HEADER -->
-        <div class="header-container">
-          @for (field of tableRecordData?.FieldsMetaData; track $index) {
-          <ul class="column-container">
-            <li class="row-header-item row-item">
-              <div class="header-item-wrapper">
-                <ul
-                  class="data-item"
-                  cdkOverlayOrigin
-                  #fieldContextOverlay="cdkOverlayOrigin"
-                >
-                  <li class="field-name">
-                    <img
-                      class="ico"
-                      src="/assets/images/{{ fieldTypeToImg(field) }}.png"
-                      alt=""
-                    />
-                    {{ field.FieldName }}
-                  </li>
-                  <li
-                    class="action-item"
-                    (click)="onOpenFieldContextMenu(field.FieldGUID)"
-                  >
-                    <img
-                      class="ico"
-                      src="/assets/images/ico-context.png"
-                      alt=""
-                    />
-                  </li>
-                </ul>
-              </div>
-            </li>
-          </ul>
-
-          <!-- Field context menu template -->
-          <ng-template
-            cdkConnectedOverlay
-            [cdkConnectedOverlayOrigin]="fieldContextOverlay"
-            [cdkConnectedOverlayOpen]="isFieldContextMenuOpen(field.FieldGUID)"
-            (detach)="onFieldOverlayDetached()"
-            (overlayOutsideClick)="onFieldOverlayDetached()"
-          >
-            @switch (showEditFieldOverlay) {
-            <!--  -->
-            @case (true) {
-            <app-edit-field-context-menu-overlay
-              [field]="field"
-              [baseGUID]="baseGUID!"
-              [tableGUID]="selectedTableGUID!"
-              (closePanel)="onFieldOverlayDetached()"
-              (didClickSave)="onUpdateField($event)"
-            ></app-edit-field-context-menu-overlay>
-            <!-- <ng-container [ngTemplateOutlet]="edittemplate"></ng-container> -->
-            }
-
-            <!--  -->
-            @case (false) {
-            <app-field-context-menu-overlay
-              [field]="field"
-              (editField)="onEditField($event)"
-              (deleteField)="onDeleteField($event)"
-            >
-              <!-- <hr /> -->
-              <!-- <div>stuff 1</div> -->
-              <!-- <div>stuff 2</div> -->
-              <!-- <div>stuff 3</div> -->
-            </app-field-context-menu-overlay>
-            } }
-          </ng-template>
-
-          }
-          <!-- Add Filed -->
-          <ul class="column-container">
-            <li class="row-item">
-              <div class="header-item-wrapper">
-                <ul
-                  class="data-item action-item"
-                  (click)="onOpenFieldContextMenu(AddFieldAction)"
-                  cdkOverlayOrigin
-                  #addFieldOverlay="cdkOverlayOrigin"
-                >
-                  <li class="field-name">
-                    <img
-                      class="ico"
-                      src="/assets/images/ico-add.png"
-                      alt=""
-                    />Add field
-                  </li>
-                </ul>
-              </div>
-            </li>
-          </ul>
-        </div>
-
-        <!-- BODY -->
-        <div class="body-container">
-          @for (field of tableRecordData?.FieldsMetaData; track $index; let
-          colIndex = $index) {
-          <!-- Column  -->
-          <div class="column-container">
-            @for (columnData of columnValues(field); track $index; let rowIndex
-            = $index) {
-            <!--  Row -->
-
-            <div
-              class="row-item-wrapper"
-              tabindex="0"
-              [attr.data-cell-id]="
-                'row-item-wrapper-' + colIndex + '-' + rowIndex
-              "
-              (click)="onSelectRowItem($event, columnData, colIndex, rowIndex)"
-            >
-              @if(isActiveCell(columnData)) {
-              <div class="active-row-item" cdkOverlayOrigin>
-                <div class="active-data-item">
-                  <div class="value-item-container">
-                    <div class="input-wrapper">
-                      <input
-                        #gridInputElement
-                        class="input-elm"
-                        type="text"
-                        [attr.data-cell-id]="
-                          'input-' + colIndex + '-' + rowIndex
-                        "
-                        (focus)="onInputCellFocus()"
-                        (blur)="onInputCellBlur()"
-                        (keyup)="
-                          onInputCellKeyup(
-                            $event,
-                            field,
-                            columnData,
-                            colIndex,
-                            rowIndex
-                          )
-                        "
-                        [(ngModel)]="dirtyDataValue"
-                      />
-                    </div>
+        <div class="data-view-container">
+          <div class="scroll-inner-container">
+            <!-- DATA ROW HEADER -->
+            <div class="header-container">
+              @for (field of tableRecordData?.FieldsMetaData; track $index) {
+              <ul class="column-container">
+                <li class="row-header-item row-item">
+                  <div class="header-item-wrapper">
+                    <ul
+                      class="data-item"
+                      cdkOverlayOrigin
+                      #fieldContextOverlay="cdkOverlayOrigin"
+                    >
+                      <li class="field-name">
+                        <img
+                          class="ico"
+                          src="/assets/images/{{ fieldTypeToImg(field) }}.png"
+                          alt=""
+                        />
+                        {{ field.FieldName }}
+                      </li>
+                      <li
+                        class="action-item"
+                        (click)="onOpenFieldContextMenu(field.FieldGUID)"
+                      >
+                        <img
+                          class="ico"
+                          src="/assets/images/ico-context.png"
+                          alt=""
+                        />
+                      </li>
+                    </ul>
                   </div>
-                </div>
-              </div>
+                </li>
+              </ul>
 
-              } @else {
-              <div
-                class="row-item"
-                cdkOverlayOrigin
-                #tableCellContextMenu="cdkOverlayOrigin"
-                (contextmenu)="onShowTableCellContextMenu(columnData.CellGUID)"
-              >
-                <div class="data-item">
-                  <div class="value-item-container">
-                    {{ columnData.DataValue }}
-                  </div>
-                </div>
-              </div>
+              <!-- Field context menu template -->
               <ng-template
                 cdkConnectedOverlay
-                [cdkConnectedOverlayOrigin]="tableCellContextMenu"
+                [cdkConnectedOverlayOrigin]="fieldContextOverlay"
                 [cdkConnectedOverlayOpen]="
-                  isTableCellContextMenuOpen(columnData.CellGUID)
+                  isFieldContextMenuOpen(field.FieldGUID)
                 "
                 (detach)="onFieldOverlayDetached()"
                 (overlayOutsideClick)="onFieldOverlayDetached()"
               >
-                <app-table-cell-context-menu
+                @switch (showEditFieldOverlay) {
+                <!--  -->
+                @case (true) {
+                <app-edit-field-context-menu-overlay
                   [field]="field"
-                  (deleteRecord)="onDeleteRecord($event, columnData.RecordGUID)"
-                ></app-table-cell-context-menu>
+                  [baseGUID]="baseGUID!"
+                  [tableGUID]="selectedTableGUID!"
+                  (closePanel)="onFieldOverlayDetached()"
+                  (didClickSave)="onUpdateField($event)"
+                ></app-edit-field-context-menu-overlay>
+                <!-- <ng-container [ngTemplateOutlet]="edittemplate"></ng-container> -->
+                }
+
+                <!--  -->
+                @case (false) {
+                <app-field-context-menu-overlay
+                  [field]="field"
+                  (editField)="onEditField($event)"
+                  (deleteField)="onDeleteField($event)"
+                >
+                  <!-- <hr /> -->
+                  <!-- <div>stuff 1</div> -->
+                  <!-- <div>stuff 2</div> -->
+                  <!-- <div>stuff 3</div> -->
+                </app-field-context-menu-overlay>
+                } }
               </ng-template>
+
               }
+              <!-- Add Filed -->
+              <ul class="column-container">
+                <li class="row-item">
+                  <div class="header-item-wrapper">
+                    <ul
+                      class="data-item action-item"
+                      (click)="onOpenFieldContextMenu(AddFieldAction)"
+                      cdkOverlayOrigin
+                      #addFieldOverlay="cdkOverlayOrigin"
+                    >
+                      <li class="field-name">
+                        <img
+                          class="ico"
+                          src="/assets/images/ico-add.png"
+                          alt=""
+                        />Add field
+                      </li>
+                    </ul>
+                  </div>
+                </li>
+              </ul>
             </div>
-            }
+            <!-- BODY -->
+            <div class="body-wrapper-container">
+              <div class="body-container">
+                @for (field of tableRecordData?.FieldsMetaData; track $index;
+                let colIndex = $index) {
+                <!-- Column  -->
+                <div class="column-container">
+                  @for (columnData of columnValues(field); track $index; let
+                  rowIndex = $index) {
+                  <!--  Row -->
+
+                  <div
+                    class="row-item-wrapper"
+                    tabindex="0"
+                    [attr.data-cell-id]="
+                      'row-item-wrapper-' + colIndex + '-' + rowIndex
+                    "
+                    (click)="
+                      onSelectRowItem($event, columnData, colIndex, rowIndex)
+                    "
+                  >
+                    @if(isActiveCell(columnData)) {
+                    <div class="active-row-item" cdkOverlayOrigin>
+                      <div class="active-data-item">
+                        <div class="value-item-container">
+                          <div class="input-wrapper">
+                            <input
+                              #gridInputElement
+                              class="input-elm"
+                              type="text"
+                              [attr.data-cell-id]="
+                                'input-' + colIndex + '-' + rowIndex
+                              "
+                              (focus)="onInputCellFocus()"
+                              (blur)="onInputCellBlur()"
+                              (keyup)="
+                                onInputCellKeyup(
+                                  $event,
+                                  field,
+                                  columnData,
+                                  colIndex,
+                                  rowIndex
+                                )
+                              "
+                              [(ngModel)]="dirtyDataValue"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    } @else {
+                    <div
+                      class="row-item"
+                      cdkOverlayOrigin
+                      #tableCellContextMenu="cdkOverlayOrigin"
+                      (contextmenu)="
+                        onShowTableCellContextMenu(columnData.CellGUID)
+                      "
+                    >
+                      <div class="data-item">
+                        <div class="value-item-container">
+                          {{ columnData.DataValue }}
+                        </div>
+                      </div>
+                    </div>
+                    <ng-template
+                      cdkConnectedOverlay
+                      [cdkConnectedOverlayOrigin]="tableCellContextMenu"
+                      [cdkConnectedOverlayOpen]="
+                        isTableCellContextMenuOpen(columnData.CellGUID)
+                      "
+                      (detach)="onFieldOverlayDetached()"
+                      (overlayOutsideClick)="onFieldOverlayDetached()"
+                    >
+                      <app-table-cell-context-menu
+                        [field]="field"
+                        (deleteRecord)="
+                          onDeleteRecord($event, columnData.RecordGUID)
+                        "
+                      ></app-table-cell-context-menu>
+                    </ng-template>
+                    }
+                  </div>
+                  }
+                </div>
+                }
+              </div>
+            </div>
           </div>
-          }
         </div>
 
         <!-- FOOTER -->

@@ -5,6 +5,8 @@
     display: flex;
     flex-direction: column;
     flex: 1 1 auto;
+
+    // overflow: hidden;
 }
 
 .host-container {
@@ -68,6 +70,9 @@
         display: flex;
         flex-direction: row;
         flex: 1 1 auto;
+
+        overflow: hidden;
+
     }
 }
 
@@ -80,18 +85,52 @@ $grid-active-border-color: blue;
 $grid-cell-background-color: #fff;
 
 .table-container {
-    border-top: none;
-    overflow: auto;
-    flex: 1 1 auto;
-
     display: flex;
     flex-direction: column;
+    border-top: none;
+
+    flex: 1 1 auto;
+    overflow: hidden;
+
+    .data-view-container {
+        display: flex;
+        flex-direction: column;
+        flex: 1 1 auto;
+        overflow: hidden;
+
+        .scroll-inner-container {
+            display: grid;
+            grid-template-rows: auto 1fr;
+            flex: 1 1 auto;
+            overflow: auto;
+        }
+
+        .scroll-inner-container::-webkit-scrollbar {
+            width: 10px;
+            height: 8px;
+            // margin-bottom: 20px;
+        }
+
+        .scroll-inner-container::-webkit-scrollbar-thumb {
+            background: rgba(90, 90, 90, 0.5);
+        }
+
+        .scroll-inner-container::-webkit-scrollbar-corner {
+            background-color: transparent;
+            border-color: transparent;
+        }
+
+        .scroll-inner-container::-webkit-scrollbar-track {
+            // padding-bottom: 20px;
+            // height: 20px
+        }
+    }
 }
 
 .header-container {
     display: flex;
     flex-direction: row;
-    background-color: #fafafa;
+    background-color: #e5e5e5;
     border-bottom: solid 1px #cecece;
 
     .column-container {
@@ -180,11 +219,13 @@ $grid-cell-background-color: #fff;
     }
 }
 
+.body-wrapper-container {}
+
 .body-container {
     display: flex;
     flex-direction: row;
     background-color: #f3f3f3;
-    flex: 1 1 auto;
+    border-bottom: solid 1px #cecece;
 
     .column-container {
         .row-item-wrapper {
@@ -317,14 +358,28 @@ $grid-cell-background-color: #fff;
             border-right: solid 1px $grid-border-color;
         }
     }
+
+    .column-container {
+        .row-item-wrapper:last-of-type {
+            .row-item {
+                border-bottom: none;
+            }
+        }
+    }
 }
+
+// .body-container,
+// .header-container {
+//     min-width: max-content;
+// }
 
 .footer-container {
     display: flex;
     flex-direction: row;
     padding: 5px;
-    border-top: solid 1px #cecece;
+    // border-top: solid 1px #cecece;
     background-color: #fafafa;
+    // background-color: #e8e8e8;
 
     .end-actions-container {
         display: flex;
