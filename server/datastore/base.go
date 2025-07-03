@@ -14,14 +14,6 @@ type TableInfo struct {
 	Name string
 }
 
-type Base struct {
-	GUID         string
-	Name         string
-	Tables       []*Table
-	TableGUIDMap map[string]*Table
-	TableNameMap map[string]*Table
-}
-
 type BaseInfo struct {
 	GUID string
 	Name string
@@ -32,14 +24,24 @@ type BaseTableInfo struct {
 	TableInfoArray []TableInfo
 }
 
+type Base struct {
+	BaseGUID     string
+	Name         string
+	Tables       []*Table
+	TableGUIDMap map[string]*Table `json:"-"`
+	TableNameMap map[string]*Table `json:"-"`
+}
+
 func NewBase(name string) *Base {
-	return &Base{
-		GUID:         utils.GenerateSLUG(),
-		Name:         name,
-		Tables:       make([]*Table, 0),
-		TableGUIDMap: map[string]*Table{},
-		TableNameMap: map[string]*Table{},
+	b := &Base{
+		BaseGUID: utils.GenerateSLUG(),
+		Name:     name,
+		Tables:   make([]*Table, 0),
 	}
+
+	b.HydrateBase()
+
+	return b
 }
 
 func (b *Base) TableCount() int {
@@ -67,7 +69,7 @@ func (b *Base) AddTable(table *Table) error {
 func (b *Base) ListTables() BaseTableInfo {
 	info := BaseTableInfo{
 		BaseInfo: BaseInfo{
-			GUID: b.GUID,
+			GUID: b.BaseGUID,
 			Name: b.Name,
 		},
 		TableInfoArray: make([]TableInfo, len(b.Tables)),
@@ -126,6 +128,16 @@ func (b *Base) ExpandChildRelationships(recs []*RecordCell) []*RecordCell {
 	return recs
 }
 
+func (b *Base) HydrateBase() {
+	b.TableGUIDMap = map[string]*Table{}
+	b.TableNameMap = map[string]*Table{}
+
+	for _, t := range b.Tables {
+		b.TableGUIDMap[t.GUID] = t
+		b.TableNameMap[t.Name] = t
+	}
+}
+
 const jsonDumpFile = "output.%v.json"
 
 func (b *Base) DumpDataAsJSON(store *Datastore, isSilent bool) error {
@@ -148,6 +160,7 @@ func (b *Base) DumpDataAsJSON(store *Datastore, isSilent bool) error {
 
 	return nil
 }
+
 func (b *Base) SilentDumpDataAsJSON(store *Datastore) error {
 	return b.DumpDataAsJSON(store, true)
 }
@@ -172,6 +185,7 @@ func NewBaseFromJSON(store *Datastore, baseName string, handler func(base *Base)
 	json.Unmarshal(jsonData, b)
 	fmt.Printf("[NewBaseFromJSON] JSON store loaded successfully.\n")
 
+	b.HydrateBase()
 	store.RegisterBase(b)
 
 	return nil

@@ -10,7 +10,7 @@ import (
 func Test_CreateBase(t *testing.T) {
 	base := datastore.NewBase("core")
 
-	assert.NotEmpty(t, base.GUID, "NewBase: should set base GUID")
+	assert.NotEmpty(t, base.BaseGUID, "NewBase: should set base GUID")
 	assert.Equal(t, "core", base.Name, "NewBase: should set base Name")
 	assert.Zero(t, base.TableCount(), "NewBase: should not create any tables")
 }

@@ -1,6 +1,8 @@
 package datastore
 
-import "errors"
+import (
+	"errors"
+)
 
 type Datastore struct {
 	BaseGUIDList []string
@@ -41,6 +43,6 @@ func (d *Datastore) GetBaseByGUID(GUID string) (Base, error) {
 }
 
 func (d *Datastore) RegisterBase(b *Base) {
-	d.BaseGUIDMap[b.GUID] = *b
-	d.BaseGUIDList = append(d.BaseGUIDList, b.GUID)
+	d.BaseGUIDMap[b.BaseGUID] = *b
+	d.BaseGUIDList = append(d.BaseGUIDList, b.BaseGUID)
 }
