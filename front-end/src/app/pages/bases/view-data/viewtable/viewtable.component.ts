@@ -104,7 +104,7 @@ export class ViewTableComponent implements OnInit {
 		// console.log("[loadTableData] tableGUID:", this.tableGUID);
 		this.apiService.apiRequests.getTableByGUID(this.baseGUID!, this.tableGUID!).subscribe({
 			next: (data) => {
-				// console.log("[ViewTableComponent] data: ", data);
+				console.log("[ViewTableComponent] data: ", data);
 				this.tableRecordData = data;
 			},
 			error: (err) => {
@@ -476,4 +476,6 @@ export class ViewTableComponent implements OnInit {
 		console.log("[keyHandlerDefault] set activeCell == null");
 
 	}
+
+
 }

@@ -1,0 +1,10 @@
+[
+    {
+        "GUID": "abc123",
+        "Name": "core"
+    },
+    {
+        "GUID": "def123",
+        "Name": "CRM"
+    }
+]

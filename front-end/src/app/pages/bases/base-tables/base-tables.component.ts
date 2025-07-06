@@ -44,7 +44,7 @@ export class BaseTablesComponent implements OnInit {
 		this.baseGUID = routeParams.get("baseGUID")!;
 
 		this.apiService.apiRequests.getTables(this.baseGUID).subscribe({
-			next: (data) => {
+			next: (data: BaseTableInfo) => {
 				console.log("[BaseTablesComponent] data: ", data);
 				this.initTableData(data);
 			},

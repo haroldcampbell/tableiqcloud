@@ -1,0 +1,181 @@
+[
+    {
+        "GUID": "t1",
+        "Name": "Table 1",
+        "Fields": [
+            {
+                "MetaData": {
+                    "TableGUID": "t1",
+                    "FieldGUID": "f1",
+                    "FieldName": "Name",
+                    "FieldType": 0,
+                    "FieldTypeName": "String",
+                    "MetaAttributes": null
+                },
+                "FieldData": [
+                    {
+                        "CellGUID": "c1",
+                        "RecordGUID": "r1",
+                        "DataValue": "Alice"
+                    },
+                    {
+                        "CellGUID": "c2",
+                        "RecordGUID": "r2",
+                        "DataValue": "Bob"
+                    }
+                ],
+                "FieldDataGUIDMap": {
+                    "r1": {
+                        "CellGUID": "c1",
+                        "RecordGUID": "r1"
+                    },
+                    "r2": {
+                        "CellGUID": "c2",
+                        "RecordGUID": "r2"
+                    }
+                },
+                "CreatedOnTimestamp": 1,
+                "IsDeleted": false,
+                "DeletedOnTimestamp": -1
+            },
+            {
+                "MetaData": {
+                    "TableGUID": "t1",
+                    "FieldGUID": "f2",
+                    "FieldName": "Age",
+                    "FieldType": 1,
+                    "FieldTypeName": "Number",
+                    "MetaAttributes": null
+                },
+                "FieldData": [
+                    {
+                        "CellGUID": "c3",
+                        "RecordGUID": "r1",
+                        "DataValue": 30
+                    },
+                    {
+                        "CellGUID": "c4",
+                        "RecordGUID": "r2",
+                        "DataValue": 25
+                    }
+                ],
+                "FieldDataGUIDMap": {
+                    "r1": {
+                        "CellGUID": "c3",
+                        "RecordGUID": "r1"
+                    },
+                    "r2": {
+                        "CellGUID": "c4",
+                        "RecordGUID": "r2"
+                    }
+                },
+                "CreatedOnTimestamp": 1,
+                "IsDeleted": false,
+                "DeletedOnTimestamp": -1
+            }
+        ],
+        "RecordGUIDs": [
+            "r1",
+            "r2"
+        ],
+        "FieldsNameIndex": {
+            "Name": 0,
+            "Age": 1
+        },
+        "CreatedOnTimestamp": 1,
+        "IsDeleted": false,
+        "DeletedOnTimestamp": -1
+    },
+    {
+        "GUID": "t2",
+        "Name": "Other Table",
+        "Fields": [
+            {
+                "MetaData": {
+                    "TableGUID": "t2",
+                    "FieldGUID": "f3",
+                    "FieldName": "Title",
+                    "FieldType": 0,
+                    "FieldTypeName": "String",
+                    "MetaAttributes": null
+                },
+                "FieldData": [
+                    {
+                        "CellGUID": "c5",
+                        "RecordGUID": "r3",
+                        "DataValue": "Manager"
+                    },
+                    {
+                        "CellGUID": "c6",
+                        "RecordGUID": "r4",
+                        "DataValue": "Developer"
+                    }
+                ],
+                "FieldDataGUIDMap": {
+                    "r3": {
+                        "CellGUID": "c5",
+                        "RecordGUID": "r3"
+                    },
+                    "r4": {
+                        "CellGUID": "c6",
+                        "RecordGUID": "r4"
+                    }
+                },
+                "CreatedOnTimestamp": 2,
+                "IsDeleted": false,
+                "DeletedOnTimestamp": -1
+            }
+        ],
+        "RecordGUIDs": [
+            "r3",
+            "r4"
+        ],
+        "FieldsNameIndex": {
+            "Title": 0
+        },
+        "CreatedOnTimestamp": 2,
+        "IsDeleted": false,
+        "DeletedOnTimestamp": -1
+    },
+    {
+        "GUID": "t3",
+        "Name": "Other thing",
+        "Fields": [
+            {
+                "MetaData": {
+                    "TableGUID": "t3",
+                    "FieldGUID": "f4",
+                    "FieldName": "Description",
+                    "FieldType": 3,
+                    "FieldTypeName": "Text",
+                    "MetaAttributes": null
+                },
+                "FieldData": [
+                    {
+                        "CellGUID": "c7",
+                        "RecordGUID": "r5",
+                        "DataValue": "Some text here."
+                    }
+                ],
+                "FieldDataGUIDMap": {
+                    "r5": {
+                        "CellGUID": "c7",
+                        "RecordGUID": "r5"
+                    }
+                },
+                "CreatedOnTimestamp": 3,
+                "IsDeleted": false,
+                "DeletedOnTimestamp": -1
+            }
+        ],
+        "RecordGUIDs": [
+            "r5"
+        ],
+        "FieldsNameIndex": {
+            "Description": 0
+        },
+        "CreatedOnTimestamp": 3,
+        "IsDeleted": false,
+        "DeletedOnTimestamp": -1
+    }
+]

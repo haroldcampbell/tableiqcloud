@@ -1,0 +1,30 @@
+[
+    {
+        "BaseInfo": {
+            "GUID": "abc123",
+            "Name": "core"
+        },
+        "TableInfoArray": [
+            {
+                "GUID": "t1",
+                "Name": "Table 1"
+            },
+            {
+                "GUID": "t2",
+                "Name": "Other Table"
+            }
+        ]
+    },
+    {
+        "BaseInfo": {
+            "GUID": "def123",
+            "Name": "CRM"
+        },
+        "TableInfoArray": [
+            {
+                "GUID": "t3",
+                "Name": "Other thing"
+            }
+        ]
+    }
+]
