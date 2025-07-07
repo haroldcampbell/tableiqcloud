@@ -23,6 +23,15 @@ def okResp(action:str, jsonBody:T)->Response[T]:
         errorCode=-1,
         jsonBody=jsonBody
     )
+def errResp(action:str,jsonBody:T,message:str="", err_code=1)->Response[T]:
+    return  Response[T](
+        action=action,
+        successStatus=False,
+         message=message,
+        # sessionKey="",
+        errorCode=err_code,
+        jsonBody=jsonBody
+    )
 
 router = APIRouter()
 
@@ -42,17 +51,29 @@ async def get_tables(base_guid: str):
 @router.get("/api/table/{base_guid}/{table_guid}")
 async def get_table_by_guid(base_guid: str, table_guid: str):
     table = store.getTableByGUID(base_guid, table_guid)
-    print(f"[get_table_by_guid] table:{table}")
-    return okResp(action="get-table",jsonBody=table)
+    if table == None:
+        return errResp(action="get-table",jsonBody=table, message="Table not found")
 
-# @router.post("/api/field/new")
-# async def create_table_field(request: CreateTableFieldRequest):
-#     # request: Pydantic model for request body
-#     return {"action": "create-table-field", "data": ...}
+    records = table.GetRecords()
+
+    return okResp(action="get-table",jsonBody=records)
+
+
+
+@router.post("/api/field/new")
+async def create_table_field(request: base.RequestDataCreateField):
+    result = store.create_table_field(request)
+    return okResp(action="create-table-field", jsonBody=result)
 
 # @router.post("/api/field/delete")
 # async def delete_table_field(request: DeleteTableFieldRequest):
 #     return {"action": "delete-table-field", "data": ...}
+
+# class RequestDataUpdateFieldDataValue(BaseModel):
+# 	BaseGUID:  str
+# 	TableGUID: str
+# 	FieldGUID: str
+# 	FieldData: base.FieldData
 
 # @router.post("/api/field/update-info")
 # async def update_table_field_info(request: UpdateTableFieldInfoRequest):

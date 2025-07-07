@@ -6,10 +6,13 @@ def getBases()->List[base.BaseInfo]:
     return mockdb.mock_bases
 
 def getBaseTableInfo(base_guid:str)->base.BaseTableInfo:
+    #TODO: add error check. check if base_guid is found
     info:base.BaseTableInfo = mockdb.mock_base_table_info_guid[base_guid]
+
     return info
 
 def getTableByGUID(base_guid:str, table_guid:str):
+    #TODO: add error check.
     base_table_info = mockdb.mock_base_table_info_guid[base_guid]
     guids = [item.GUID for item in base_table_info.TableInfoArray]
 
@@ -24,6 +27,20 @@ def getTableByGUID(base_guid:str, table_guid:str):
 
     table = result[0]
 
-    records = table.GetRecords()
+    return table
 
-    return records
+
+def create_table_field(req:base.RequestDataCreateField):
+    try:
+        ftype = base.str_to_TableFieldType(req.FieldType)
+    except ValueError as e:
+        raise e
+    #TODO: check if BaseGUID exists first
+
+    table = getTableByGUID(req.BaseGUID, req.TableGUID)
+    if table == None:
+        raise ValueError(f"Unable to create table field. Table not found. \n\treq.BaseGUID: '{req.BaseGUID}'\n\treq.TableGUID: '{req.TableGUID}'")
+
+    rec_data = table.create_table_field_by_name(req.FieldName, ftype)
+
+    return rec_data
