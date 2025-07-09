@@ -46,17 +46,18 @@ def str_to_TableFieldType(field_type_str:str) -> TableFieldType:
 
     return ftype
 class FieldMetaData(BaseModel):
+    TableGUID: str
     FieldGUID: str
     FieldName: str
     FieldType: TableFieldType
-    TableGUID: Optional[str] = None  # Guid for the parent table
     FieldTypeName: Optional[str] = None
     MetaAttributes: Optional[Any] = None
 
 
-def init_FieldMetaData(field_name:str, field_type:TableFieldType)->FieldMetaData:
+def init_FieldMetaData(table_guid:str, field_name:str, field_type:TableFieldType)->FieldMetaData:
     guid = str(uuid.uuid4()).upper()
     return FieldMetaData(
+        TableGUID=table_guid,
         FieldGUID=guid,
         FieldName=field_name,
         FieldType=field_type,
@@ -109,8 +110,9 @@ class TableField(BaseModel):
             self.FieldData.append(data)
             self.FieldDataGUIDMap[recordGUID] = data.to_field_data_GUID_info()
 
-def new_TableField(field_name:str, field_type:TableFieldType)->TableField:
-    meta_data = init_FieldMetaData(field_name=field_name, field_type=field_type)
+def new_TableField(table_guid:str, field_name:str, field_type:TableFieldType)->TableField:
+    meta_data = init_FieldMetaData(table_guid, field_name=field_name, field_type=field_type)
+
     return TableField(
         MetaData=meta_data,
         FieldData=[],
@@ -183,10 +185,35 @@ class Table(BaseModel):
         return records
 
     def create_table_field_by_name(self, field_name:str, ftype:TableFieldType):
-        field = new_TableField(field_name, ftype)
+        field = new_TableField(self.GUID, field_name, ftype)
         field = self.add_table_field(field)
 
         return self.get_records_for_field(field)
+
+    def delete_table_field(self, table_field_guid:str):
+        field_name=None
+        field_index=-1
+
+        for i, item in enumerate(self.Fields):
+            if item.MetaData is None:
+                continue
+
+            if item.MetaData.FieldGUID == table_field_guid:
+                field_name = item.MetaData.FieldName
+                field_index=i
+                break
+
+        # field not found in list of fields
+        if field_index == -1 or field_name is None:
+            return False
+
+        # delete the record from the self.Fields
+        del self.Fields[field_index]
+        # delete the record from the self.FieldsNameIndex
+        self.FieldsNameIndex.pop(field_name, None)
+
+        return True
+
 
 
 class RequestDataCreateField(BaseModel):
@@ -194,3 +221,8 @@ class RequestDataCreateField(BaseModel):
 	TableGUID: str
 	FieldName: str
 	FieldType: str
+
+class RequestDataDeleteField(BaseModel):
+    BaseGUID: str
+    TableGUID: str
+    TableFieldGUID: str

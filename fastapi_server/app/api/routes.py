@@ -65,9 +65,17 @@ async def create_table_field(request: base.RequestDataCreateField):
     result = store.create_table_field(request)
     return okResp(action="create-table-field", jsonBody=result)
 
-# @router.post("/api/field/delete")
-# async def delete_table_field(request: DeleteTableFieldRequest):
-#     return {"action": "delete-table-field", "data": ...}
+@router.post("/api/field/delete")
+async def delete_table_field(request: base.RequestDataDeleteField):
+    table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
+    if table == None:
+        return errResp(action="delete-table-field",jsonBody=table, message="Table not found")
+
+    ok = table.delete_table_field(request.TableFieldGUID)
+    if not ok:
+        return errResp(action="delete-table-field",jsonBody=table, message="Field not found")
+
+    return okResp(action="delete-table-field", jsonBody=request.TableFieldGUID)
 
 # class RequestDataUpdateFieldDataValue(BaseModel):
 # 	BaseGUID:  str
