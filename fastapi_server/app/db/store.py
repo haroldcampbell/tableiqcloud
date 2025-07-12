@@ -1,13 +1,16 @@
-import app.models.base as base
-import app.db.mockdb as mockdb
-from typing import List, Dict
+from typing import List
 
-def getBases()->List[base.BaseInfo]:
+import app.db.mockdb as mockdb
+
+import app.models as models
+import app.api as api
+
+def getBases()->List[models.BaseInfo]:
     return mockdb.mock_bases
 
-def getBaseTableInfo(base_guid:str)->base.BaseTableInfo:
+def getBaseTableInfo(base_guid:str)->models.BaseTableInfo:
     #TODO: add error check. check if base_guid is found
-    info:base.BaseTableInfo = mockdb.mock_base_table_info_guid[base_guid]
+    info:models.BaseTableInfo = mockdb.mock_base_table_info_guid[base_guid]
 
     return info
 
@@ -30,9 +33,9 @@ def getTableByGUID(base_guid:str, table_guid:str):
     return table
 
 
-def create_table_field(req:base.RequestDataCreateField):
+def create_table_field(req:api.RequestDataCreateField):
     try:
-        ftype = base.str_to_TableFieldType(req.FieldType)
+        ftype = models.TableFieldType.str_to_TableFieldType(req.FieldType)
     except ValueError as e:
         raise e
     #TODO: check if BaseGUID exists first

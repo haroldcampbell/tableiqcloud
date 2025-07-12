@@ -3,7 +3,8 @@ from pydantic import BaseModel
 from typing import List, Optional, TypeVar, Generic
 
 import app.db.store as store
-import app.models.base as base
+
+from .api_requests import RequestDataCreateField, RequestDataDeleteField
 
 T = TypeVar('T')
 class Response(BaseModel, Generic[T]):
@@ -23,6 +24,8 @@ def okResp(action:str, jsonBody:T)->Response[T]:
         errorCode=-1,
         jsonBody=jsonBody
     )
+
+
 def errResp(action:str,jsonBody:T,message:str="", err_code=1)->Response[T]:
     return  Response[T](
         action=action,
@@ -41,11 +44,13 @@ async def get_bases():
     bases = store.getBases()
     return okResp(action="get-bases", jsonBody=bases)
 
+
 # Returns a single Base
 @router.get("/api/base/{base_guid}")
 async def get_tables(base_guid: str):
     base_tables = store.getBaseTableInfo(base_guid)
     return okResp(action="get-tables", jsonBody=base_tables)
+
 
 # Gets a table from a base based on the table_guid
 @router.get("/api/table/{base_guid}/{table_guid}")
@@ -59,14 +64,14 @@ async def get_table_by_guid(base_guid: str, table_guid: str):
     return okResp(action="get-table",jsonBody=records)
 
 
-
 @router.post("/api/field/new")
-async def create_table_field(request: base.RequestDataCreateField):
+async def create_table_field(request: RequestDataCreateField):
     result = store.create_table_field(request)
     return okResp(action="create-table-field", jsonBody=result)
 
+
 @router.post("/api/field/delete")
-async def delete_table_field(request: base.RequestDataDeleteField):
+async def delete_table_field(request: RequestDataDeleteField):
     table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
     if table == None:
         return errResp(action="delete-table-field",jsonBody=table, message="Table not found")
@@ -77,11 +82,6 @@ async def delete_table_field(request: base.RequestDataDeleteField):
 
     return okResp(action="delete-table-field", jsonBody=request.TableFieldGUID)
 
-# class RequestDataUpdateFieldDataValue(BaseModel):
-# 	BaseGUID:  str
-# 	TableGUID: str
-# 	FieldGUID: str
-# 	FieldData: base.FieldData
 
 # @router.post("/api/field/update-info")
 # async def update_table_field_info(request: UpdateTableFieldInfoRequest):
