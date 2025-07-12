@@ -3,8 +3,7 @@ from pydantic import BaseModel
 from typing import List, Optional, TypeVar, Generic
 
 import app.db.store as store
-
-from .api_requests import RequestDataCreateField, RequestDataDeleteField
+import app.api as api
 
 T = TypeVar('T')
 class Response(BaseModel, Generic[T]):
@@ -65,13 +64,13 @@ async def get_table_by_guid(base_guid: str, table_guid: str):
 
 
 @router.post("/api/field/new")
-async def create_table_field(request: RequestDataCreateField):
+async def create_table_field(request: api.RequestDataCreateField):
     result = store.create_table_field(request)
     return okResp(action="create-table-field", jsonBody=result)
 
 
 @router.post("/api/field/delete")
-async def delete_table_field(request: RequestDataDeleteField):
+async def delete_table_field(request: api.RequestDataDeleteField):
     table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
     if table == None:
         return errResp(action="delete-table-field",jsonBody=table, message="Table not found")
@@ -83,9 +82,16 @@ async def delete_table_field(request: RequestDataDeleteField):
     return okResp(action="delete-table-field", jsonBody=request.TableFieldGUID)
 
 
-# @router.post("/api/field/update-info")
-# async def update_table_field_info(request: UpdateTableFieldInfoRequest):
-#     return {"action": "update-table-field", "data": ...}
+@router.post("/api/field/update-info")
+async def update_table_field_info(request: api.RequestDataUpdateField):
+
+    table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
+    if table == None:
+        return errResp(action="update-info",jsonBody=table, message="Table not found")
+
+    fieldMetaData = table.update_table_field_meta_data(request.TableFieldGUID, request.FieldName, request.FieldType)
+
+    return okResp(action="update-table-field", jsonBody=fieldMetaData)
 
 # @router.post("/api/field/update-value")
 # async def update_table_field_value(request: UpdateTableFieldValueRequest):

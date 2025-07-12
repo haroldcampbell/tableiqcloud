@@ -75,6 +75,16 @@ class Table(BaseModel):
 
         return self.get_records_for_field(field)
 
+    def find_table_field_by_guid(self, table_field_guid:str) -> tuple[int, Optional[TableField]]:
+        for i, item in enumerate(self.Fields):
+            if item.MetaData is None:
+                continue
+
+            if item.MetaData.FieldGUID == table_field_guid:
+                return i, item
+
+        return -1, None
+
     def delete_table_field(self, table_field_guid:str):
         field_name=None
         field_index=-1
@@ -99,3 +109,15 @@ class Table(BaseModel):
 
         return True
 
+    def update_table_field_meta_data(self, table_field_guid:str, field_name:str, ftype:TableFieldType):
+        index, field = self.find_table_field_by_guid(table_field_guid)
+        if index == -1 or field is None:
+            raise ValueError(f"Table.update_table_field_meta_data. \n\tField not found. \n\tGUID: {table_field_guid}")
+
+        if field.MetaData is None:
+            raise ValueError(f"Table.update_table_field_meta_data. \n\tMetaData can't be None. \n\tfield: {field}")
+
+        field.MetaData.FieldName = str.strip(field_name)
+        field.MetaData.FieldType = ftype
+
+        return field.MetaData
