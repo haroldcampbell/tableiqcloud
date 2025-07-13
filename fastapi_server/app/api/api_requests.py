@@ -20,3 +20,10 @@ class RequestDataUpdateField(BaseModel):
 
 	FieldName: str
 	FieldType: models.TableFieldType
+
+class RequestDataUpdateFieldDataValue(BaseModel):
+	BaseGUID:  str
+	TableGUID: str
+	FieldGUID: str
+	FieldData: models.FieldData
+

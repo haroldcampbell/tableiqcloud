@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from typing import List, Optional, TypeVar, Generic
 
 import app.db.store as store
+import app.models as models
 import app.api as api
 
 T = TypeVar('T')
@@ -84,7 +85,6 @@ async def delete_table_field(request: api.RequestDataDeleteField):
 
 @router.post("/api/field/update-info")
 async def update_table_field_info(request: api.RequestDataUpdateField):
-
     table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
     if table == None:
         return errResp(action="update-info",jsonBody=table, message="Table not found")
@@ -93,9 +93,27 @@ async def update_table_field_info(request: api.RequestDataUpdateField):
 
     return okResp(action="update-table-field", jsonBody=fieldMetaData)
 
-# @router.post("/api/field/update-value")
-# async def update_table_field_value(request: UpdateTableFieldValueRequest):
-#     return {"action": "update-table-field-value", "data": ...}
+@router.post("/api/field/update-value")
+async def update_table_field_value(request: api.RequestDataUpdateFieldDataValue):
+    table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
+    if table == None:
+        return errResp(action="update-info",jsonBody=table, message="Table not found")
+
+    fd = models.FieldData(
+        CellGUID=request.FieldData.CellGUID,
+        RecordGUID=request.FieldData.RecordGUID,
+        DataValue=request.FieldData.DataValue
+    )
+
+    try:
+        updatedData = table.update_table_field_value(request.FieldGUID, fd)
+    except ValueError as e:
+        return errResp(action="update-table-field-value", jsonBody=None, message=str(e))
+
+    if updatedData is None:
+        return errResp(action="update-table-field-value", jsonBody=updatedData, message="Field not found or update failed")
+
+    return okResp(action="update-table-field-value", jsonBody=updatedData)
 
 # @router.post("/api/table-record/new")
 # async def create_table_record(request: CreateTableRecordRequest):

@@ -121,3 +121,18 @@ class Table(BaseModel):
         field.MetaData.FieldType = ftype
 
         return field.MetaData
+
+    def update_table_field_value(self, table_field_guid:str, field_data:FieldData) -> Optional[FieldData]:
+        index, field = self.find_table_field_by_guid(table_field_guid)
+        if index == -1 or field is None:
+            raise ValueError(f"Table.update_table_field_value. \n\tField not found. \n\tGUID: {table_field_guid}")
+
+        if field.MetaData is None:
+            raise ValueError(f"Table.update_table_field_value. \n\tMetaData can't be None. \n\tfield: {field}")
+
+        for d in field.FieldData:
+            if d.RecordGUID == field_data.RecordGUID and d.CellGUID == field_data.CellGUID:
+                d.DataValue = field_data.DataValue
+                return d
+
+        return None
