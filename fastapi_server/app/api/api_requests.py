@@ -1,4 +1,5 @@
 from pydantic import BaseModel, Field
+from typing import List
 
 import app.models as models
 
@@ -26,4 +27,12 @@ class RequestDataUpdateFieldDataValue(BaseModel):
 	TableGUID: str
 	FieldGUID: str
 	FieldData: models.FieldData
+
+class RequestDataCreateRecord(BaseModel):
+	BaseGUID:  str
+	TableGUID: str
+
+class RequestDataCreateRecordResponse(BaseModel):
+	RecordGUID: str
+	Cells: List[models.RecordCell] = Field(default_factory=list)
 

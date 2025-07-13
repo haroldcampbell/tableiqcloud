@@ -91,13 +91,13 @@ async def update_table_field_info(request: api.RequestDataUpdateField):
 
     fieldMetaData = table.update_table_field_meta_data(request.TableFieldGUID, request.FieldName, request.FieldType)
 
-    return okResp(action="update-table-field", jsonBody=fieldMetaData)
+    return okResp(action="update-info", jsonBody=fieldMetaData)
 
 @router.post("/api/field/update-value")
 async def update_table_field_value(request: api.RequestDataUpdateFieldDataValue):
     table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
     if table == None:
-        return errResp(action="update-info",jsonBody=table, message="Table not found")
+        return errResp(action="update-table-field-value",jsonBody=table, message="Table not found")
 
     fd = models.FieldData(
         CellGUID=request.FieldData.CellGUID,
@@ -115,9 +115,25 @@ async def update_table_field_value(request: api.RequestDataUpdateFieldDataValue)
 
     return okResp(action="update-table-field-value", jsonBody=updatedData)
 
-# @router.post("/api/table-record/new")
-# async def create_table_record(request: CreateTableRecordRequest):
-#     return {"action": "create-table-record", "data": ...}
+
+@router.post("/api/table-record/new")
+async def create_table_record(request: api.RequestDataCreateRecord):
+    action_name = "create-table-record"
+
+    table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
+    if table == None:
+        return errResp(action=action_name,jsonBody=table, message="Table not found")
+
+    try:
+        record_guid, record_cells = table.create_table_record()
+    except ValueError as e:
+        return errResp(action=action_name, jsonBody=None, message=str(e))
+
+    resp = api.RequestDataCreateRecordResponse(
+        RecordGUID=record_guid,
+        Cells=record_cells
+    )
+    return okResp(action=action_name, jsonBody=resp)
 
 # @router.post("/api/table-record/delete")
 # async def delete_table_record(request: DeleteTableRecordRequest):
