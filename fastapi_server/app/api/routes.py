@@ -135,6 +135,14 @@ async def create_table_record(request: api.RequestDataCreateRecord):
     )
     return okResp(action=action_name, jsonBody=resp)
 
-# @router.post("/api/table-record/delete")
-# async def delete_table_record(request: DeleteTableRecordRequest):
-#     return {"action": "delete-table-record", "data": ...}
+@router.post("/api/table-record/delete")
+async def delete_table_record(request: api.RequestDataDeleteRecord):
+    action_name = "delete-table-record"
+
+    table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
+    if table == None:
+        return errResp(action=action_name,jsonBody=table, message="Table not found")
+
+    table.delete_table_record_by_record_guid(request.RecordGUID)
+
+    return okResp(action=action_name, jsonBody=request.RecordGUID)

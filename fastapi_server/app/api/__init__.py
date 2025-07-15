@@ -2,7 +2,7 @@
 from .api_requests import (
     RequestDataCreateField, RequestDataDeleteField, RequestDataUpdateField,
     RequestDataUpdateFieldDataValue,RequestDataCreateRecord,
-    RequestDataCreateRecordResponse
+    RequestDataCreateRecordResponse, RequestDataDeleteRecord
 )
 
 from .routes import Response, okResp, errResp
@@ -14,6 +14,7 @@ __all__ = [
     "RequestDataUpdateFieldDataValue",
     "RequestDataCreateRecord",
     "RequestDataCreateRecordResponse",
+    "RequestDataDeleteRecord",
     "Response",
     "okResp",
     "errResp"

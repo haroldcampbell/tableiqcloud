@@ -209,3 +209,14 @@ class Table(BaseModel):
             raise ValueError(f"Table.create_table_record. \n\tRecord with GUID {record_guid} not found after creation.")
 
         return record_guid, result
+
+    def delete_table_record_by_record_guid(self, record_guid: str) -> bool:
+        if record_guid not in self.RecordGUIDs:
+            return False
+
+        self.RecordGUIDs.remove(record_guid)
+
+        for field in self.Fields:
+            field.delete_record_by_record_guid(record_guid)
+
+        return True

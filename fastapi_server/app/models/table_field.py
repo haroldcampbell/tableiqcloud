@@ -38,6 +38,21 @@ class TableField(BaseModel):
 
         return field_data
 
+    def delete_record_by_record_guid(self, recordGUID: str) -> bool:
+        if self.MetaData == None or self.MetaData.FieldGUID == None:
+            return False
+
+        if recordGUID not in self.FieldDataGUIDMap:
+            return False
+
+        # Remove the field data for the record GUID
+        del self.FieldDataGUIDMap[recordGUID]
+
+        # Filter out the field data that matches the record GUID
+        self.FieldData = [fd for fd in self.FieldData if fd.RecordGUID != recordGUID]
+
+        return True
+
 def new_TableField(table_guid:str, field_name:str, field_type:TableFieldType)->TableField:
     meta_data = init_FieldMetaData(table_guid, field_name=field_name, field_type=field_type)
 

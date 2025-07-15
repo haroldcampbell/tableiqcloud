@@ -36,3 +36,8 @@ class RequestDataCreateRecordResponse(BaseModel):
 	RecordGUID: str
 	Cells: List[models.RecordCell] = Field(default_factory=list)
 
+class RequestDataDeleteRecord(BaseModel):
+	BaseGUID:   str
+	TableGUID:  str
+	RecordGUID: str
+
