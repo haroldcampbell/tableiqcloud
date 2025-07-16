@@ -76,6 +76,7 @@ export class ViewTableComponent implements OnInit {
 			[TableFieldType.FieldTypeText, "ico-field-text"],
 			[TableFieldType.FieldTypeRelationship, "ico-field-relationship"],
 		]);
+
 	}
 
 	ngAfterViewChecked() {
@@ -93,6 +94,8 @@ export class ViewTableComponent implements OnInit {
 		// 	// inputElm.focus();
 		// 	console.log('Element has been added to the DOM', this.activeCellGUID, wrapperElm, inputElm.value);
 		// }
+
+
 	}
 
 	private loadTableData() {
@@ -106,6 +109,7 @@ export class ViewTableComponent implements OnInit {
 			next: (data) => {
 				console.log("[ViewTableComponent] data: ", data);
 				this.tableRecordData = data;
+
 			},
 			error: (err) => {
 				console.log("[ViewTableComponent] err: ", err);

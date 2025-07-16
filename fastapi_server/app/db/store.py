@@ -44,6 +44,6 @@ def create_table_field(req:api.RequestDataCreateField):
     if table == None:
         raise ValueError(f"Unable to create table field. Table not found. \n\treq.BaseGUID: '{req.BaseGUID}'\n\treq.TableGUID: '{req.TableGUID}'")
 
-    rec_data = table.create_table_field_by_name(req.FieldName, ftype)
+    rec_data = table.create_table_field_by_name(req.FieldName, ftype, req.FieldOptions)
 
     return rec_data

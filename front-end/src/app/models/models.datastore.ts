@@ -28,14 +28,16 @@ export enum TableFieldType {
 	FieldTypeNumber,
 	FieldTypeDate,
 	FieldTypeText, // To hold markdown data
-	FieldTypeRelationship
+	FieldTypeRelationship,
+	FieldTypeOption, // For dropdowns
 }
 
 // TableFieldType as string
 export enum StringifiedFieldType {
 	FieldTypeString = "String",
 	FieldTypeNumber = "Number",
-	FieldTypeDate = "Date"
+	FieldTypeDate = "Date",
+	FieldTypeOption = "Option",
 }
 
 
@@ -56,6 +58,9 @@ export function StringifiedFieldTypeToType(s: StringifiedFieldType): TableFieldT
 
 		// case StringifiedFieldType.FieldTypeDate:
 		// 	return TableFieldType.FieldTypeRelationship;
+
+		case StringifiedFieldType.FieldTypeOption:
+			return TableFieldType.FieldTypeOption;
 
 	}
 	return TableFieldType.FieldTypeString
@@ -91,6 +96,7 @@ export interface FieldMetaData {
 	FieldType: TableFieldType;
 	FieldTypeName: string;
 	MetaAttributes: any;
+	FieldOptions: { [OptionName: string]: any }; // For dropdowns, etc. This is a map of option names to values
 }
 
 export interface FieldData {
@@ -160,6 +166,7 @@ export interface BaseTableInfo {
 	TableInfoArray: TableInfo[];
 }
 
+export type FieldOptionsType = { [key: string]: any };
 
 //////////////////////////////////////////////////////////////////////////////////////////
 export interface RequestDataCreateField {
@@ -167,6 +174,7 @@ export interface RequestDataCreateField {
 	TableGUID: string;
 	FieldName: string;
 	FieldType: StringifiedFieldType;
+	FieldOptions?: FieldOptionsType; // For dropdowns, etc.
 }
 
 export interface ReqestDataDeleteField {
