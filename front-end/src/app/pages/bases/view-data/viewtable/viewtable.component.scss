@@ -120,10 +120,10 @@ $grid-cell-background-color: #fff;
             border-color: transparent;
         }
 
-        .scroll-inner-container::-webkit-scrollbar-track {
-            // padding-bottom: 20px;
-            // height: 20px
-        }
+        // .scroll-inner-container::-webkit-scrollbar-track {
+        //     // padding-bottom: 20px;
+        //     // height: 20px
+        // }
     }
 }
 
@@ -219,7 +219,7 @@ $grid-cell-background-color: #fff;
     }
 }
 
-.body-wrapper-container {}
+// .body-wrapper-container {}
 
 .body-container {
     display: flex;
@@ -278,6 +278,13 @@ $grid-cell-background-color: #fff;
                     margin: 2px;
 
                     overflow: hidden;
+                }
+
+                .option-value-container {
+                    background-color: #f0f0f0;
+                    border-radius: 5px;
+                    line-height: 1em;
+                    padding: 3px 5px;
                 }
             }
         }

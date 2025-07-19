@@ -88,6 +88,22 @@ export function FieldTypeToStringifiedFieldType(t: TableFieldType): StringifiedF
 	return StringifiedFieldType.FieldTypeString
 }
 
+export interface OptionInfo {
+	OptionId: string;
+	OptionIndex: number;
+	OptionName: string;
+}
+export const OptionInfoKey = "option"
+
+export function CreateFieldOptionAsSelect(items: OptionInfo[]) {
+	let options: FieldOptionsType = {}
+	options[OptionInfoKey] = items;
+
+	return options
+}
+export function GetFieldOptionAsSelect(fieldOptions: { [OptionName: string]: OptionInfo[] }) {
+	return fieldOptions[OptionInfoKey] ?? []
+}
 export interface FieldMetaData {
 	TableGUID: string; // Guid for the parent table
 
@@ -209,3 +225,4 @@ export interface RequestDataUpdateFieldDataValue {
 	FieldGUID: string;
 	FieldData: FieldData;
 }
+

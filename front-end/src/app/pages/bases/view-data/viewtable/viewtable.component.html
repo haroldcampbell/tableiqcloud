@@ -166,6 +166,9 @@
                       <div class="active-data-item">
                         <div class="value-item-container">
                           <div class="input-wrapper">
+                            @switch (getFieldInputElement(field)) {
+                            <!-- Handle regular string input -->
+                            @case (FieldInputElement.Input) {
                             <input
                               #gridInputElement
                               class="input-elm"
@@ -173,8 +176,8 @@
                               [attr.data-cell-id]="
                                 'input-' + colIndex + '-' + rowIndex
                               "
-                              (focus)="onInputCellFocus()"
-                              (blur)="onInputCellBlur()"
+                              (focus)="onCellFocus()"
+                              (blur)="onCellBlur()"
                               (keyup)="
                                 onInputCellKeyup(
                                   $event,
@@ -186,6 +189,33 @@
                               "
                               [(ngModel)]="dirtyDataValue"
                             />
+                            }
+                            <!-- Handle select input -->
+                            @case(FieldInputElement.Option) {
+                            <!--  -->
+                            <select
+                              class="input-elm"
+                              (change)="
+                                onSelectedFieldOption(
+                                  $event,
+                                  field,
+                                  columnData,
+                                  colIndex,
+                                  rowIndex
+                                )
+                              "
+                              (focus)="onCellFocus()"
+                              (blur)="onCellBlur()"
+                              [(ngModel)]="dirtyDataValue"
+                            >
+                              @for (item of GetFieldOptionAsSelect(field); track
+                              $index) {
+                              <option [value]="item.OptionName">
+                                {{ item.OptionName }}
+                              </option>
+                              }
+                            </select>
+                            } }
                           </div>
                         </div>
                       </div>
@@ -202,7 +232,14 @@
                     >
                       <div class="data-item">
                         <div class="value-item-container">
-                          {{ columnData.DataValue }}
+                          <span
+                            *ngIf="hasColumnValue(columnData)"
+                            [class.option-value-container]="
+                              isOptionField(field)
+                            "
+                          >
+                            {{ columnData.DataValue }}
+                          </span>
                         </div>
                       </div>
                     </div>

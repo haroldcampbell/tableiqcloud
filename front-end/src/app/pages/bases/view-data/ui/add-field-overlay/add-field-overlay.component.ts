@@ -1,15 +1,10 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CoreModule } from '../../../../../modules/core.module';
 import { MatSelect, MatSelectChange } from '@angular/material/select';
-import { FieldOptionsType, RequestDataCreateField, StringifiedFieldType } from '../../../../../models/models.datastore';
+import { CreateFieldOptionAsSelect, FieldOptionsType, OptionInfo, RequestDataCreateField, StringifiedFieldType } from '../../../../../models/models.datastore';
 import { Subject } from 'rxjs';
 import { auditTime } from 'rxjs/operators';
 
-interface OptionInfo {
-	OptionId: string;
-	OptionIndex: number;
-	OptionName: string;
-}
 
 interface OptionInfoElem {
 	OptionInfo: OptionInfo;
@@ -73,7 +68,7 @@ export class AddFieldOverlayComponent implements OnInit, AfterViewInit, OnDestro
 		let options: FieldOptionsType = {}
 		if (this.selectedFieldType == StringifiedFieldType.FieldTypeOption) {
 			// Convert optionNames to a format suitable for FieldOptionsType
-			options["option"] = this.optionInfoElm.map(opt => opt.OptionInfo)
+			options = CreateFieldOptionAsSelect(this.optionInfoElm.map(opt => opt.OptionInfo))
 		}
 
 		console.log("[onApplyChanges] Creating field with options:", options);

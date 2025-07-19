@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../../api.services/api.service';
-import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord, RequestDataUpdateFieldDataValue } from '../../../../models/models.datastore';
+import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord, RequestDataUpdateFieldDataValue, GetFieldOptionAsSelect } from '../../../../models/models.datastore';
 import { hasString } from '../../../../core/utils';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { AddFieldOverlayComponent } from '../ui/add-field-overlay/add-field-overlay.component';
@@ -75,6 +75,7 @@ export class ViewTableComponent implements OnInit {
 			[TableFieldType.FieldTypeDate, "ico-field-date"],
 			[TableFieldType.FieldTypeText, "ico-field-text"],
 			[TableFieldType.FieldTypeRelationship, "ico-field-relationship"],
+			[TableFieldType.FieldTypeOption, "ico-field-select"],
 		]);
 
 	}
@@ -117,6 +118,11 @@ export class ViewTableComponent implements OnInit {
 		})
 	}
 
+	hasColumnValue(columnData: FieldData) {
+		return columnData.DataValue != null
+			&& columnData.DataValue != undefined
+			&& columnData.DataValue != "";
+	}
 	columnValues(field: FieldMetaData) {
 		return this.tableRecordData!.ColumnValues[field.FieldGUID];//.get(field.FieldGUID)
 	}
@@ -375,12 +381,12 @@ export class ViewTableComponent implements OnInit {
 
 	/** Fired when the input element has focus.
 	 * This happens after the select is select, then clicked again to gain focus */
-	onInputCellFocus() {
+	onCellFocus() {
 		// console.log("[onInputCellFocus] selectedCell:", selectedCell);
 		this.cellEditMode = CellEditMode.CellEditModeEditing;
 	}
 
-	onInputCellBlur() {
+	onCellBlur() {
 		// console.log("[onInputCellBlur] selectedCell:", selectedCell);
 		// TODO: Auto-save
 		// this.activeCell = selectedCell;
@@ -462,18 +468,12 @@ export class ViewTableComponent implements OnInit {
 			}
 		}
 
-		// console.log("[keyHandlerEnter:updateTableFieldDataValue] selectedCell:", data.selectedCell);
+		this.onUpdateCellValue(request, (result: FieldData) => {
+			data.selectedCell.DataValue = result.DataValue
+			console.log("[keyHandlerEnter] result: ", result);
+		});
 
-		this.apiService.apiRequests.updateTableFieldDataValue(request)
-			.subscribe({
-				next: (result: FieldData) => {
-					data.selectedCell.DataValue = result.DataValue
-					// console.log("[keyHandlerEnter] result: ", result);
-				},
-				error: (err) => {
-					console.log("[keyHandlerEnter] err: ", err);
-				}
-			})
+		// console.log("[keyHandlerEnter:updateTableFieldDataValue] selectedCell:", data.selectedCell);
 	}
 
 	private keyHandlerDefault(data: KeyboardData, cell: HTMLElement) {
@@ -481,5 +481,68 @@ export class ViewTableComponent implements OnInit {
 
 	}
 
+	private onUpdateCellValue(request: RequestDataUpdateFieldDataValue, fnc: (result: FieldData) => void) {
+		this.apiService.apiRequests.updateTableFieldDataValue(request)
+			.subscribe({
+				next: (result: FieldData) => {
+					fnc(result);
+					// data.selectedCell.DataValue = result.DataValue
+				},
+				error: (err) => {
+					console.log("[onUpdateCellValue] err: ", err);
+				}
+			})
+	}
 
+	getFieldInputElement(field: FieldMetaData) {
+		switch (field.FieldType) {
+			case TableFieldType.FieldTypeOption:
+				return FieldInputElement.Option;
+			default:
+				return FieldInputElement.Input
+		}
+	}
+
+	get FieldInputElement() {
+		return FieldInputElement
+	}
+
+	isOptionField(field: FieldMetaData) {
+		return field.FieldType == TableFieldType.FieldTypeOption ?
+			true :
+			false;
+
+	}
+
+	GetFieldOptionAsSelect(field: FieldMetaData) {
+		console.log("[GetFieldOptionAsSelect] field.FieldOptions: ", field.FieldOptions, GetFieldOptionAsSelect(field.FieldOptions))
+		return GetFieldOptionAsSelect(field.FieldOptions)
+	}
+
+	onSelectedFieldOption(event$: Event, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
+		console.log("[onSelectedFieldOption] $:", event$, " field: ", field)
+
+		const request: RequestDataUpdateFieldDataValue = {
+			BaseGUID: this.baseGUID!,
+			TableGUID: this.tableGUID!,
+			FieldGUID: field.FieldGUID,
+			FieldData: {
+				CellGUID: selectedCell.CellGUID,
+				RecordGUID: selectedCell.RecordGUID,
+				DataValue: this.dirtyDataValue,
+			}
+		}
+
+		console.log("[onSelectedFieldOption] request:", request)
+
+		this.onUpdateCellValue(request, (result: FieldData) => {
+			selectedCell.DataValue = result.DataValue
+			console.log("[onSelectedFieldOption] result: ", result);
+		});
+	}
+}
+
+export enum FieldInputElement {
+	Input = "Input",
+	Option = "Option"
 }
