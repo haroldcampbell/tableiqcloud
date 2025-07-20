@@ -53,8 +53,8 @@ class TableField(BaseModel):
 
         return True
 
-def new_TableField(table_guid:str, field_name:str, field_type:TableFieldType, field_options:Optional[Dict[str, Any]] = None )->TableField:
-    meta_data = init_FieldMetaData(table_guid, field_name=field_name, field_type=field_type, field_options=field_options)
+def new_TableField(table_guid:str, field_name:str, field_type:TableFieldType, field_params:Optional[Dict[str, Any]] = None )->TableField:
+    meta_data = init_FieldMetaData(table_guid, field_name=field_name, field_type=field_type, field_params=field_params)
 
     return TableField(
         MetaData=meta_data,

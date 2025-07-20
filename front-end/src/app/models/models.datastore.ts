@@ -101,9 +101,22 @@ export function CreateFieldOptionAsSelect(items: OptionInfo[]) {
 
 	return options
 }
-export function GetFieldOptionAsSelect(fieldOptions: { [OptionName: string]: OptionInfo[] }) {
-	return fieldOptions[OptionInfoKey] ?? []
+export function GetFieldOptionAsSelect(FieldType: TableFieldType, fieldParams?: FieldParamOption): FieldParamOptionInfo[] {
+	if (FieldType !== TableFieldType.FieldTypeOption) return [];
+
+	return fieldParams?.ParamValues ?? [];
 }
+
+export interface FieldParamOptionInfo {
+	OptionId: string;
+	OptionIndex: number;
+	OptionName: string;
+}
+export interface FieldParamOption {
+	ParamKey: string;
+	ParamValues: FieldParamOptionInfo[];
+}
+
 export interface FieldMetaData {
 	TableGUID: string; // Guid for the parent table
 
@@ -112,7 +125,7 @@ export interface FieldMetaData {
 	FieldType: TableFieldType;
 	FieldTypeName: string;
 	MetaAttributes: any;
-	FieldOptions: { [OptionName: string]: any }; // For dropdowns, etc. This is a map of option names to values
+	FieldParams: FieldParamOption | any; // For dropdowns, etc. This is a map of option names to values
 }
 
 export interface FieldData {

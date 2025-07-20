@@ -95,8 +95,6 @@ export class ViewTableComponent implements OnInit {
 		// 	// inputElm.focus();
 		// 	console.log('Element has been added to the DOM', this.activeCellGUID, wrapperElm, inputElm.value);
 		// }
-
-
 	}
 
 	private loadTableData() {
@@ -108,7 +106,7 @@ export class ViewTableComponent implements OnInit {
 		// console.log("[loadTableData] tableGUID:", this.tableGUID);
 		this.apiService.apiRequests.getTableByGUID(this.baseGUID!, this.tableGUID!).subscribe({
 			next: (data) => {
-				console.log("[ViewTableComponent] data: ", data);
+				// console.log("[ViewTableComponent] data: ", data);
 				this.tableRecordData = data;
 
 			},
@@ -303,9 +301,6 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	activeCellGUID: string = ""
-	// testCellText = "Heart Trust"
-	// testCellText = "Jamaica"
-	// testCellText = "UWI Mona"
 	dirtyDataValue: string = "";
 	cellEditMode = CellEditMode.CellEditModeNone;
 
@@ -344,7 +339,7 @@ export class ViewTableComponent implements OnInit {
 	 */
 	onSelectRowItemKeyUp(event: KeyboardEvent) {
 		// console.log("[onSelectRowItemKeyUp]");
-		console.log("[onSelectRowItemKeyUp] event:", event);
+		// console.log("[onSelectRowItemKeyUp] event:", event);
 		event.preventDefault();
 
 		switch (event.key) {
@@ -438,7 +433,7 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	private keyHandlerEscape(data: KeyboardData, cell: HTMLElement) {
-		console.log("[keyHandlerEscape]");
+		// console.log("[keyHandlerEscape]");
 		data.event.preventDefault();
 
 		this.clearCellGUID();
@@ -447,7 +442,7 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	private keyHandlerEnter(data: KeyboardData, cell: HTMLElement) {
-		console.log("[keyHandlerEnter] data.field:", data.field);
+		// console.log("[keyHandlerEnter] data.field:", data.field);
 
 		data.event.preventDefault();
 		data.event.stopImmediatePropagation();
@@ -470,15 +465,14 @@ export class ViewTableComponent implements OnInit {
 
 		this.onUpdateCellValue(request, (result: FieldData) => {
 			data.selectedCell.DataValue = result.DataValue
-			console.log("[keyHandlerEnter] result: ", result);
+			// console.log("[keyHandlerEnter] result: ", result);
 		});
 
 		// console.log("[keyHandlerEnter:updateTableFieldDataValue] selectedCell:", data.selectedCell);
 	}
 
 	private keyHandlerDefault(data: KeyboardData, cell: HTMLElement) {
-		console.log("[keyHandlerDefault] set activeCell == null");
-
+		// console.log("[keyHandlerDefault] set activeCell == null");
 	}
 
 	private onUpdateCellValue(request: RequestDataUpdateFieldDataValue, fnc: (result: FieldData) => void) {
@@ -511,17 +505,14 @@ export class ViewTableComponent implements OnInit {
 		return field.FieldType == TableFieldType.FieldTypeOption ?
 			true :
 			false;
-
 	}
 
 	GetFieldOptionAsSelect(field: FieldMetaData) {
-		console.log("[GetFieldOptionAsSelect] field.FieldOptions: ", field.FieldOptions, GetFieldOptionAsSelect(field.FieldOptions))
-		return GetFieldOptionAsSelect(field.FieldOptions)
+		return GetFieldOptionAsSelect(field.FieldType, field.FieldParams);
 	}
 
 	onSelectedFieldOption(event$: Event, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
-		console.log("[onSelectedFieldOption] $:", event$, " field: ", field)
-
+		// console.log("[onSelectedFieldOption] $:", event$, " field: ", field)
 		const request: RequestDataUpdateFieldDataValue = {
 			BaseGUID: this.baseGUID!,
 			TableGUID: this.tableGUID!,
@@ -533,11 +524,11 @@ export class ViewTableComponent implements OnInit {
 			}
 		}
 
-		console.log("[onSelectedFieldOption] request:", request)
+		// console.log("[onSelectedFieldOption] request:", request)
 
 		this.onUpdateCellValue(request, (result: FieldData) => {
 			selectedCell.DataValue = result.DataValue
-			console.log("[onSelectedFieldOption] result: ", result);
+			// console.log("[onSelectedFieldOption] result: ", result);
 		});
 	}
 }

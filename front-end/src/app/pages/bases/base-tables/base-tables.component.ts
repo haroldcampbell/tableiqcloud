@@ -45,7 +45,7 @@ export class BaseTablesComponent implements OnInit {
 
 		this.apiService.apiRequests.getTables(this.baseGUID).subscribe({
 			next: (data: BaseTableInfo) => {
-				console.log("[BaseTablesComponent] data: ", data);
+				// console.log("[BaseTablesComponent] data: ", data);
 				this.initTableData(data);
 			},
 			error: (err) => {
@@ -72,7 +72,7 @@ export class BaseTablesComponent implements OnInit {
 
 	onSelectTable(tableGUID: string) {
 		this.selectedTableGUID = tableGUID;
-		console.log("[onSelectTable] selectedTableGUID:", tableGUID)
+		// console.log("[onSelectTable] selectedTableGUID:", tableGUID)
 		this.router.navigate(['base', this.baseGUID, tableGUID]);
 	}
 
@@ -86,7 +86,7 @@ export class BaseTablesComponent implements OnInit {
 
 	onSelectNavItem(item: NavItems) {
 		this.selectedNavItem = item;
-		console.log("[onSelectNavItem] selectedNavItemName:", item)
+		// console.log("[onSelectNavItem] selectedNavItemName:", item)
 	}
 
 	isSelectedNavItem(item: NavItems) {

@@ -74,8 +74,8 @@ class Table(BaseModel):
 
         return records
 
-    def create_table_field_by_name(self, field_name:str, ftype:TableFieldType, field_options:Optional[Dict[str, str]]=None) -> TableRecordData:
-        field = new_TableField(self.GUID, field_name, ftype, field_options)
+    def create_table_field_by_name(self, field_name:str, ftype:TableFieldType, field_params:Optional[Dict[str, str]]=None) -> TableRecordData:
+        field = new_TableField(self.GUID, field_name, ftype, field_params)
         field = self.add_table_field(field)
 
         return self.get_records_for_field(field)
