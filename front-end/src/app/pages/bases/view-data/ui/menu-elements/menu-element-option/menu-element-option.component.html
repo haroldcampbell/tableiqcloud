@@ -1,0 +1,33 @@
+<h3>Options</h3>
+<div [class.hidden-item]="!isEmptyOptionList">Add one or more options.</div>
+<ul class="option-container" [class.hidden-item]="isEmptyOptionList">
+  @for(item of optionInfoElm; track item.OptionInfo.OptionIndex) {
+  <li>
+    <ul class="option-item-container">
+      <!-- <li class="option-input-move-handle">::</li> -->
+      <li class="option-input-container">
+        <div class="option-value-wrapper">
+          <input
+            class="option-value"
+            [id]="'option-value-' + item.OptionInfo.OptionId"
+            [value]="item.OptionInfo.OptionName"
+            autocomplete="off"
+            type="text"
+            placeholder="Enter option value"
+            (keyup)="onOptionValueChange($event, item)"
+            (focus)="onOptionInputFocus($event, item)"
+            (blur)="onOptionValueBlur($event, item)"
+          />
+        </div>
+      </li>
+      <li class="option-input-action">
+        <div (click)="onRemoveOption(item)">X</div>
+      </li>
+    </ul>
+  </li>
+  }
+</ul>
+
+<div class="option-action-container">
+  <button class="action-create" (click)="onAddOption()">Add option</button>
+</div>

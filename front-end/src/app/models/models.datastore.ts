@@ -77,6 +77,10 @@ export function FieldTypeToStringifiedFieldType(t: TableFieldType): StringifiedF
 		case TableFieldType.FieldTypeString:
 			return StringifiedFieldType.FieldTypeString;
 
+		case TableFieldType.FieldTypeOption:
+			return StringifiedFieldType.FieldTypeOption;
+
+
 		// case TableFieldType.FieldTypeText:
 		// 	return StringifiedFieldType.FieldTypeString;
 

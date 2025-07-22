@@ -1,0 +1,82 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    padding-bottom: 10px;
+    border-bottom: solid 1px #f0f0f0;
+
+    h3 {
+        text-align: left;
+        font-size: 1em;
+        font-weight: 700;
+        margin-bottom: 10px;
+        padding-bottom: 5px;
+        line-height: 1em;
+
+        border-bottom: solid 1px #f0f0f0;
+    }
+}
+
+.option-container {
+    display: flex;
+    flex-direction: column;
+    row-gap: 5px;
+
+    .option-item-container {
+        display: flex;
+        flex-direction: row;
+        column-gap: 5px;
+        flex: 1 1 auto;
+
+        // .option-input-move-handle {
+        //     width: 20px;
+        //     height: 20px;
+        //     border: solid 1px #e0e0e0;
+        //     font-size: 1em;
+        //     color: #333;
+        // }
+
+        .option-input-container {
+            display: flex;
+            flex: 1 1 auto;
+
+            .option-value-wrapper {
+                display: flex;
+                flex: 1 1 auto;
+
+                .option-value {
+                    flex: 1 1 auto;
+                }
+            }
+        }
+
+        .option-input-action {
+            width: 20px;
+            height: 20px;
+            border: solid 1px #e0e0e0;
+            font-size: 1em;
+            color: #333;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    }
+}
+
+.option-action-container {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    margin-top: 10px;
+}
+
+.hidden-item {
+    display: none;
+}
+
+
+// .mat-option-reset {
+//     padding: 5px 5px !important;
+//     font-size: 1em !important;
+//     min-height: unset !important;
+//     height: unset !important;
+// }

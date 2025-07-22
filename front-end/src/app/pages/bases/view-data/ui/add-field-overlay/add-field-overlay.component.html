@@ -59,56 +59,7 @@
           : 'field-item-hidden'
       "
     >
-      <h3>Options</h3>
-      <div [class.hidden-item]="!isEmptyOptionList">
-        Add one or more options.
-      </div>
-      <ul class="option-container" [class.hidden-item]="isEmptyOptionList">
-        @for(item of optionInfoElm; track item.OptionInfo.OptionIndex) {
-        <li>
-          <ul class="option-item-container">
-            <!-- <li class="option-input-move-handle">::</li> -->
-            <li class="option-input-container">
-              <div class="option-value-wrapper">
-                <!-- [(ngModel)]="item" -->
-                <!-- [(ngModel)]="item.OptionName"
-                  [attr.data-option-index]="item.OptionIndex"
-                  [attr.data-option-name]="item.OptionName"
-                  (keyup)="onOptionValueChange($event, item.OptionIndex)"
-                  (blur)="onOptionValueBlur($event, item.OptionIndex)"
-                  [disabled]="isOptionFieldTypeDisabled()"
-                  [attr.data-field-type]="selectedFieldType"
-                  [attr.data-field-name]="fieldName"
-                  [attr.data-base-guid]="baseGUID"
-                  [attr.data-table-guid]="tableGUID"
-                  [attr.data-option-index]="item.OptionIndex"
-                  (ngModelChange)="onOptionValueChange($event, item.OptionIndex)"
-                  (blur)="onOptionValueBlur($event, item.OptionIndex)" -->
-                <input
-                  class="option-value"
-                  [id]="'option-value-' + item.OptionInfo.OptionId"
-                  [value]="item.OptionInfo.OptionName"
-                  autocomplete="off"
-                  type="text"
-                  placeholder="Enter option value"
-                  (keyup)="onOptionValueChange($event, item)"
-                  (focus)="onOptionInputFocus($event, item)"
-                  (blur)="onOptionValueBlur($event, item)"
-                />
-              </div>
-            </li>
-            <li class="option-input-action">
-              <div (click)="onRemoveOption(item)">X</div>
-            </li>
-          </ul>
-        </li>
-        }
-      </ul>
-      <div class="option-action-container">
-        <button class="action-create" (click)="onAddOption()">
-          Add option
-        </button>
-      </div>
+      <app-menu-element-option (optionInfoList)="onOptionInfoListChanged($event)"></app-menu-element-option>
     </div>
 
     <!-- Select field type -->
