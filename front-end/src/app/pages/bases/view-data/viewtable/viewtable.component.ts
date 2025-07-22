@@ -9,6 +9,7 @@ import { CoreModule } from '../../../../modules/core.module';
 import { FieldContextMenuOverlayComponent } from '../ui/field-context-menu-overlay/field-context-menu-overlay.component';
 import { EditFieldContextMenuOverlayComponent } from '../ui/edit-field-context-menu-overlay/edit-field-context-menu-overlay.component';
 import { TableCellContextMenuComponent } from '../ui/table-cell-context-menu/table-cell-context-menu.component';
+import { MatSelectChange } from '@angular/material/select';
 
 interface KeyboardData {
 	event: KeyboardEvent
@@ -511,7 +512,7 @@ export class ViewTableComponent implements OnInit {
 		return GetFieldOptionAsSelect(field.FieldType, field.FieldParams);
 	}
 
-	onSelectedFieldOption(event$: Event, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
+	onSelectedFieldOption(event$: MatSelectChange, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
 		// console.log("[onSelectedFieldOption] $:", event$, " field: ", field)
 		const request: RequestDataUpdateFieldDataValue = {
 			BaseGUID: this.baseGUID!,

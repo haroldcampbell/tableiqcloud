@@ -193,7 +193,7 @@
                             <!-- Handle select input -->
                             @case(FieldInputElement.Option) {
                             <!--  -->
-                            <select
+                            <!-- <select
                               class="input-elm"
                               (change)="
                                 onSelectedFieldOption(
@@ -214,7 +214,35 @@
                                 {{ item.OptionName }}
                               </option>
                               }
-                            </select>
+                            </select> -->
+                            <mat-select
+                              class="input-elm"
+                              style="font-size: 14px"
+                              #matSelect
+                              (selectionChange)="
+                                onSelectedFieldOption(
+                                  $event,
+                                  field,
+                                  columnData,
+                                  colIndex,
+                                  rowIndex
+                                )
+                              "
+                              (focus)="onCellFocus()"
+                              [value]="columnData.DataValue"
+                              [(ngModel)]="dirtyDataValue"
+                            >
+                              <!-- (blur)="onCellBlur()" -->
+                              @for (item of GetFieldOptionAsSelect(field); track
+                              $index) {
+                              <mat-option
+                                [value]="item.OptionName"
+                                class="option-value"
+                              >
+                                {{ item.OptionName }}
+                              </mat-option>
+                              }
+                            </mat-select>
                             } }
                           </div>
                         </div>
