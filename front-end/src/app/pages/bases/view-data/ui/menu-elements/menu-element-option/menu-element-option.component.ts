@@ -1,6 +1,6 @@
-import { AfterViewInit, Component, EventEmitter, OnDestroy, OnInit, Output } from '@angular/core';
-import { auditTime, debounceTime, Subject } from 'rxjs';
-import { OptionInfo } from '../../../../../../models/models.datastore';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { auditTime, debounceTime, delay, map, merge, mergeMap, Subject } from 'rxjs';
+import { FieldMetaData, FieldParamOption, OptionInfo } from '../../../../../../models/models.datastore';
 
 export interface OptionInfoElem {
 	OptionInfo: OptionInfo;
@@ -18,9 +18,18 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 	optionInfoElm: OptionInfoElem[] = []; // For Option field type, holds the value of options
 	private addOption$ = new Subject<OptionInfoElem>();
 	private createOption$ = new Subject<OptionInfoElem>();
+
+	@Input() field!: FieldMetaData;
+
 	@Output() optionInfoList = new EventEmitter<OptionInfoElem[]>();
 
 	ngOnInit(): void {
+		this.initExistingOptions();
+
+	}
+
+	getOptionInputElm(item: OptionInfoElem) {
+		return document.getElementById(`option-value-${item.OptionInfo.OptionId}`) as HTMLInputElement;
 	}
 
 	ngAfterViewInit() {
@@ -33,12 +42,13 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 			});
 
 		this.addOption$
-			.pipe(debounceTime(50))  // Waits 50ms after last emit before running
+			.pipe(auditTime(50))  // Waits 50ms after last emit before running
 			.subscribe((item: OptionInfoElem) => {
-				const input = document.getElementById(`option-value-${item.OptionInfo.OptionId}`) as HTMLInputElement;
+				// Store the input element reference for later use
+				const input = this.getOptionInputElm(item);
 				if (input) {
 					input.focus();
-					item._inputElm = input; // Store the input element reference for later use
+					item._inputElm = input;
 				}
 				this.optionInfoList.emit(this.optionInfoElm); // Emit the current list of options
 			});
@@ -47,6 +57,34 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 	ngOnDestroy(): void {
 		this.createOption$.complete();
 		this.addOption$.complete(); // Cleanup
+	}
+
+	initExistingOptions() {
+		if (this.field === undefined || this.field.FieldParams === undefined) {
+			console.warn("Field or FieldParams is undefined, skipping initialization of existing options.");
+			return;
+		}
+
+		const optionInforList = (this.field.FieldParams as FieldParamOption)?.ParamValues ?? []
+
+		let s = new Subject<OptionInfoElem>();
+
+		s.pipe(delay(50))
+			.forEach((item) => {
+				// Store the input element reference for later use
+				item._inputElm = this.getOptionInputElm(item);
+			});
+
+		optionInforList.map(i => {
+			const itemElm = {
+				OptionInfo: i,
+				_inputElm: undefined
+			}
+			this.optionInfoElm.push(itemElm);
+			s.next(itemElm)
+		});
+
+		s.complete();
 	}
 
 	get isEmptyOptionList(): boolean {
@@ -80,6 +118,8 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 		if (item._inputElm) {
 			item._inputElm.blur(); // Remove focus from the input element
 			item.OptionInfo.OptionName = item._inputElm.value.trim(); // Update the option name with trimmed value
+
+			console.log("[onOptionValueBlur] changed: ", item._inputElm.value.trim())
 			this.optionInfoList.emit(this.optionInfoElm); // Emit the current list of options
 		}
 	}

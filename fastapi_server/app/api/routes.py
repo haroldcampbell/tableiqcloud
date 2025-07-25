@@ -89,7 +89,8 @@ async def update_table_field_info(request: api.RequestDataUpdateField):
     if table == None:
         return errResp(action="update-info",jsonBody=table, message="Table not found")
 
-    fieldMetaData = table.update_table_field_meta_data(request.TableFieldGUID, request.FieldName, request.FieldType)
+    fieldMetaData = table.update_table_field_meta_data(
+        request.TableFieldGUID, request.FieldName, request.FieldType, request.FieldOptions)
 
     return okResp(action="update-info", jsonBody=fieldMetaData)
 

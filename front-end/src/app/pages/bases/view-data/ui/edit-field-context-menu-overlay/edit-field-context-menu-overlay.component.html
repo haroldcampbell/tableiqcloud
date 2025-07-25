@@ -75,7 +75,26 @@
         /></span>
         {{ FieldType.FieldTypeDate }}
       </li>
+      <li
+        class="list-item"
+        [class.selected-list-item]="
+          isSelectedListItem(FieldType.FieldTypeOption)
+        "
+        (click)="onSelectFieldType(FieldType.FieldTypeOption)"
+      >
+        <span>
+          <img class="ico" src="/assets/images/ico-field-select.png" alt=""
+        /></span>
+        {{ FieldType.FieldTypeOption }}
+      </li>
     </ul>
+
+    <!-- UI for Option menu element -->
+    <app-menu-element-option
+      *ngIf="isOptionFieldType()"
+      [field]="field"
+      (optionInfoList)="onOptionInfoListChanged($event)"
+    ></app-menu-element-option>
   </div>
 
   <div class="overlay-footer">

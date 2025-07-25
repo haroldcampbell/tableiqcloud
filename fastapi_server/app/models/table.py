@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pydantic import BaseModel,Field
-from typing import List, Dict, Optional,Callable
+from typing import List, Dict, Optional,Callable, Any
 import uuid
 import logging
 
@@ -114,16 +114,17 @@ class Table(BaseModel):
 
         return True
 
-    def update_table_field_meta_data(self, table_field_guid:str, field_name:str, ftype:TableFieldType):
+    def update_table_field_meta_data(self, table_field_guid:str, field_name:str, ftype:TableFieldType, field_options: Dict[str, Any]):
         index, field = self.find_table_field_by_guid(table_field_guid)
         if index == -1 or field is None:
             raise ValueError(f"Table.update_table_field_meta_data. \n\tField not found. \n\tGUID: {table_field_guid}")
 
-        if field.MetaData is None:
-            raise ValueError(f"Table.update_table_field_meta_data. \n\tMetaData can't be None. \n\tfield: {field}")
+        field.update_meta_data(field_name, ftype, field_options)
 
-        field.MetaData.FieldName = str.strip(field_name)
-        field.MetaData.FieldType = ftype
+        # TODO:
+        #    - Update the list of exizting value that's available in the UI
+        #    - Show the Name in the dropdown even if we keeping the GUID as the Value
+
 
         return field.MetaData
 

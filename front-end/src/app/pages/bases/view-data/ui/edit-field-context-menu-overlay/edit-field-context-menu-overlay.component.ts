@@ -1,18 +1,22 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CoreModule } from '../../../../../modules/core.module';
-import { FieldMetaData, FieldTypeToStringifiedFieldType, RequestDataCreateField, RequestDataUpdateField, StringifiedFieldType, StringifiedFieldTypeToType } from '../../../../../models/models.datastore';
+import { CreateFieldOptionAsSelect, FieldMetaData, FieldOptionsType, FieldTypeToStringifiedFieldType, RequestDataCreateField, RequestDataUpdateField, StringifiedFieldType, StringifiedFieldTypeToType } from '../../../../../models/models.datastore';
 import { MatSelect, MatSelectChange } from '@angular/material/select';
+import { MenuElementOptionComponent, OptionInfoElem } from '../menu-elements/menu-element-option/menu-element-option.component';
 
 @Component({
 	selector: 'app-edit-field-context-menu-overlay',
 	standalone: true,
 	imports: [
-		CoreModule
+		CoreModule,
+		MenuElementOptionComponent
 	],
 	templateUrl: './edit-field-context-menu-overlay.component.html',
 	styleUrl: './edit-field-context-menu-overlay.component.scss'
 })
 export class EditFieldContextMenuOverlayComponent implements OnInit {
+	private _optionInfoList: OptionInfoElem[] = [];
+
 	disSelectedField = true; // Has an initial field been selected?
 
 	@Input() field!: FieldMetaData;
@@ -65,12 +69,19 @@ export class EditFieldContextMenuOverlayComponent implements OnInit {
 	}
 
 	onApplyChanges() {
+		let options: FieldOptionsType = {}
+		if (this.selectedFieldType == StringifiedFieldType.FieldTypeOption) {
+			// Convert option list to a format suitable for FieldOptionsType
+			options = CreateFieldOptionAsSelect(this._optionInfoList.map(opt => opt.OptionInfo))
+		}
+
 		this.didClickSave.emit({
 			BaseGUID: this.baseGUID,
 			TableGUID: this.tableGUID,
 			TableFieldGUID: this.field.FieldGUID,
 			FieldName: this.fieldName,
 			FieldType: StringifiedFieldTypeToType(this.selectedFieldType),
+			FieldOptions: options // Pass the options if applicable
 		});
 	}
 
@@ -81,5 +92,13 @@ export class EditFieldContextMenuOverlayComponent implements OnInit {
 
 	onShowFieldTypeOptions() {
 		this.disSelectedField = false;
+	}
+
+	isOptionFieldType(): boolean {
+		return this.selectedFieldType === StringifiedFieldType.FieldTypeOption;
+	}
+
+	onOptionInfoListChanged(listItems: OptionInfoElem[]) {
+		this._optionInfoList = listItems;
 	}
 }

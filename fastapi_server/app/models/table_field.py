@@ -53,6 +53,21 @@ class TableField(BaseModel):
 
         return True
 
+    def update_meta_data(self, field_name:str, ftype:TableFieldType, field_options:Dict[str, Any]):
+        if self.MetaData is None:
+            raise ValueError(f"TableField.update_table_field_meta_data. \n\tMetaData can't be None. \n\tfield: {self}")
+
+        self.MetaData.update_meta_data(field_name, ftype, field_options)
+
+        if ftype == TableFieldType.FieldTypeOption:
+            deleted_ids = self.MetaData.update_meta_data_field_params(ftype, field_options)
+            for data in self.FieldData:
+                if data.DataValue in deleted_ids:
+                    data.DataValue = ""
+
+
+        return
+
 def new_TableField(table_guid:str, field_name:str, field_type:TableFieldType, field_params:Optional[Dict[str, Any]] = None )->TableField:
     meta_data = init_FieldMetaData(table_guid, field_name=field_name, field_type=field_type, field_params=field_params)
 

@@ -22,6 +22,7 @@ class RequestDataUpdateField(BaseModel):
 
 	FieldName: str
 	FieldType: models.TableFieldType
+	FieldOptions: Dict[str, Any] = Field(default_factory=dict)
 
 class RequestDataUpdateFieldDataValue(BaseModel):
 	BaseGUID:  str

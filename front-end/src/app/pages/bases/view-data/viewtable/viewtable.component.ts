@@ -1,7 +1,7 @@
 import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../../api.services/api.service';
-import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord, RequestDataUpdateFieldDataValue, GetFieldOptionAsSelect } from '../../../../models/models.datastore';
+import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord, RequestDataUpdateFieldDataValue, GetFieldOptionAsSelect, FieldParamOptionInfo } from '../../../../models/models.datastore';
 import { hasString } from '../../../../core/utils';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { AddFieldOverlayComponent } from '../ui/add-field-overlay/add-field-overlay.component';
@@ -24,6 +24,10 @@ enum CellEditMode {
 	CellEditModeSelected,
 	CellEditModeEditing
 }
+
+type FieldGuid = string;
+type OptionID = string;
+type ParamOptionIDMap = Map<OptionID, FieldParamOptionInfo>;
 
 @Component({
 	selector: 'ui-viewtable',
@@ -109,7 +113,7 @@ export class ViewTableComponent implements OnInit {
 			next: (data) => {
 				// console.log("[ViewTableComponent] data: ", data);
 				this.tableRecordData = data;
-
+				this.initParamValuesMap()
 			},
 			error: (err) => {
 				console.log("[ViewTableComponent] err: ", err);
@@ -124,6 +128,39 @@ export class ViewTableComponent implements OnInit {
 	}
 	columnValues(field: FieldMetaData) {
 		return this.tableRecordData!.ColumnValues[field.FieldGUID];//.get(field.FieldGUID)
+	}
+
+	fieldMap = new Map<FieldGuid, FieldMetaData>();
+	fieldParamOptionIDMap = new Map<FieldGuid, ParamOptionIDMap>();
+
+	initParamValuesMap() {
+		this.tableRecordData?.FieldsMetaData.forEach(field => {
+			this.fieldMap.set(field.FieldGUID, field);
+
+			if (field.FieldType != TableFieldType.FieldTypeOption) {
+				return;
+			}
+
+			this.buildFieldParamOptionMap(field);
+		});
+	}
+
+	buildFieldParamOptionMap(field: FieldMetaData) {
+		let paramValueMap = new Map<OptionID, FieldParamOptionInfo>();
+		field.FieldParams.ParamValues.forEach((param: FieldParamOptionInfo) => {
+			paramValueMap.set(param.OptionId, param);
+		});
+
+		this.fieldParamOptionIDMap.set(field.FieldGUID, paramValueMap);
+	}
+
+	presentColumnDataValue(field: FieldMetaData, columnData: FieldData) {
+		if (field.FieldType != TableFieldType.FieldTypeOption) {
+			return columnData.DataValue;
+		}
+
+		let paramValueMap = this.fieldParamOptionIDMap.get(field.FieldGUID)
+		return paramValueMap?.get(columnData.DataValue)?.OptionName ?? "";
 	}
 
 	// return the ico name for the field
@@ -177,7 +214,7 @@ export class ViewTableComponent implements OnInit {
 
 		this.apiService.apiRequests.updateTableFieldInfo(r).subscribe({
 			next: (data) => {
-				// console.log("[onCreateField] data: ", data);
+				console.log("[onUpdateField] data: ", data);
 				this.updateTableFieldType(data);
 			},
 			error: (err) => {
@@ -187,6 +224,8 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	updateTableFieldType(data: FieldMetaData) {
+		console.log("[updateTableFieldType] data: ", data);
+
 		const results = this.tableRecordData?.FieldsMetaData.filter(f => f.FieldGUID == data.FieldGUID);
 		if (results == undefined) {
 			return;
@@ -195,6 +234,48 @@ export class ViewTableComponent implements OnInit {
 		let field = results[0];
 		field.FieldName = data.FieldName;
 		field.FieldType = data.FieldType;
+
+		switch (field.FieldType) {
+			case TableFieldType.FieldTypeOption: {
+				this.updateColumnValuesForOptions(data);
+				break;
+			}
+		}
+	}
+
+	updateColumnValuesForOptions(data: FieldMetaData) {
+		// Update ColumnValues
+		// let columnValues = this.tableRecordData?.ColumnValues[data.FieldGUID] ?? [];
+		// let optionIDMap = new Map<string, FieldParamOptionInfo>();
+		// data.FieldParams.ParamValues.forEach((option: FieldParamOptionInfo) => {
+		// 	optionIDMap.set(option.OptionId, option);
+		// })
+
+		// console.log("[updateColumnValuesForOptions] columnValues: ", columnValues);
+		// columnValues.forEach((fieldData: FieldData) => {
+		// 	if (fieldData.DataValue === null || fieldData.DataValue === undefined) {
+		// 		return;
+		// 	}
+
+		// 	let option = optionIDMap.get(fieldData.DataValue);
+		// 	if (option) {
+		// 		fieldData.DataValue = option.OptionName; // Update the value to the OptionName
+		// 	} else {
+		// 		fieldData.DataValue = ""; // Clear if not found
+		// 	}
+		// });
+		this.tableRecordData?.FieldsMetaData.forEach((f, index) => {
+			if (f.FieldGUID != data.FieldGUID) {
+				return;
+			}
+			this.tableRecordData!.FieldsMetaData[index] = data;
+
+			// let records = this.tableRecordData?.ColumnValues[f.FieldGUID];
+			// records = records?.filter(r => r.RecordGUID != recordGUID) || [];
+			// this.tableRecordData!.ColumnValues![f.FieldGUID]! = records;
+		})
+
+		this.buildFieldParamOptionMap(data)
 	}
 
 	updateTableRecord(data: TableRecordData) {

@@ -66,7 +66,7 @@ export class AddFieldOverlayComponent implements OnInit, AfterViewInit, OnDestro
 	onApplyChanges() {
 		let options: FieldOptionsType = {}
 		if (this.selectedFieldType == StringifiedFieldType.FieldTypeOption) {
-			// Convert optionNames to a format suitable for FieldOptionsType
+			// Convert option list to a format suitable for FieldOptionsType
 			options = CreateFieldOptionAsSelect(this._optionInfoList.map(opt => opt.OptionInfo))
 		}
 
@@ -90,7 +90,7 @@ export class AddFieldOverlayComponent implements OnInit, AfterViewInit, OnDestro
 		this.selectedFieldType = $event.value
 	}
 
-	isOptionFieldTypeDisabled(): boolean {
+	isOptionFieldType(): boolean {
 		return this.selectedFieldType === StringifiedFieldType.FieldTypeOption;
 	}
 

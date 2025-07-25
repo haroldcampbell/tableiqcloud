@@ -193,28 +193,6 @@
                             <!-- Handle select input -->
                             @case(FieldInputElement.Option) {
                             <!--  -->
-                            <!-- <select
-                              class="input-elm"
-                              (change)="
-                                onSelectedFieldOption(
-                                  $event,
-                                  field,
-                                  columnData,
-                                  colIndex,
-                                  rowIndex
-                                )
-                              "
-                              (focus)="onCellFocus()"
-                              (blur)="onCellBlur()"
-                              [(ngModel)]="dirtyDataValue"
-                            >
-                              @for (item of GetFieldOptionAsSelect(field); track
-                              $index) {
-                              <option [value]="item.OptionName">
-                                {{ item.OptionName }}
-                              </option>
-                              }
-                            </select> -->
                             <mat-select
                               class="input-elm"
                               style="font-size: 14px"
@@ -236,7 +214,7 @@
                               @for (item of GetFieldOptionAsSelect(field); track
                               $index) {
                               <mat-option
-                                [value]="item.OptionName"
+                                [value]="item.OptionId"
                                 class="option-value"
                               >
                                 {{ item.OptionName }}
@@ -266,7 +244,7 @@
                               isOptionField(field)
                             "
                           >
-                            {{ columnData.DataValue }}
+                            {{ presentColumnDataValue(field, columnData) }}
                           </span>
                         </div>
                       </div>

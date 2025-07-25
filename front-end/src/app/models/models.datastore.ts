@@ -63,6 +63,7 @@ export function StringifiedFieldTypeToType(s: StringifiedFieldType): TableFieldT
 			return TableFieldType.FieldTypeOption;
 
 	}
+
 	return TableFieldType.FieldTypeString
 }
 
@@ -223,6 +224,7 @@ export interface RequestDataUpdateField {
 
 	FieldName: string;
 	FieldType: TableFieldType;
+	FieldOptions?: FieldOptionsType; // For dropdowns, etc.
 }
 
 export interface RequestDataCreateRecord {

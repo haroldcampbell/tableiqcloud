@@ -52,16 +52,6 @@
       </mat-select>
     </div>
 
-    <div
-      [class]="
-        isOptionFieldTypeDisabled()
-          ? 'option-content-wrapper'
-          : 'field-item-hidden'
-      "
-    >
-      <app-menu-element-option (optionInfoList)="onOptionInfoListChanged($event)"></app-menu-element-option>
-    </div>
-
     <!-- Select field type -->
     <ul
       [class]="
@@ -107,6 +97,12 @@
         {{ FieldType.FieldTypeOption }}
       </li>
     </ul>
+
+    <!-- UI for Option menu element -->
+    <app-menu-element-option
+      *ngIf="isOptionFieldType()"
+      (optionInfoList)="onOptionInfoListChanged($event)"
+    ></app-menu-element-option>
   </div>
 
   <div class="overlay-footer">
