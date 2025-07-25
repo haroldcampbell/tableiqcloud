@@ -1,3 +1,5 @@
 
 # Python files
 **/*.pyc
+
+**/notes.md
