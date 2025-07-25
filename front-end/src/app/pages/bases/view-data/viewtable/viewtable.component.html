@@ -124,9 +124,9 @@
                   <div class="header-item-wrapper">
                     <ul
                       class="data-item action-item"
-                      (click)="onOpenFieldContextMenu(AddFieldAction)"
                       cdkOverlayOrigin
                       #addFieldOverlay="cdkOverlayOrigin"
+                      (click)="onOpenFieldContextMenu(AddFieldAction)"
                     >
                       <li class="field-name">
                         <img
@@ -140,17 +140,17 @@
                 </li>
               </ul>
             </div>
+
             <!-- BODY -->
             <div class="body-wrapper-container">
               <div class="body-container">
-                @for (field of tableRecordData?.FieldsMetaData; track $index;
-                let colIndex = $index) {
-                <!-- Column  -->
+                <!-- prettier-ignore -->
+                @for (field of tableRecordData?.FieldsMetaData; track $index; let colIndex = $index) {
+                <!-- Column -->
                 <div class="column-container">
-                  @for (columnData of columnValues(field); track $index; let
-                  rowIndex = $index) {
-                  <!--  Row -->
-
+                  <!-- prettier-ignore -->
+                  @for (columnData of columnValues(field); track $index; let rowIndex = $index) {
+                  <!-- Row -->
                   <div
                     class="row-item-wrapper"
                     tabindex="0"
@@ -161,110 +161,19 @@
                       onSelectRowItem($event, columnData, colIndex, rowIndex)
                     "
                   >
+                    <!-- prettier-ignore -->
+                    @let cellContext = {
+                      field: field,
+                      columnData: columnData,
+                      colIndex: colIndex,
+                      rowIndex: rowIndex
+                    };
                     @if(isActiveCell(columnData)) {
-                    <div class="active-row-item" cdkOverlayOrigin>
-                      <div class="active-data-item">
-                        <div class="value-item-container">
-                          <div class="input-wrapper">
-                            @switch (getFieldInputElement(field)) {
-                            <!-- Handle regular string input -->
-                            @case (FieldInputElement.Input) {
-                            <input
-                              #gridInputElement
-                              class="input-elm"
-                              type="text"
-                              [attr.data-cell-id]="
-                                'input-' + colIndex + '-' + rowIndex
-                              "
-                              (focus)="onCellFocus()"
-                              (blur)="onCellBlur()"
-                              (keyup)="
-                                onInputCellKeyup(
-                                  $event,
-                                  field,
-                                  columnData,
-                                  colIndex,
-                                  rowIndex
-                                )
-                              "
-                              [(ngModel)]="dirtyDataValue"
-                            />
-                            }
-                            <!-- Handle select input -->
-                            @case(FieldInputElement.Option) {
-                            <!--  -->
-                            <mat-select
-                              class="input-elm"
-                              style="font-size: 14px"
-                              #matSelect
-                              (selectionChange)="
-                                onSelectedFieldOption(
-                                  $event,
-                                  field,
-                                  columnData,
-                                  colIndex,
-                                  rowIndex
-                                )
-                              "
-                              (focus)="onCellFocus()"
-                              [value]="columnData.DataValue"
-                              [(ngModel)]="dirtyDataValue"
-                            >
-                              <!-- (blur)="onCellBlur()" -->
-                              @for (item of GetFieldOptionAsSelect(field); track
-                              $index) {
-                              <mat-option
-                                [value]="item.OptionId"
-                                class="option-value"
-                              >
-                                {{ item.OptionName }}
-                              </mat-option>
-                              }
-                            </mat-select>
-                            } }
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
+                    <!-- prettier-ignore -->
+                    <ng-container *ngTemplateOutlet="editCellTemplate; context: cellContext"></ng-container>
                     } @else {
-                    <div
-                      class="row-item"
-                      cdkOverlayOrigin
-                      #tableCellContextMenu="cdkOverlayOrigin"
-                      (contextmenu)="
-                        onShowTableCellContextMenu(columnData.CellGUID)
-                      "
-                    >
-                      <div class="data-item">
-                        <div class="value-item-container">
-                          <span
-                            *ngIf="hasColumnValue(columnData)"
-                            [class.option-value-container]="
-                              isOptionField(field)
-                            "
-                          >
-                            {{ presentColumnDataValue(field, columnData) }}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <ng-template
-                      cdkConnectedOverlay
-                      [cdkConnectedOverlayOrigin]="tableCellContextMenu"
-                      [cdkConnectedOverlayOpen]="
-                        isTableCellContextMenuOpen(columnData.CellGUID)
-                      "
-                      (detach)="onFieldOverlayDetached()"
-                      (overlayOutsideClick)="onFieldOverlayDetached()"
-                    >
-                      <app-table-cell-context-menu
-                        [field]="field"
-                        (deleteRecord)="
-                          onDeleteRecord($event, columnData.RecordGUID)
-                        "
-                      ></app-table-cell-context-menu>
-                    </ng-template>
+                    <!-- prettier-ignore -->
+                    <ng-container *ngTemplateOutlet="viewingCellTemplate; context: cellContext"></ng-container>
                     }
                   </div>
                   }
@@ -288,9 +197,108 @@
   </ul>
 </div>
 
-<!-- <ng-template #edittemplate> things </ng-template> -->
+<!-- Template for viewing mode -->
+<ng-template
+  #viewingCellTemplate
+  let-field="field"
+  let-columnData="columnData"
+  let-colIndex="colIndex"
+  let-rowIndex="rowIndex"
+>
+  <div
+    class="row-item"
+    cdkOverlayOrigin
+    #tableCellContextMenu="cdkOverlayOrigin"
+    (contextmenu)="onShowTableCellContextMenu(columnData.CellGUID)"
+  >
+    <div class="data-item">
+      <div class="value-item-container">
+        <span
+          *ngIf="hasColumnValue(columnData)"
+          [class.option-value-container]="isOptionField(field)"
+        >
+          {{ presentColumnDataValue(field, columnData) }}
+        </span>
+      </div>
+    </div>
+  </div>
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="tableCellContextMenu"
+    [cdkConnectedOverlayOpen]="isTableCellContextMenuOpen(columnData.CellGUID)"
+    (detach)="onFieldOverlayDetached()"
+    (overlayOutsideClick)="onFieldOverlayDetached()"
+  >
+    <app-table-cell-context-menu
+      [field]="field"
+      (deleteRecord)="onDeleteRecord($event, columnData.RecordGUID)"
+    ></app-table-cell-context-menu>
+  </ng-template>
+</ng-template>
 
-<!-- Add Field Template -->
+<!-- Template for editing mode -->
+<ng-template
+  #editCellTemplate
+  let-field="field"
+  let-columnData="columnData"
+  let-colIndex="colIndex"
+  let-rowIndex="rowIndex"
+>
+  <div class="active-row-item" cdkOverlayOrigin>
+    <div class="active-data-item">
+      <div class="value-item-container">
+        <div class="input-wrapper">
+          @switch (getFieldInputElement(field)) {
+          <!-- Handle regular string input -->
+          @case (FieldInputElement.Input) {
+          <input
+            #gridInputElement
+            class="input-elm"
+            type="text"
+            [attr.data-cell-id]="'input-' + colIndex + '-' + rowIndex"
+            (focus)="onCellFocus()"
+            (blur)="onCellBlur()"
+            (keyup)="
+              onInputCellKeyup($event, field, columnData, colIndex, rowIndex)
+            "
+            [(ngModel)]="dirtyDataValue"
+          />
+          }
+          <!-- Handle select input -->
+          @case(FieldInputElement.Option) {
+          <mat-select
+            class="input-elm"
+            style="font-size: 14px"
+            #matSelect
+            (selectionChange)="
+              onSelectedFieldOption(
+                $event,
+                field,
+                columnData,
+                colIndex,
+                rowIndex
+              )
+            "
+            (focus)="onCellFocus()"
+            [value]="columnData.DataValue"
+            [(ngModel)]="dirtyDataValue"
+          >
+            @for (item of GetFieldOptionAsSelect(field); track $index) {
+            <mat-option [value]="item.OptionId" class="option-value">
+              {{ item.OptionName }}
+            </mat-option>
+            }
+          </mat-select>
+          }
+          <!-- End of switch -->
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!-- Template for Add Field Overlay -->
 <ng-template
   cdkConnectedOverlay
   [cdkConnectedOverlayOrigin]="addFieldOverlay"
