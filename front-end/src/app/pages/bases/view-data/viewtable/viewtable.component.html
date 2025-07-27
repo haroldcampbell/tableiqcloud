@@ -283,6 +283,7 @@
             (click)="$event.stopPropagation()"
             [value]="columnData.DataValue"
             [(ngModel)]="dirtyDataValue"
+            panelClass="panel-select-option"
           >
             @for (item of GetFieldOptionAsSelect(field); track $index) {
             <mat-option

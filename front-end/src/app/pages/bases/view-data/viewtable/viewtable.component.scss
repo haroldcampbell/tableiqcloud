@@ -376,10 +376,33 @@ $grid-cell-background-color: #fff;
     }
 }
 
-// .body-container,
-// .header-container {
-//     min-width: max-content;
-// }
+::ng-deep .panel-select-option {
+    background-color: white !important;
+
+    .option-value {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 2px 5px !important;
+        min-height: 1em !important;
+        height: unset !important;
+        font-size: 0.9em !important;
+        background-color: #fff;
+
+        &:hover {
+            background-color: #ccc !important;
+        }
+
+        ::ng-deep .mat-pseudo-checkbox-checked::after {
+            width: calc(4px * 2.333) !important;
+            height: 4px !important;
+            top: -2.2px // margin-right: 5px !important;
+        }
+    }
+}
+
+
+
 
 .footer-container {
     display: flex;
