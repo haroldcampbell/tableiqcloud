@@ -271,7 +271,7 @@
             style="font-size: 14px"
             #matSelect
             (selectionChange)="
-              onSelectedFieldOption(
+              onChangedSelectedFieldOption(
                 $event,
                 field,
                 columnData,
@@ -280,11 +280,16 @@
               )
             "
             (focus)="onCellFocus()"
+            (click)="$event.stopPropagation()"
             [value]="columnData.DataValue"
             [(ngModel)]="dirtyDataValue"
           >
             @for (item of GetFieldOptionAsSelect(field); track $index) {
-            <mat-option [value]="item.OptionId" class="option-value">
+            <mat-option
+              [value]="item.OptionId"
+              class="option-value"
+              (click)="$event.stopPropagation()"
+            >
               {{ item.OptionName }}
             </mat-option>
             }

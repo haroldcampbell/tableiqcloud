@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../../api.services/api.service';
 import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord, RequestDataUpdateFieldDataValue, GetFieldOptionAsSelect, FieldParamOptionInfo } from '../../../../models/models.datastore';
@@ -29,6 +29,11 @@ type FieldGuid = string;
 type OptionID = string;
 type ParamOptionIDMap = Map<OptionID, FieldParamOptionInfo>;
 
+
+export enum FieldInputElement {
+	Input = "Input",
+	Option = "Option"
+}
 @Component({
 	selector: 'ui-viewtable',
 	standalone: true,
@@ -69,6 +74,7 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	constructor(
+		private elementRef: ElementRef,
 		private apiService: APIService,
 		public router: Router,
 	) { }
@@ -101,6 +107,8 @@ export class ViewTableComponent implements OnInit {
 		// 	console.log('Element has been added to the DOM', this.activeCellGUID, wrapperElm, inputElm.value);
 		// }
 	}
+
+
 
 	private loadTableData() {
 		if (!hasString(this.baseGUID) || !hasString(this.tableGUID)) {
@@ -245,34 +253,12 @@ export class ViewTableComponent implements OnInit {
 
 	updateColumnValuesForOptions(data: FieldMetaData) {
 		// Update ColumnValues
-		// let columnValues = this.tableRecordData?.ColumnValues[data.FieldGUID] ?? [];
-		// let optionIDMap = new Map<string, FieldParamOptionInfo>();
-		// data.FieldParams.ParamValues.forEach((option: FieldParamOptionInfo) => {
-		// 	optionIDMap.set(option.OptionId, option);
-		// })
 
-		// console.log("[updateColumnValuesForOptions] columnValues: ", columnValues);
-		// columnValues.forEach((fieldData: FieldData) => {
-		// 	if (fieldData.DataValue === null || fieldData.DataValue === undefined) {
-		// 		return;
-		// 	}
-
-		// 	let option = optionIDMap.get(fieldData.DataValue);
-		// 	if (option) {
-		// 		fieldData.DataValue = option.OptionName; // Update the value to the OptionName
-		// 	} else {
-		// 		fieldData.DataValue = ""; // Clear if not found
-		// 	}
-		// });
 		this.tableRecordData?.FieldsMetaData.forEach((f, index) => {
 			if (f.FieldGUID != data.FieldGUID) {
 				return;
 			}
 			this.tableRecordData!.FieldsMetaData[index] = data;
-
-			// let records = this.tableRecordData?.ColumnValues[f.FieldGUID];
-			// records = records?.filter(r => r.RecordGUID != recordGUID) || [];
-			// this.tableRecordData!.ColumnValues![f.FieldGUID]! = records;
 		})
 
 		this.buildFieldParamOptionMap(data)
@@ -396,17 +382,42 @@ export class ViewTableComponent implements OnInit {
 	clearCellGUID() {
 		this.cellEditMode = CellEditMode.CellEditModeNone;
 		this.activeCellGUID = "";
+		this.activeCell = null;
 	}
+
+	activeCell: { row: number, col: number, selectedElm: HTMLElement } | null = null;
+	@HostListener('document:click', ['$event'])
+	onDocumentClick(event: MouseEvent) {
+		let isContained = false;
+
+		if (this.activeCell !== null) {
+			isContained = this.activeCell.selectedElm.contains(event.target as Node);
+		}
+
+		if (!isContained) {
+			this.clearCellGUID();
+		}
+	}
+
 
 	private rowItemWrapperElm!: HTMLElement;
 	/** Fired when the cell is first clicked. This set the outline indicating that it is selected. */
 	onSelectRowItem(event: MouseEvent, selectedCell: FieldData, colIndex: number, rowIndex: number) {
 		// console.log("[onSelectRowItem] selectedCell:", selectedCell, event);
+
+		event.stopPropagation();
+
 		this.dirtyDataValue = selectedCell.DataValue
 		this.activeCellGUID = selectedCell.CellGUID;
 
 		const cellId = `row-item-wrapper-${colIndex}-${rowIndex}`;
 		this.rowItemWrapperElm = document.querySelector(`[data-cell-id="${cellId}"]`) as HTMLElement;
+
+		this.activeCell = {
+			row: rowIndex,
+			col: colIndex,
+			selectedElm: this.rowItemWrapperElm,
+		};
 
 		if (this.rowItemWrapperElm == null) {
 			return;
@@ -593,7 +604,8 @@ export class ViewTableComponent implements OnInit {
 		return GetFieldOptionAsSelect(field.FieldType, field.FieldParams);
 	}
 
-	onSelectedFieldOption(event$: MatSelectChange, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
+	onChangedSelectedFieldOption(event: MatSelectChange, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
+
 		// console.log("[onSelectedFieldOption] $:", event$, " field: ", field)
 		const request: RequestDataUpdateFieldDataValue = {
 			BaseGUID: this.baseGUID!,
@@ -613,9 +625,4 @@ export class ViewTableComponent implements OnInit {
 			// console.log("[onSelectedFieldOption] result: ", result);
 		});
 	}
-}
-
-export enum FieldInputElement {
-	Input = "Input",
-	Option = "Option"
 }
