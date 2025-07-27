@@ -18,6 +18,7 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 	optionInfoElm: OptionInfoElem[] = []; // For Option field type, holds the value of options
 	private addOption$ = new Subject<OptionInfoElem>();
 	private createOption$ = new Subject<OptionInfoElem>();
+	private removeOption$ = new Subject<OptionInfoElem>();
 
 	@Input() field!: FieldMetaData;
 
@@ -25,7 +26,6 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 
 	ngOnInit(): void {
 		this.initExistingOptions();
-
 	}
 
 	getOptionInputElm(item: OptionInfoElem) {
@@ -52,11 +52,19 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 				}
 				this.optionInfoList.emit(this.optionInfoElm); // Emit the current list of options
 			});
+
+		this.removeOption$
+			.pipe(debounceTime(50))
+			.subscribe((item: OptionInfoElem) => {
+				this.removeOption(item)
+			})
 	}
 
 	ngOnDestroy(): void {
+		// Subscription Cleanup
 		this.createOption$.complete();
-		this.addOption$.complete(); // Cleanup
+		this.addOption$.complete();
+		this.removeOption$.complete();
 	}
 
 	initExistingOptions() {
@@ -106,9 +114,13 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 	}
 
 	onRemoveOption(item: OptionInfoElem) {
+		this.removeOption$.next(item);
+	}
+	private removeOption(item: OptionInfoElem) {
 		this.optionInfoElm = this.optionInfoElm.filter(opt => opt.OptionInfo.OptionIndex !== item.OptionInfo.OptionIndex);
 		this.optionInfoList.emit(this.optionInfoElm); // Emit the current list of options
 	}
+
 
 	onOptionInputFocus($event: FocusEvent, item: OptionInfoElem) {
 		// console.log("Option input focused for index:", item.OptionInfo.OptionIndex);
