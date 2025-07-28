@@ -8,7 +8,7 @@ export interface OptionInfoElem {
 }
 
 @Component({
-	selector: 'app-menu-element-option',
+	selector: 'menu-element-option',
 	standalone: true,
 	imports: [],
 	templateUrl: './menu-element-option.component.html',
