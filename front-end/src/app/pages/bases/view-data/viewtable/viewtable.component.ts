@@ -92,20 +92,7 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	ngAfterViewChecked() {
-		// if (this.activeCellGUID != "" && this.gridInputElementRef) {
-		// 	let inputElm = this.gridInputElementRef.nativeElement as HTMLInputElement;
-		// 	let wrapperElm = this.gridWrapperElementRef.nativeElement as HTMLElement;
 
-		// 	if (this.cellEditMode == CellEditMode.CellEditModeNone) {
-		// 		wrapperElm.addEventListener("keyup", this.keyupListener)
-		// 		this.cellEditMode = CellEditMode.CellEditModeSelected;
-		// 		wrapperElm.focus();
-		// 	}
-
-		// 	// wrapperElm.onkeyup = this.onSelectedCellKeyUp
-		// 	// inputElm.focus();
-		// 	console.log('Element has been added to the DOM', this.activeCellGUID, wrapperElm, inputElm.value);
-		// }
 	}
 
 

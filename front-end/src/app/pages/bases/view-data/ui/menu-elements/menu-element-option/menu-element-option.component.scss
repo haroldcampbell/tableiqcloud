@@ -37,6 +37,51 @@
         //     color: #333;
         // }
 
+
+        .option-color-selector {
+            display: flex;
+            align-items: center;
+
+            .color-cell {
+                width: 15px;
+                height: 15px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 3px;
+                cursor: pointer;
+
+                .color-swatch {
+                    width: 10px;
+                    height: 10px;
+                    border-radius: 5px;
+                    box-shadow: 0 0px 4px rgba(0, 0, 0, 0.12);
+                }
+
+                &:hover {
+                    .color-swatch {
+                        box-shadow: 0 0px 4px rgba(0, 0, 0, 0.5);
+                    }
+                }
+            }
+
+            .color-picker-panel {
+                display: grid;
+                grid-template-columns: repeat(4, 1fr);
+                gap: 4px;
+                background: white;
+                border: 1px solid #ccc;
+                padding: 8px;
+                border-radius: 4px;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .transparent-backdrop {
+                background: transparent;
+            }
+        }
+
+
         .option-input-container {
             display: flex;
             flex: 1 1 auto;
@@ -92,12 +137,11 @@
             }
         }
 
-        &:hover {
-            .option-input-container {
-
+        .option-input-container {
+            &:hover {
                 .option-value-wrapper {
-
                     .option-value {
+                        // cursor: pointer;
                         border: solid 1px #ccc;
                         box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.125);
                     }

@@ -1,16 +1,25 @@
-import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewContainerRef } from '@angular/core';
 import { auditTime, debounceTime, delay, map, merge, mergeMap, Subject } from 'rxjs';
 import { FieldMetaData, FieldParamOption, OptionInfo } from '../../../../../../models/models.datastore';
+import { ColorPickerComponent } from '../color-picker/color-picker.component';
+import { CommonModule } from '@angular/common';
+import { Overlay, OverlayModule, OverlayPositionBuilder, OverlayRef } from '@angular/cdk/overlay';
+import { TemplatePortal } from '@angular/cdk/portal';
 
 export interface OptionInfoElem {
 	OptionInfo: OptionInfo;
+	_itemColor: string;
 	_inputElm?: HTMLInputElement; // Optional reference to the input element for focus management
 }
 
 @Component({
 	selector: 'menu-element-option',
 	standalone: true,
-	imports: [],
+	imports: [
+		CommonModule,
+		OverlayModule,
+		ColorPickerComponent,
+	],
 	templateUrl: './menu-element-option.component.html',
 	styleUrl: './menu-element-option.component.scss'
 })
@@ -19,10 +28,19 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 	private addOption$ = new Subject<OptionInfoElem>();
 	private createOption$ = new Subject<OptionInfoElem>();
 	private removeOption$ = new Subject<OptionInfoElem>();
+	private overlayRef: OverlayRef | null = null;
 
 	@Input() field!: FieldMetaData;
 
 	@Output() optionInfoList = new EventEmitter<OptionInfoElem[]>();
+
+	constructor(
+		private overlay: Overlay,
+		private positionBuilder: OverlayPositionBuilder,
+		private vcr: ViewContainerRef
+	) { }
+
+
 
 	ngOnInit(): void {
 		this.initExistingOptions();
@@ -86,7 +104,9 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 		optionInforList.map(i => {
 			const itemElm = {
 				OptionInfo: i,
-				_inputElm: undefined
+				_inputElm: undefined,
+				//TODO: init colors
+				_itemColor: "",
 			}
 			this.optionInfoElm.push(itemElm);
 			s.next(itemElm)
@@ -107,7 +127,8 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 				OptionIndex: this.optionInfoElm.length,
 				OptionName: "",
 			},
-			_inputElm: undefined // Initialize input element reference as null
+			_itemColor: "",
+			_inputElm: undefined, // Initialize input element reference as null
 		}
 
 		this.createOption$.next(itemElem);
@@ -138,5 +159,26 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 
 	onOptionValueChange($event: KeyboardEvent, item: OptionInfoElem) {
 
+	}
+
+	selectedColorPickerItem?: OptionInfoElem;
+
+	showColorPickerContextMenu(item: OptionInfoElem) {
+		return this.selectedColorPickerItem == item;
+	}
+
+	onOpenColorPickerContextMenu(item: OptionInfoElem) {
+		// console.log("[MenuElementOptionComponent.onOpenColorPickerContextMenu] ", item);
+		this.selectedColorPickerItem = item;
+	}
+
+	onColorSelected(color: string, item: OptionInfoElem) {
+		// console.log("[MenuElementOptionComponent.onColorSelected] ", { color: color, item: item })
+		item._itemColor = color;
+		this.onColorPickerDetached();
+	}
+
+	onColorPickerDetached() {
+		this.selectedColorPickerItem = undefined;
 	}
 }

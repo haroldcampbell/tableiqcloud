@@ -5,6 +5,36 @@
   <li>
     <ul class="option-item-container">
       <!-- <li class="option-input-move-handle">::</li> -->
+      <li class="option-color-selector">
+        <div
+          class="color-cell"
+          cdkOverlayOrigin
+          #colorPickerOverlay="cdkOverlayOrigin"
+          (detach)="onColorPickerDetached()"
+          (overlayOutsideClick)="onColorPickerDetached()"
+        >
+          <div
+            class="color-swatch"
+            [style]="{ backgroundColor: item._itemColor }"
+            (click)="onOpenColorPickerContextMenu(item)"
+          ></div>
+
+          <!-- [colors]="presetColors" -->
+          <ng-template
+            #colorPickerOverlay
+            cdkConnectedOverlay
+            [cdkConnectedOverlayOrigin]="colorPickerOverlay"
+            [cdkConnectedOverlayOpen]="showColorPickerContextMenu(item)"
+          >
+            <color-picker
+              [selectedColor]="item._itemColor"
+              (colorSelected)="onColorSelected($event, item)"
+            >
+            </color-picker>
+          </ng-template>
+        </div>
+      </li>
+
       <li class="option-input-container">
         <div class="option-value-wrapper">
           <input

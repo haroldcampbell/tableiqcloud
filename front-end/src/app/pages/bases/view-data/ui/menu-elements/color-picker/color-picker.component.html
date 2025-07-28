@@ -1,0 +1,10 @@
+<div class="color-grid">
+  @for (color of colors; track $index) {
+  <div
+    class="color-box"
+    [style]="{ backgroundColor: color }"
+    [class.selected]="color === selectedColor"
+    (click)="selectColor(color)"
+  ></div>
+  }
+</div>
