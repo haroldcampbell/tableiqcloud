@@ -10,7 +10,7 @@ import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 export class ColorPickerComponent implements OnInit {
 	@Input() colors: string[] = [];
 	@Input() selectedColor: string | null = null;
-	@Output() colorSelected = new EventEmitter<string>();
+	@Output() colorSelected = new EventEmitter<string | undefined>();
 
 	ngOnInit(): void {
 		this.colors = [
@@ -23,7 +23,12 @@ export class ColorPickerComponent implements OnInit {
 	}
 
 	selectColor(color: string) {
-		console.log("[ColorPickerComponent.selectColor] ", { color: color })
+		console.log("[ColorPickerComponent.selectColor] ", { color: color });
 		this.colorSelected.emit(color);
+	}
+
+	dismissDialog() {
+		console.log("[ColorPickerComponent.dismissDialog] ");
+		this.colorSelected.emit(undefined);
 	}
 }

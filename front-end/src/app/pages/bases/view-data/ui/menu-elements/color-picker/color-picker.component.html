@@ -1,10 +1,22 @@
-<div class="color-grid">
-  @for (color of colors; track $index) {
-  <div
-    class="color-box"
-    [style]="{ backgroundColor: color }"
-    [class.selected]="color === selectedColor"
-    (click)="selectColor(color)"
-  ></div>
-  }
+<div class="container">
+  <ul class="action">
+    <li>Select color</li>
+    <li>
+      <img
+        class="ico"
+        src="/assets/images/ico-close.png"
+        (click)="dismissDialog()"
+      />
+    </li>
+  </ul>
+  <div class="color-grid">
+    @for (color of colors; track $index) {
+    <div
+      class="color-box"
+      [style]="{ backgroundColor: color }"
+      [class.selected]="color === selectedColor"
+      (click)="selectColor(color)"
+    ></div>
+    }
+  </div>
 </div>

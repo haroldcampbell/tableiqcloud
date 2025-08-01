@@ -172,9 +172,11 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 		this.selectedColorPickerItem = item;
 	}
 
-	onColorSelected(color: string, item: OptionInfoElem) {
+	onColorSelected(color: string | undefined, item: OptionInfoElem) {
 		// console.log("[MenuElementOptionComponent.onColorSelected] ", { color: color, item: item })
-		item._itemColor = color;
+		if (color !== undefined) {
+			item._itemColor = color;
+		}
 		this.onColorPickerDetached();
 	}
 
