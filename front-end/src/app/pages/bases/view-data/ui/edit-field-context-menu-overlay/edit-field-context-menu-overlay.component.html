@@ -93,6 +93,7 @@
     <menu-element-option
       *ngIf="isOptionFieldType()"
       [field]="field"
+      [optionInfoElm]="optionInfoList"
       (optionInfoList)="onOptionInfoListChanged($event)"
     ></menu-element-option>
   </div>

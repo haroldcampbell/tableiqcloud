@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { CoreModule } from '../../../../../modules/core.module';
 import { MatSelect, MatSelectChange } from '@angular/material/select';
-import { CreateFieldOptionAsSelect, FieldOptionsType, OptionInfo, RequestDataCreateField, StringifiedFieldType } from '../../../../../models/models.datastore';
+import { CreateFieldOptionAsSelect, FieldOptionsType, FieldParamOptionInfo, RequestDataCreateField, StringifiedFieldType } from '../../../../../models/models.datastore';
 import { Subject } from 'rxjs';
 import { auditTime } from 'rxjs/operators';
 import { MenuElementOptionComponent, OptionInfoElem } from '../menu-elements/menu-element-option/menu-element-option.component';

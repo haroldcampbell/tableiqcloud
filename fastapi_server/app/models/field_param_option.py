@@ -8,6 +8,7 @@ class FieldParamOptionInfo(BaseModel):
     OptionId: str
     OptionIndex: int
     OptionName: str
+    OptionMetaData: Any #Additional meta data
 
 class FieldParamOption(BaseModel):
     model_config = ConfigDict(frozen=True)
@@ -25,7 +26,8 @@ class FieldParamOption(BaseModel):
             FieldParamOptionInfo(
               OptionId = str(uuid.uuid4()).upper() ,
               OptionIndex = i,
-              OptionName = o.get("OptionName", "").strip()
+              OptionName = o.get("OptionName", "").strip(),
+              OptionMetaData = {}
             )
             for i, o in enumerate(options or [])
         ]

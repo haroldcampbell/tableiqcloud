@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CoreModule } from '../../../../../modules/core.module';
-import { CreateFieldOptionAsSelect, FieldMetaData, FieldOptionsType, FieldTypeToStringifiedFieldType, RequestDataCreateField, RequestDataUpdateField, StringifiedFieldType, StringifiedFieldTypeToType } from '../../../../../models/models.datastore';
+import { CreateFieldOptionAsSelect, FieldMetaData, FieldOptionsType, FieldParamOption, FieldTypeToStringifiedFieldType, RequestDataCreateField, RequestDataUpdateField, StringifiedFieldType, StringifiedFieldTypeToType } from '../../../../../models/models.datastore';
 import { MatSelect, MatSelectChange } from '@angular/material/select';
 import { MenuElementOptionComponent, OptionInfoElem } from '../menu-elements/menu-element-option/menu-element-option.component';
 
@@ -58,10 +58,32 @@ export class EditFieldContextMenuOverlayComponent implements OnInit {
 	ngOnInit(): void {
 		this._fieldName = this.field.FieldName;
 		this._selectedFieldType = FieldTypeToStringifiedFieldType(this.field.FieldType);
+		this.initOptionInfoList();
 	}
 
 	isSelectedListItem(s: StringifiedFieldType) {
 		return s == this._selectedFieldType;
+	}
+
+	initOptionInfoList() {
+		if (this.field === undefined || this.field.FieldParams === undefined) {
+			console.warn("Field or FieldParams is undefined, skipping initialization of existing options.");
+			return;
+		}
+
+		this._optionInfoList = [];
+		const optionInforList = (this.field.FieldParams as FieldParamOption)?.ParamValues ?? []
+		optionInforList.map(i => {
+			const itemElm = {
+				OptionInfo: i,
+				_inputElm: undefined,
+			}
+			this._optionInfoList.push(itemElm);
+		});
+	}
+
+	get optionInfoList() {
+		return this._optionInfoList;
 	}
 
 	onCancel() {
@@ -70,9 +92,10 @@ export class EditFieldContextMenuOverlayComponent implements OnInit {
 
 	onApplyChanges() {
 		let options: FieldOptionsType = {}
+
 		if (this.selectedFieldType == StringifiedFieldType.FieldTypeOption) {
 			// Convert option list to a format suitable for FieldOptionsType
-			options = CreateFieldOptionAsSelect(this._optionInfoList.map(opt => opt.OptionInfo))
+			options = CreateFieldOptionAsSelect(this._optionInfoList.map(opt => opt.OptionInfo));
 		}
 
 		this.didClickSave.emit({

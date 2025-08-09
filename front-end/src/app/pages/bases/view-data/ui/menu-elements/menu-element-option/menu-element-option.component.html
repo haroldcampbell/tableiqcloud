@@ -15,7 +15,7 @@
         >
           <div
             class="color-swatch"
-            [style]="{ backgroundColor: item._itemColor }"
+            [style]="{ backgroundColor: getItemColor(item) }"
             (click)="onOpenColorPickerContextMenu(item)"
           ></div>
 
@@ -27,7 +27,7 @@
             [cdkConnectedOverlayOpen]="showColorPickerContextMenu(item)"
           >
             <color-picker
-              [selectedColor]="item._itemColor"
+              [selectedColor]="getItemColor(item)"
               (colorSelected)="onColorSelected($event, item)"
             >
             </color-picker>

@@ -28,17 +28,20 @@ class FieldMetaData(BaseModel):
 
         for incoming in field_option_list:
             existing = existing_params_map.get(incoming.OptionId)
+            optionMetaData = incoming.OptionMetaData # TODO: This may need to be sanitized if we have keys
             if existing:
                 # Update existing option
                 existing.OptionIndex = incoming.OptionIndex
                 existing.OptionName = incoming.OptionName.strip() if incoming.OptionName else ""
+                existing.OptionMetaData = optionMetaData
                 new_params_list.append(existing)
             else:
                 # Add new option with new GUID
                 new_params_list.append(FieldParamOptionInfo(
                     OptionId=str(uuid.uuid4()).upper(),
                     OptionIndex=incoming.OptionIndex,
-                    OptionName=incoming.OptionName.strip() if incoming.OptionName else ""
+                    OptionName=incoming.OptionName.strip() if incoming.OptionName else "",
+                    OptionMetaData=optionMetaData,
                 ))
 
         # Update model

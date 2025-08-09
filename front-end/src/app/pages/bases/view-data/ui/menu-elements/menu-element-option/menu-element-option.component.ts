@@ -1,14 +1,14 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output, TemplateRef, ViewContainerRef } from '@angular/core';
 import { auditTime, debounceTime, delay, map, merge, mergeMap, Subject } from 'rxjs';
-import { FieldMetaData, FieldParamOption, OptionInfo } from '../../../../../../models/models.datastore';
+import { FieldMetaData, FieldParamOption, FieldParamOptionInfo, Key_FieldParamOptionInfo_OptionMetaDataColor } from '../../../../../../models/models.datastore';
 import { ColorPickerComponent } from '../color-picker/color-picker.component';
 import { CommonModule } from '@angular/common';
 import { Overlay, OverlayModule, OverlayPositionBuilder, OverlayRef } from '@angular/cdk/overlay';
 import { TemplatePortal } from '@angular/cdk/portal';
 
 export interface OptionInfoElem {
-	OptionInfo: OptionInfo;
-	_itemColor: string;
+	OptionInfo: FieldParamOptionInfo;
+	// _itemColor: string;
 	_inputElm?: HTMLInputElement; // Optional reference to the input element for focus management
 }
 
@@ -24,13 +24,13 @@ export interface OptionInfoElem {
 	styleUrl: './menu-element-option.component.scss'
 })
 export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDestroy {
-	optionInfoElm: OptionInfoElem[] = []; // For Option field type, holds the value of options
 	private addOption$ = new Subject<OptionInfoElem>();
 	private createOption$ = new Subject<OptionInfoElem>();
 	private removeOption$ = new Subject<OptionInfoElem>();
 	private overlayRef: OverlayRef | null = null;
 
 	@Input() field!: FieldMetaData;
+	@Input() optionInfoElm: OptionInfoElem[] = []; // For Option field type, holds the value of options
 
 	@Output() optionInfoList = new EventEmitter<OptionInfoElem[]>();
 
@@ -39,8 +39,6 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 		private positionBuilder: OverlayPositionBuilder,
 		private vcr: ViewContainerRef
 	) { }
-
-
 
 	ngOnInit(): void {
 		this.initExistingOptions();
@@ -86,13 +84,6 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 	}
 
 	initExistingOptions() {
-		if (this.field === undefined || this.field.FieldParams === undefined) {
-			console.warn("Field or FieldParams is undefined, skipping initialization of existing options.");
-			return;
-		}
-
-		const optionInforList = (this.field.FieldParams as FieldParamOption)?.ParamValues ?? []
-
 		let s = new Subject<OptionInfoElem>();
 
 		s.pipe(delay(50))
@@ -101,14 +92,8 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 				item._inputElm = this.getOptionInputElm(item);
 			});
 
-		optionInforList.map(i => {
-			const itemElm = {
-				OptionInfo: i,
-				_inputElm: undefined,
-				//TODO: init colors
-				_itemColor: "",
-			}
-			this.optionInfoElm.push(itemElm);
+
+		this.optionInfoElm.forEach(itemElm => {
 			s.next(itemElm)
 		});
 
@@ -126,8 +111,10 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 				OptionId: this.optionInfoElm.length + "-" + Date.now(), // Use current timestamp as a unique ID
 				OptionIndex: this.optionInfoElm.length,
 				OptionName: "",
+				OptionMetaData: {
+					[Key_FieldParamOptionInfo_OptionMetaDataColor]: "",
+				},
 			},
-			_itemColor: "",
 			_inputElm: undefined, // Initialize input element reference as null
 		}
 
@@ -137,17 +124,18 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 	onRemoveOption(item: OptionInfoElem) {
 		this.removeOption$.next(item);
 	}
+
 	private removeOption(item: OptionInfoElem) {
 		this.optionInfoElm = this.optionInfoElm.filter(opt => opt.OptionInfo.OptionIndex !== item.OptionInfo.OptionIndex);
 		this.optionInfoList.emit(this.optionInfoElm); // Emit the current list of options
 	}
-
 
 	onOptionInputFocus($event: FocusEvent, item: OptionInfoElem) {
 		// console.log("Option input focused for index:", item.OptionInfo.OptionIndex);
 	}
 
 	onOptionValueBlur($event: FocusEvent, item: OptionInfoElem) {
+		console.log("[onOptionValueBlur] ", item)
 		if (item._inputElm) {
 			item._inputElm.blur(); // Remove focus from the input element
 			item.OptionInfo.OptionName = item._inputElm.value.trim(); // Update the option name with trimmed value
@@ -174,13 +162,28 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 
 	onColorSelected(color: string | undefined, item: OptionInfoElem) {
 		// console.log("[MenuElementOptionComponent.onColorSelected] ", { color: color, item: item })
+
 		if (color !== undefined) {
-			item._itemColor = color;
+			if (!item.OptionInfo.OptionMetaData) {
+				item.OptionInfo.OptionMetaData = {}
+			}
+			item.OptionInfo.OptionMetaData[Key_FieldParamOptionInfo_OptionMetaDataColor] = color;
+			// item._itemColor = color;
 		}
 		this.onColorPickerDetached();
+		this.optionInfoList.emit(this.optionInfoElm);
 	}
 
 	onColorPickerDetached() {
 		this.selectedColorPickerItem = undefined;
+	}
+
+	getItemColor(item: OptionInfoElem): string {
+		if (!item.OptionInfo.OptionMetaData) {
+			item.OptionInfo.OptionMetaData = {
+				[Key_FieldParamOptionInfo_OptionMetaDataColor]: ""
+			}
+		}
+		return item.OptionInfo.OptionMetaData[Key_FieldParamOptionInfo_OptionMetaDataColor];
 	}
 }

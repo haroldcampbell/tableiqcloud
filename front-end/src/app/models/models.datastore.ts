@@ -93,14 +93,15 @@ export function FieldTypeToStringifiedFieldType(t: TableFieldType): StringifiedF
 	return StringifiedFieldType.FieldTypeString
 }
 
-export interface OptionInfo {
-	OptionId: string;
-	OptionIndex: number;
-	OptionName: string;
-}
+// export interface OptionInfo {
+// 	OptionId: string;
+// 	OptionIndex: number;
+// 	OptionName: string;
+// 	OptionMetaData: any; // Additional meta data
+// }
 export const OptionInfoKey = "option"
 
-export function CreateFieldOptionAsSelect(items: OptionInfo[]) {
+export function CreateFieldOptionAsSelect(items: FieldParamOptionInfo[]) {
 	let options: FieldOptionsType = {}
 	options[OptionInfoKey] = items;
 
@@ -116,7 +117,11 @@ export interface FieldParamOptionInfo {
 	OptionId: string;
 	OptionIndex: number;
 	OptionName: string;
+	OptionMetaData: any; // Additional meta data
 }
+
+export const Key_FieldParamOptionInfo_OptionMetaDataColor = "itemColor";
+
 export interface FieldParamOption {
 	ParamKey: string;
 	ParamValues: FieldParamOptionInfo[];
