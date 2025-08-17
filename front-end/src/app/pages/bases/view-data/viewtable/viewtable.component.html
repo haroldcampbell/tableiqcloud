@@ -216,6 +216,7 @@
         <span
           *ngIf="hasColumnValue(columnData)"
           [class.option-value-container]="isOptionField(field)"
+          [style.backgroundColor]="columnDataValueCellColor(field, columnData)"
         >
           {{ presentColumnDataValue(field, columnData) }}
         </span>

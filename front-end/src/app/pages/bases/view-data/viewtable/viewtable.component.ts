@@ -149,13 +149,47 @@ export class ViewTableComponent implements OnInit {
 		this.fieldParamOptionIDMap.set(field.FieldGUID, paramValueMap);
 	}
 
+	/**
+	 * Shows the column data value for the field.
+	 *
+	 * @param field
+	 * Used to determin if the field is an option field.
+	 *
+	   * @param columnData
+	 *
+	 * @returns {string}
+	 * Returns the data value for the field, or the option name if the field is an option field.
+	 * If the field is not an option field, it will return the data value directly.
+	 */
 	presentColumnDataValue(field: FieldMetaData, columnData: FieldData) {
 		if (field.FieldType != TableFieldType.FieldTypeOption) {
 			return columnData.DataValue;
 		}
 
 		let paramValueMap = this.fieldParamOptionIDMap.get(field.FieldGUID)
+
+		console.log("[presentColumnDataValue] field:", field, " paramValueMap:", paramValueMap, columnData.DataValue);
+
 		return paramValueMap?.get(columnData.DataValue)?.OptionName ?? "";
+	}
+
+	columnDataValueCellColor(field: FieldMetaData, columnData: FieldData) {
+		if (field.FieldType != TableFieldType.FieldTypeOption) {
+			return "";
+		}
+
+		let paramValueMap = this.fieldParamOptionIDMap.get(field.FieldGUID)
+
+		console.log("[presentColumnDataValue] field:", field, " paramValueMap:", paramValueMap, columnData.DataValue);
+
+		const fieldOption = paramValueMap?.get(columnData.DataValue)
+
+		if (fieldOption == undefined) {
+			return "";
+		}
+
+		const itemColor = fieldOption.OptionMetaData["itemColor"] || "#ffffff"; // Default to white if not set
+		return itemColor
 	}
 
 	// return the ico name for the field

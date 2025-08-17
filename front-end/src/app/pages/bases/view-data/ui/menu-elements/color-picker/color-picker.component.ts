@@ -14,10 +14,9 @@ export class ColorPickerComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.colors = [
-			'#FF0000', '#00FF00', '#ADD8E6', '#FFA500',
-			'#FF00FF', '#00FFFF', '#A52A2A', '#FFFFFF',
-			// '#FFA500', '#800080', '#808000', '#008080',
-			// '#A52A2A', '#808080', '#C0C0C0', '#ADD8E6'
+			"#D6D5E8", "#c7e4f5", "#CBEEEF", "#c5c89a",
+			"#b4b3c6", "#abc6d6", "#a3c7c9", "#b2b682",
+			"#AA85C7", '#ffcdcd', '#e9e9e9', '#FFFFFF',
 		];
 
 	}
