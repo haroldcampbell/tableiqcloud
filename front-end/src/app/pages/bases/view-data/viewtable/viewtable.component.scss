@@ -280,6 +280,14 @@ $grid-cell-background-color: #fff;
                     overflow: hidden;
                 }
 
+                .value-item-container-align-center {
+                    justify-content: center;
+                }
+
+                .field-item-yes-no:hover {
+                    cursor: pointer;
+                }
+
                 .option-value-container {
                     background-color: #f0f0f0;
                     border-radius: 5px;

@@ -27,6 +27,7 @@
         [value]="selectedFieldType"
         (selectionChange)="onFieldTypeChanged(matSelect, $event)"
       >
+        <!-- Single line text option-->
         <mat-option
           class="mat-option-reset"
           [value]="FieldType.FieldTypeString"
@@ -34,15 +35,26 @@
         >
           Single line text
         </mat-option>
+        <!-- Number Option-->
         <mat-option
           class="mat-option-reset"
           [value]="FieldType.FieldTypeNumber"
         >
           {{ FieldType.FieldTypeNumber }}
         </mat-option>
+        <!-- Date option -->
         <mat-option class="mat-option-reset" [value]="FieldType.FieldTypeDate">
           {{ FieldType.FieldTypeDate }}
         </mat-option>
+        <!-- Yes/No option -->
+        <mat-option class="mat-option-reset" [value]="FieldType.FieldTypeYesNo">
+          {{ FieldType.FieldTypeYesNo }}
+        </mat-option>
+        <!-- Star rating option -->
+        <mat-option class="mat-option-reset" [value]="FieldType.FieldTypeStar">
+          {{ FieldType.FieldTypeStar }}
+        </mat-option>
+        <!-- Select Option -->
         <mat-option
           class="mat-option-reset"
           [value]="FieldType.FieldTypeOption"
@@ -60,6 +72,7 @@
           : 'field-item-hidden'
       "
     >
+      <!-- Single line text -->
       <li
         class="list-item"
         (click)="onSelectFieldType(FieldType.FieldTypeString)"
@@ -69,6 +82,7 @@
         /></span>
         Single line text
       </li>
+      <!-- Number -->
       <li
         class="list-item"
         (click)="onSelectFieldType(FieldType.FieldTypeNumber)"
@@ -78,6 +92,7 @@
         /></span>
         {{ FieldType.FieldTypeNumber }}
       </li>
+      <!-- Date -->
       <li
         class="list-item"
         (click)="onSelectFieldType(FieldType.FieldTypeDate)"
@@ -87,6 +102,27 @@
         /></span>
         {{ FieldType.FieldTypeDate }}
       </li>
+      <!-- Yes/No field -->
+      <li
+        class="list-item"
+        (click)="onSelectFieldType(FieldType.FieldTypeYesNo)"
+      >
+        <span>
+          <img class="ico" src="/assets/images/ico-field-yes-no.png" alt=""
+        /></span>
+        {{ FieldType.FieldTypeYesNo }}
+      </li>
+      <!-- Star rating -->
+      <li
+        class="list-item"
+        (click)="onSelectFieldType(FieldType.FieldTypeStar)"
+      >
+        <span>
+          <img class="ico" src="/assets/images/ico-field-date.png" alt=""
+        /></span>
+        {{ FieldType.FieldTypeStar }}
+      </li>
+      <!-- Options -->
       <li
         class="list-item"
         (click)="onSelectFieldType(FieldType.FieldTypeOption)"

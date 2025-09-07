@@ -158,7 +158,13 @@
                       'row-item-wrapper-' + colIndex + '-' + rowIndex
                     "
                     (click)="
-                      onSelectRowItem($event, columnData, colIndex, rowIndex)
+                      onSelectRowItem(
+                        $event,
+                        columnData,
+                        field,
+                        colIndex,
+                        rowIndex
+                      )
                     "
                   >
                     <!-- prettier-ignore -->
@@ -212,7 +218,21 @@
     (contextmenu)="onShowTableCellContextMenu(columnData.CellGUID)"
   >
     <div class="data-item">
-      <div class="value-item-container">
+      <div
+        class="value-item-container"
+        [class.value-item-container-align-center]="isYesNoField(field)"
+      >
+        @if(isYesNoField(field)){
+        <input
+          type="checkbox"
+          class="field-item-yes-no"
+          [checked]="presentColumnDataValue(field, columnData)"
+          (click)="
+            onClickedYesNoField($event, field, columnData, colIndex, rowIndex)
+          "
+        />
+        } @else {
+
         <span
           *ngIf="hasColumnValue(columnData)"
           [class.option-value-container]="isOptionField(field)"
@@ -220,6 +240,7 @@
         >
           {{ presentColumnDataValue(field, columnData) }}
         </span>
+        }
       </div>
     </div>
   </div>

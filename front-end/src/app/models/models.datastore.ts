@@ -30,6 +30,8 @@ export enum TableFieldType {
 	FieldTypeText, // To hold markdown data
 	FieldTypeRelationship,
 	FieldTypeOption, // For dropdowns
+	FieldTypeYesNo,
+	FieldTypeStar,
 }
 
 // TableFieldType as string
@@ -38,6 +40,9 @@ export enum StringifiedFieldType {
 	FieldTypeNumber = "Number",
 	FieldTypeDate = "Date",
 	FieldTypeOption = "Option",
+	FieldTypeYesNo = "YesNo",
+	FieldTypeStar = "Star",
+
 }
 
 
@@ -61,6 +66,12 @@ export function StringifiedFieldTypeToType(s: StringifiedFieldType): TableFieldT
 
 		case StringifiedFieldType.FieldTypeOption:
 			return TableFieldType.FieldTypeOption;
+
+		case StringifiedFieldType.FieldTypeYesNo:
+			return TableFieldType.FieldTypeYesNo;
+
+		case StringifiedFieldType.FieldTypeStar:
+			return TableFieldType.FieldTypeStar;
 
 	}
 

@@ -87,6 +87,7 @@ export class ViewTableComponent implements OnInit {
 			[TableFieldType.FieldTypeText, "ico-field-text"],
 			[TableFieldType.FieldTypeRelationship, "ico-field-relationship"],
 			[TableFieldType.FieldTypeOption, "ico-field-select"],
+			[TableFieldType.FieldTypeYesNo, "ico-field-yes-no"],
 		]);
 
 	}
@@ -423,10 +424,15 @@ export class ViewTableComponent implements OnInit {
 
 	private rowItemWrapperElm!: HTMLElement;
 	/** Fired when the cell is first clicked. This set the outline indicating that it is selected. */
-	onSelectRowItem(event: MouseEvent, selectedCell: FieldData, colIndex: number, rowIndex: number) {
-		// console.log("[onSelectRowItem] selectedCell:", selectedCell, event);
+	onSelectRowItem(event: MouseEvent, selectedCell: FieldData, field: FieldMetaData, colIndex: number, rowIndex: number) {
+		console.log("[onSelectRowItem]", { selectedCell, field, event });
 
 		event.stopPropagation();
+
+		if (field.FieldType == TableFieldType.FieldTypeYesNo) {
+			// TODO: Handle flipping the yes/no value when the cell is clicked.
+			return;
+		}
 
 		this.dirtyDataValue = selectedCell.DataValue
 		this.activeCellGUID = selectedCell.CellGUID;
@@ -615,6 +621,12 @@ export class ViewTableComponent implements OnInit {
 		return FieldInputElement
 	}
 
+	isYesNoField(field: FieldMetaData) {
+		return field.FieldType == TableFieldType.FieldTypeYesNo ?
+			true :
+			false;
+	}
+
 	isOptionField(field: FieldMetaData) {
 		return field.FieldType == TableFieldType.FieldTypeOption ?
 			true :
@@ -627,7 +639,6 @@ export class ViewTableComponent implements OnInit {
 
 	onChangedSelectedFieldOption(event: MatSelectChange, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
 
-		// console.log("[onSelectedFieldOption] $:", event$, " field: ", field)
 		const request: RequestDataUpdateFieldDataValue = {
 			BaseGUID: this.baseGUID!,
 			TableGUID: this.tableGUID!,
@@ -639,11 +650,33 @@ export class ViewTableComponent implements OnInit {
 			}
 		}
 
-		// console.log("[onSelectedFieldOption] request:", request)
-
 		this.onUpdateCellValue(request, (result: FieldData) => {
 			selectedCell.DataValue = result.DataValue
 			// console.log("[onSelectedFieldOption] result: ", result);
+		});
+	}
+
+	onClickedYesNoField(event: MouseEvent, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
+		event.stopPropagation();
+
+		// Flip the value
+		this.dirtyDataValue = selectedCell.DataValue == "1" ? "0" : "1";
+		selectedCell.DataValue = this.dirtyDataValue; // Don't wait for server response to update the UI
+
+		const request: RequestDataUpdateFieldDataValue = {
+			BaseGUID: this.baseGUID!,
+			TableGUID: this.tableGUID!,
+			FieldGUID: field.FieldGUID,
+			FieldData: {
+				CellGUID: selectedCell.CellGUID,
+				RecordGUID: selectedCell.RecordGUID,
+				DataValue: this.dirtyDataValue,
+			}
+		}
+
+		this.onUpdateCellValue(request, (result: FieldData) => {
+			selectedCell.DataValue = result.DataValue
+			// console.log("[onClickedYesNoField] result: ", result);
 		});
 	}
 }
