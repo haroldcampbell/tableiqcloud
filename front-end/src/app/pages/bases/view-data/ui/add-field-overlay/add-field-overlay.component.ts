@@ -5,6 +5,7 @@ import { CreateFieldOptionAsSelect, FieldOptionsType, FieldParamOptionInfo, Requ
 import { Subject } from 'rxjs';
 import { auditTime } from 'rxjs/operators';
 import { MenuElementOptionComponent, OptionInfoElem } from '../menu-elements/menu-element-option/menu-element-option.component';
+import { MenuElementRelationshipComponent } from "../menu-elements/menu-element-relationship/menu-element-relationship.component";
 
 
 
@@ -13,7 +14,8 @@ import { MenuElementOptionComponent, OptionInfoElem } from '../menu-elements/men
 	standalone: true,
 	imports: [
 		CoreModule,
-		MenuElementOptionComponent
+		MenuElementOptionComponent,
+		MenuElementRelationshipComponent
 	],
 	templateUrl: './add-field-overlay.component.html',
 	styleUrl: './add-field-overlay.component.scss'
@@ -90,9 +92,13 @@ export class AddFieldOverlayComponent implements OnInit, AfterViewInit, OnDestro
 		this.selectedFieldType = $event.value
 	}
 
-	isOptionFieldType(): boolean {
-		return this.selectedFieldType === StringifiedFieldType.FieldTypeOption;
-	}
+	// isOptionFieldType(): boolean {
+	// 	return this.selectedFieldType === StringifiedFieldType.FieldTypeOption;
+	// }
+
+	// isRelationshipFieldType(): boolean {
+	// 	return this.selectedFieldType === StringifiedFieldType.FieldTypeRelationship;
+	// }
 
 	onOptionInfoListChanged(listItems: OptionInfoElem[]) {
 		this._optionInfoList = listItems;

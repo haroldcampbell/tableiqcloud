@@ -61,6 +61,13 @@
         >
           {{ FieldType.FieldTypeOption }}
         </mat-option>
+        <!-- Relationship option -->
+        <mat-option
+          class="mat-option-reset"
+          [value]="FieldType.FieldTypeRelationship"
+        >
+          {{ FieldType.FieldTypeRelationship }}
+        </mat-option>
       </mat-select>
     </div>
 
@@ -122,7 +129,7 @@
         /></span>
         {{ FieldType.FieldTypeStar }}
       </li> -->
-      <!-- Options -->
+      <!-- Options field -->
       <li
         class="list-item"
         (click)="onSelectFieldType(FieldType.FieldTypeOption)"
@@ -132,13 +139,38 @@
         /></span>
         {{ FieldType.FieldTypeOption }}
       </li>
+      <!-- Linked field -->
+      <li
+        class="list-item"
+        (click)="onSelectFieldType(FieldType.FieldTypeRelationship)"
+      >
+        <span>
+          <img
+            class="ico"
+            src="/assets/images/ico-field-relationship.png"
+            alt=""
+        /></span>
+        {{ FieldType.FieldTypeRelationship }}
+      </li>
     </ul>
 
-    <!-- UI for Option menu element -->
+    <!-- Logic to show sub-menu elements -->
+    @switch(selectedFieldType) {
+
+    <!-- UI for Option memnu element-->
+    @case (FieldType.FieldTypeOption) {
     <menu-element-option
-      *ngIf="isOptionFieldType()"
       (optionInfoList)="onOptionInfoListChanged($event)"
     ></menu-element-option>
+    }
+
+    <!-- UI for Relationsip menu element -->
+    @case (FieldType.FieldTypeRelationship) {
+    <menu-element-relationship></menu-element-relationship>
+    }
+
+    <!-- End switch -->
+    }
   </div>
 
   <div class="overlay-footer">

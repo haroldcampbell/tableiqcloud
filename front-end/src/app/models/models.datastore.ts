@@ -42,6 +42,7 @@ export enum StringifiedFieldType {
 	FieldTypeOption = "Option",
 	FieldTypeYesNo = "YesNo",
 	FieldTypeStar = "Star",
+	FieldTypeRelationship = "Relationship",
 
 }
 
