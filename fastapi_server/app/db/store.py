@@ -47,3 +47,7 @@ def create_table_field(req:api.RequestDataCreateField):
     rec_data = table.create_table_field_by_name(req.FieldName, ftype, req.FieldOptions)
 
     return rec_data
+
+def save_mock_bases():
+    mockdb.save_mock_bases()
+    return None

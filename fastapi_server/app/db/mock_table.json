@@ -10,7 +10,8 @@
                     "FieldName": "Name",
                     "FieldType": 0,
                     "FieldTypeName": "String",
-                    "MetaAttributes": null
+                    "MetaAttributes": null,
+                    "FieldParams": null
                 },
                 "FieldData": [
                     {
@@ -34,8 +35,8 @@
                         "RecordGUID": "r2"
                     }
                 },
-                "CreatedOnTimestamp": 1,
                 "IsDeleted": false,
+                "CreatedOnTimestamp": 1,
                 "DeletedOnTimestamp": -1
             },
             {
@@ -45,7 +46,8 @@
                     "FieldName": "Age",
                     "FieldType": 1,
                     "FieldTypeName": "Number",
-                    "MetaAttributes": null
+                    "MetaAttributes": null,
+                    "FieldParams": null
                 },
                 "FieldData": [
                     {
@@ -69,9 +71,45 @@
                         "RecordGUID": "r2"
                     }
                 },
-                "CreatedOnTimestamp": 1,
                 "IsDeleted": false,
+                "CreatedOnTimestamp": 1,
                 "DeletedOnTimestamp": -1
+            },
+            {
+                "MetaData": {
+                    "TableGUID": "t1",
+                    "FieldGUID": "4B7A2F42-883C-4659-ACAC-386071477514",
+                    "FieldName": "test",
+                    "FieldType": 6,
+                    "FieldTypeName": null,
+                    "MetaAttributes": null,
+                    "FieldParams": null
+                },
+                "FieldData": [
+                    {
+                        "CellGUID": "F060835E-4D16-439D-A968-5106B9A75E97",
+                        "RecordGUID": "r1",
+                        "DataValue": null
+                    },
+                    {
+                        "CellGUID": "180CE6BA-7B80-43A3-976E-FFC3DB973C35",
+                        "RecordGUID": "r2",
+                        "DataValue": "1"
+                    }
+                ],
+                "FieldDataGUIDMap": {
+                    "r1": {
+                        "CellGUID": "F060835E-4D16-439D-A968-5106B9A75E97",
+                        "RecordGUID": "r1"
+                    },
+                    "r2": {
+                        "CellGUID": "180CE6BA-7B80-43A3-976E-FFC3DB973C35",
+                        "RecordGUID": "r2"
+                    }
+                },
+                "IsDeleted": false,
+                "CreatedOnTimestamp": 1757251544,
+                "DeletedOnTimestamp": 0
             }
         ],
         "RecordGUIDs": [
@@ -80,7 +118,8 @@
         ],
         "FieldsNameIndex": {
             "Name": 0,
-            "Age": 1
+            "Age": 1,
+            "test": 2
         },
         "CreatedOnTimestamp": 1,
         "IsDeleted": false,
@@ -97,7 +136,8 @@
                     "FieldName": "Title",
                     "FieldType": 0,
                     "FieldTypeName": "String",
-                    "MetaAttributes": null
+                    "MetaAttributes": null,
+                    "FieldParams": null
                 },
                 "FieldData": [
                     {
@@ -121,8 +161,8 @@
                         "RecordGUID": "r4"
                     }
                 },
-                "CreatedOnTimestamp": 2,
                 "IsDeleted": false,
+                "CreatedOnTimestamp": 2,
                 "DeletedOnTimestamp": -1
             }
         ],
@@ -148,7 +188,8 @@
                     "FieldName": "Description",
                     "FieldType": 3,
                     "FieldTypeName": "Text",
-                    "MetaAttributes": null
+                    "MetaAttributes": null,
+                    "FieldParams": null
                 },
                 "FieldData": [
                     {
@@ -163,8 +204,8 @@
                         "RecordGUID": "r5"
                     }
                 },
-                "CreatedOnTimestamp": 3,
                 "IsDeleted": false,
+                "CreatedOnTimestamp": 3,
                 "DeletedOnTimestamp": -1
             }
         ],

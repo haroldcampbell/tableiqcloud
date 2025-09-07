@@ -10,6 +10,23 @@ def json_load_data(filename:str):
         return json.load(f)
     return None
 
+def save_json_data(filename:str, data):
+    file_path = Path(__file__).parent / filename
+    with open(file_path, "w") as f:
+        json.dump(data, f, indent=4)
+    return None
+
+def save_mock_bases():
+    data = [item.model_dump() for item in mock_bases]
+    save_json_data("mock_bases.json", data)
+
+    data = [item.model_dump() for item in mock_table]
+    save_json_data("mock_table.json", data)
+
+    data = [item.model_dump() for item in mock_base_table_info_list]
+    save_json_data("mock_base_table_info_list.json", data)
+
+
 # load mock bases
 bases_data = json_load_data("mock_bases.json")
 mock_bases = [models.BaseInfo(**item) for item in bases_data]

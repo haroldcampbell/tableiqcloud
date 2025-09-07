@@ -67,6 +67,10 @@ async def get_table_by_guid(base_guid: str, table_guid: str):
 @router.post("/api/field/new")
 async def create_table_field(request: api.RequestDataCreateField):
     result = store.create_table_field(request)
+
+    # Save mock data
+    store.save_mock_bases()
+
     return okResp(action="create-table-field", jsonBody=result)
 
 
@@ -80,6 +84,10 @@ async def delete_table_field(request: api.RequestDataDeleteField):
     if not ok:
         return errResp(action="delete-table-field",jsonBody=table, message="Field not found")
 
+    # Save mock data
+    store.save_mock_bases()
+
+
     return okResp(action="delete-table-field", jsonBody=request.TableFieldGUID)
 
 
@@ -91,6 +99,9 @@ async def update_table_field_info(request: api.RequestDataUpdateField):
 
     fieldMetaData = table.update_table_field_meta_data(
         request.TableFieldGUID, request.FieldName, request.FieldType, request.FieldOptions)
+
+    # Save mock data
+    store.save_mock_bases()
 
     return okResp(action="update-info", jsonBody=fieldMetaData)
 
@@ -114,6 +125,9 @@ async def update_table_field_value(request: api.RequestDataUpdateFieldDataValue)
     if updatedData is None:
         return errResp(action="update-table-field-value", jsonBody=updatedData, message="Field not found or update failed")
 
+    # Save mock data
+    store.save_mock_bases()
+
     return okResp(action="update-table-field-value", jsonBody=updatedData)
 
 
@@ -134,6 +148,10 @@ async def create_table_record(request: api.RequestDataCreateRecord):
         RecordGUID=record_guid,
         Cells=record_cells
     )
+
+    # Save mock data
+    store.save_mock_bases()
+
     return okResp(action=action_name, jsonBody=resp)
 
 @router.post("/api/table-record/delete")
@@ -145,5 +163,8 @@ async def delete_table_record(request: api.RequestDataDeleteRecord):
         return errResp(action=action_name,jsonBody=table, message="Table not found")
 
     table.delete_table_record_by_record_guid(request.RecordGUID)
+
+    # Save mock data
+    store.save_mock_bases()
 
     return okResp(action=action_name, jsonBody=request.RecordGUID)
