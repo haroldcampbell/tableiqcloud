@@ -183,6 +183,12 @@ export interface RecordCell {
 	FieldData: FieldData;
 }
 
+export interface TableFieldInfo {
+	GUID: string;
+	Name: string;
+	FieldsMetaData: FieldMetaData[];
+	FieldsNameIndex: { [Name: string]: number } // Maps the Name to the field Index
+}
 
 export interface Table {
 	GUID: string;

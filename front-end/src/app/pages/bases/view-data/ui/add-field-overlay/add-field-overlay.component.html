@@ -166,7 +166,10 @@
 
     <!-- UI for Relationsip menu element -->
     @case (FieldType.FieldTypeRelationship) {
-    <menu-element-relationship></menu-element-relationship>
+    <menu-element-relationship
+      [baseGUID]="baseGUID"
+      (hasValidSaveState)="onMenuElementSaveStateChanged($event)"
+    ></menu-element-relationship>
     }
 
     <!-- End switch -->
@@ -179,7 +182,11 @@
         <button class="action-cancel" (click)="onCancel()">Cancel</button>
       </li>
       <li>
-        <button class="action-create" (click)="onApplyChanges()">
+        <button
+          class="action-create"
+          (click)="onApplyChanges()"
+          [disabled]="!isMenuElementValid"
+        >
           Create field
         </button>
       </li>

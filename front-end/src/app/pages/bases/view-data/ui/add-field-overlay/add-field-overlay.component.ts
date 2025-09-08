@@ -90,6 +90,7 @@ export class AddFieldOverlayComponent implements OnInit, AfterViewInit, OnDestro
 
 	onFieldTypeChanged(matSelect: MatSelect, $event: MatSelectChange) {
 		this.selectedFieldType = $event.value
+		this.isMenuElementValid = true;
 	}
 
 	// isOptionFieldType(): boolean {
@@ -102,5 +103,12 @@ export class AddFieldOverlayComponent implements OnInit, AfterViewInit, OnDestro
 
 	onOptionInfoListChanged(listItems: OptionInfoElem[]) {
 		this._optionInfoList = listItems;
+	}
+
+	// Track if the current state of the menu element is valid and can be saved
+	isMenuElementValid: boolean = true;
+
+	onMenuElementSaveStateChanged(isValid: boolean) {
+		this.isMenuElementValid = isValid;
 	}
 }

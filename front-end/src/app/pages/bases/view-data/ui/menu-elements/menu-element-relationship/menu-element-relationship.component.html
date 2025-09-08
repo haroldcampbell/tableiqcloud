@@ -1,1 +1,56 @@
-<p>menu-element-relationship works!</p>
+<h3>Linked Table</h3>
+<div class="option-container">
+  <!-- List of tables -->
+  <ul class="selector-outer-container">
+    <li class="flow-col">
+      <label for="">Select linked table</label>
+    </li>
+    <li class="selector-container">
+      <mat-select
+        #matSelectTables
+        class="input-elm"
+        style="font-size: 14px"
+        [(ngModel)]="dirtyTableValue"
+        (click)="$event.stopPropagation()"
+        (selectionChange)="onChangedLinkedTable($event)"
+      >
+        @for (item of tableList; track $index) {
+        <mat-option
+          [value]="item.GUID"
+          class="mat-option-reset option-value"
+          (click)="$event.stopPropagation()"
+        >
+          {{ item.Name }}
+        </mat-option>
+        }
+      </mat-select>
+    </li>
+  </ul>
+
+  <!-- List of related table fields -->
+  <ul class="selector-outer-container" *ngIf="didSelectTable">
+    <li class="flow-col">
+      <label for="">Select linked field</label>
+    </li>
+    <li class="selector-container">
+      <mat-select
+        #matSelectTablesFields
+        class="input-elm"
+        style="font-size: 14px"
+        [(ngModel)]="dirtyFieldValue"
+        (click)="$event.stopPropagation()"
+        (selectionChange)="onChangedTableField($event)"
+      >
+        @for (item of seletedTableFields; track $index) {
+        <mat-option
+          [value]="item.FieldGUID"
+          class="mat-option-reset option-value"
+          (click)="$event.stopPropagation()"
+        >
+          {{ item.FieldName }}
+        </mat-option>
+        }
+      </mat-select>
+    </li>
+  </ul>
+</div>
