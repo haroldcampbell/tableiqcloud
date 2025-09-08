@@ -22,6 +22,11 @@ class TableRecordData(BaseModel):
     FieldsMetaData: List[FieldMetaData]=Field(default_factory=list)
     ColumnValues: Dict[TableFieldGUID, TableFieldArray]=Field(default_factory=dict)
 
+class TableFieldInfo(BaseModel):
+    GUID: str
+    Name: str
+    FieldsMetaData: List[FieldMetaData]=Field(default_factory=list)
+    FieldsNameIndex: Dict[str, int]  # Maps the Name to the field Index
 
 class Table(BaseModel):
     GUID: str
@@ -45,6 +50,23 @@ class Table(BaseModel):
             records.ColumnValues[item.MetaData.FieldGUID] = item.FieldData
 
         return records
+
+    def get_table_field_info(self) -> TableFieldInfo:
+        # collect the field meta data
+        fields_meta_data = []
+        for item in self.Fields:
+            if item.MetaData == None:
+                # This should never happen but just in case
+                logging.warning(f"[Table.get_table_info] Field MetaData is None. \n\tTable: {self} \n\tField: {item}")
+                continue
+
+            fields_meta_data.append(item.MetaData)
+
+        return TableFieldInfo(GUID=self.GUID,
+                         Name=self.Name,
+                         FieldsMetaData=fields_meta_data,
+                         FieldsNameIndex=self.FieldsNameIndex)
+
 
     def add_table_field(self, field:TableField)->TableField:
         if field.MetaData == None:

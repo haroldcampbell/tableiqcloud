@@ -52,7 +52,17 @@ async def get_tables(base_guid: str):
     return okResp(action="get-tables", jsonBody=base_tables)
 
 
-# Gets a table from a base based on the table_guid
+# Gets a table info from a base based on the table_guid
+@router.get("/api/table/{base_guid}/{table_guid}/info")
+async def get_table_field_info_by_guid(base_guid: str, table_guid: str):
+    table_fiel_info = store.get_table_field_info_by_guid(base_guid, table_guid)
+    if table_fiel_info == None:
+        return errResp(action="get-table-info",jsonBody=table_fiel_info, message="Table not found")
+
+
+    return okResp(action="get-table-info",jsonBody=table_fiel_info)
+
+# Get the table details without the records
 @router.get("/api/table/{base_guid}/{table_guid}")
 async def get_table_by_guid(base_guid: str, table_guid: str):
     table = store.getTableByGUID(base_guid, table_guid)

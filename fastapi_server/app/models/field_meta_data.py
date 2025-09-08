@@ -95,6 +95,10 @@ def init_field_params(field_type:TableFieldType, field_params: Optional[Dict[str
 
         return FieldParamOption.new_field_param_option(field_params[FieldParamOption._Key])
 
+    if field_type == TableFieldType.FieldTypeRelationship:
+        # TODO: Implement relationship field params
+        return None
+
     return None
 
 
