@@ -7,11 +7,15 @@
         "TableInfoArray": [
             {
                 "GUID": "t1",
-                "Name": "Table 1"
+                "Name": "Guests"
             },
             {
                 "GUID": "t2",
-                "Name": "Other Table"
+                "Name": "Guides"
+            },
+            {
+                "GUID": "t3",
+                "Name": "Activities"
             }
         ]
     },

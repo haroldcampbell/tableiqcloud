@@ -4,8 +4,10 @@ from typing import  Optional, Any, Dict, List, ClassVar
 import uuid
 
 from .table_field_type import TableFieldType
-from .field_param_option import FieldParamOption
-from .field_param_option import FieldParamOptionInfo
+from .field_param_option import FieldParamOption, FieldParamOptionInfo
+from .field_param_relationship import FieldParamRelationship, FieldParamLinkedFieldInfo
+
+
 class FieldMetaData(BaseModel):
     TableGUID: str
     FieldGUID: str
@@ -79,26 +81,22 @@ def init_FieldMetaData(table_guid:str, field_name:str, field_type:TableFieldType
         FieldParams=params,
     )
 
+
 def init_field_params(field_type:TableFieldType, field_params: Optional[Dict[str, Any]]) -> Optional[Any]:
     if field_params is None:
         return None
 
-    if field_type == TableFieldType.FieldTypeOption:
-        if FieldParamOption._Key not in field_params:
-            # raise ValueError(f"Field type '{field_type.name}' requires '{FieldParamOption.ParamKey}' in field_params.")
-            return FieldParamOption.nil_field_param_option()
+    match field_type:
+        case TableFieldType.FieldTypeOption:
+            # Logic for option fields (i.e. FieldTypeOption)
+            return FieldParamOption.init(field_params)
 
-        # Ensure the value is a list of FieldParamOptionInfo
-        if not isinstance(field_params[FieldParamOption._Key], list):
-            # raise ValueError(f"Field type '{field_type.name}' expects a list for '{FieldParamOption.ParamKey}'.")
-            return FieldParamOption.nil_field_param_option()
+        case TableFieldType.FieldTypeRelationship:
+            # Logic for linked relationships (i.e. FieldTypeRelationship)
+            return FieldParamRelationship.init(field_params)
 
-        return FieldParamOption.new_field_param_option(field_params[FieldParamOption._Key])
+        case _:
+            return None
 
-    if field_type == TableFieldType.FieldTypeRelationship:
-        # TODO: Implement relationship field params
-        return None
-
-    return None
 
 
