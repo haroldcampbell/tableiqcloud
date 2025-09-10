@@ -168,7 +168,9 @@
     @case (FieldType.FieldTypeRelationship) {
     <menu-element-relationship
       [baseGUID]="baseGUID"
+      [parentTableGUID]="tableGUID"
       (hasValidSaveState)="onMenuElementSaveStateChanged($event)"
+      (relationshipInfo)="onRelationshipInfoChanged($event)"
     ></menu-element-relationship>
     }
 

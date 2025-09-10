@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { APIService } from '../../../../../../api.services/api.service';
 import { hasString } from '../../../../../../core/utils';
-import { BaseTableInfo, FieldMetaData, TableFieldInfo, TableInfo } from '../../../../../../models/models.datastore';
+import { BaseTableInfo, FieldMetaData, FieldParamLinkedFieldInfo, FieldParamOptionInfo, TableFieldInfo, TableInfo } from '../../../../../../models/models.datastore';
 import { NgForOf } from "../../../../../../../../node_modules/@angular/common/index";
 import { CoreModule } from '../../../../../../modules/core.module';
 import { MatSelectChange } from '@angular/material/select';
@@ -20,8 +20,11 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 	dirtyFieldValue: string = "";
 
 	@Input() baseGUID?: string;
+	@Input() parentTableGUID?: string;
 
 	@Output() hasValidSaveState = new EventEmitter<boolean>();
+
+	@Output() relationshipInfo = new EventEmitter<FieldParamLinkedFieldInfo>();
 
 	constructor(
 		// private elementRef: ElementRef,
@@ -69,6 +72,7 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 	}
 
 	selectedTableGUID: string = "";
+	selectedTableFieldGUID: string = "";
 	tableFieldInfo?: TableFieldInfo;
 
 	get didSelectTable(): boolean {
@@ -104,6 +108,15 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 	onChangedTableField(event: MatSelectChange) {
 		console.log("[onChangedTableField] event:", event);
 		this.dirtyFieldValue = event.value;
+		this.selectedTableFieldGUID = event.value
 		this.hasValidSaveState.emit(true);
+
+		const info: FieldParamLinkedFieldInfo = {
+			ParentTableGUID: this.parentTableGUID!,
+			LinkedChildTableGUID: this.selectedTableGUID,
+			LinkedFieldGUID: this.selectedTableFieldGUID
+		}
+
+		this.relationshipInfo.emit(info)
 	}
 }

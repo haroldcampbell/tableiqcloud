@@ -8,19 +8,6 @@ export interface TableInfo {
 }
 
 
-// function infoToLocalDate(list: BoardInfo[]) {
-// 	return list.map(info => {
-// 		info.CreatedOn = new Date(info.CreatedOnTimestamp * 1000)
-// 		return info
-// 	});
-// }
-
-// export function provisionBoardAccessList(data: BoardAccessListData) {
-// 	data.BoardInfoList = infoToLocalDate(data.BoardInfoList);
-// 	data.PendingBoardInfoList = infoToLocalDate(data.PendingBoardInfoList);
-// 	return data
-// }
-
 const iota = 0;
 
 export enum TableFieldType {
@@ -62,8 +49,8 @@ export function StringifiedFieldTypeToType(s: StringifiedFieldType): TableFieldT
 		// case StringifiedFieldType.FieldTypeDate:
 		// 	return TableFieldType.FieldTypeText;
 
-		// case StringifiedFieldType.FieldTypeDate:
-		// 	return TableFieldType.FieldTypeRelationship;
+		case StringifiedFieldType.FieldTypeRelationship:
+			return TableFieldType.FieldTypeRelationship;
 
 		case StringifiedFieldType.FieldTypeOption:
 			return TableFieldType.FieldTypeOption;
@@ -97,25 +84,22 @@ export function FieldTypeToStringifiedFieldType(t: TableFieldType): StringifiedF
 		// case TableFieldType.FieldTypeText:
 		// 	return StringifiedFieldType.FieldTypeString;
 
-		// case TableFieldType.FieldTypeRelationship:
-		// 	return StringifiedFieldType.FieldTypeString;
+		case TableFieldType.FieldTypeRelationship:
+			return StringifiedFieldType.FieldTypeRelationship;
 
 	}
 
 	return StringifiedFieldType.FieldTypeString
 }
 
-// export interface OptionInfo {
-// 	OptionId: string;
-// 	OptionIndex: number;
-// 	OptionName: string;
-// 	OptionMetaData: any; // Additional meta data
-// }
-export const OptionInfoKey = "option"
+
+// ---- FieldParams code for FieldTypeOption
+export const InfoKeyRelationship = "relationship"
+export const InfoKeyOption = "option"
 
 export function CreateFieldOptionAsSelect(items: FieldParamOptionInfo[]) {
 	let options: FieldOptionsType = {}
-	options[OptionInfoKey] = items;
+	options[InfoKeyOption] = items;
 
 	return options
 }
@@ -136,9 +120,31 @@ export const Key_FieldParamOptionInfo_OptionMetaDataColor = "itemColor";
 
 export interface FieldParamOption {
 	ParamKey: string;
-	ParamValues: FieldParamOptionInfo[];
+	ParamValues: FieldParamOptionInfo[]
 }
 
+// ---- FieldParams code for FieldTypeRelationship
+export function CreateFieldRelationshipAsSelect(items: FieldParamLinkedFieldInfo) {
+	let options: FieldOptionsType = {}
+	options[InfoKeyRelationship] = items;
+
+	return options
+}
+
+
+export interface FieldParamLinkedFieldInfo {
+	InfoId: string;
+	ParentTableGUID: string;
+	LinkedChildTableGUID: string;
+	LinkedFieldGUID: string;
+}
+
+export interface FieldParamRelationship {
+	ParamKey: string;
+	ParamValues: FieldParamLinkedFieldInfo
+}
+
+// ----
 export interface FieldMetaData {
 	TableGUID: string; // Guid for the parent table
 
@@ -147,7 +153,7 @@ export interface FieldMetaData {
 	FieldType: TableFieldType;
 	FieldTypeName: string;
 	MetaAttributes: any;
-	FieldParams: FieldParamOption | any; // For dropdowns, etc. This is a map of option names to values
+	FieldParams: FieldParamOption | FieldParamRelationship | any; // For dropdowns, etc. This is a map of option names to values
 }
 
 export interface FieldData {
