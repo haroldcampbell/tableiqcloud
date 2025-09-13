@@ -1,4 +1,4 @@
-import { RecordCell } from "./models.datastore";
+import { FieldData, RecordCell } from "./models.datastore";
 
 
 export interface APIServerResponse<T> {

@@ -4,6 +4,8 @@ from .table import Table
 from .table_field_type import TableFieldType
 from .record_cell import RecordCell
 from .field_meta_data import FieldMetaData
+from .field_param_relationship import FieldParamLinkedFieldInfo, FieldParamRelationship
+
 
 __all__ = [
     "BaseInfo",
@@ -13,5 +15,9 @@ __all__ = [
     "RecordCell",
     "TableInfo",
     "Table",
-    "TableFieldType"
+    "TableFieldType",
+
+    # Relationship field param types
+    "FieldParamLinkedFieldInfo",
+    "FieldParamRelationship",
     ]

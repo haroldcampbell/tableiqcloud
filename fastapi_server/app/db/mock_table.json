@@ -110,6 +110,50 @@
                 "IsDeleted": false,
                 "CreatedOnTimestamp": 1757251544,
                 "DeletedOnTimestamp": 0
+            },
+            {
+                "MetaData": {
+                    "TableGUID": "t1",
+                    "FieldGUID": "C4C978E7-7E78-4023-933F-5D739A8FC5D6",
+                    "FieldName": "PkG",
+                    "FieldType": 4,
+                    "FieldTypeName": null,
+                    "MetaAttributes": null,
+                    "FieldParams": {
+                        "ParamKey": "relationship",
+                        "ParamValues": {
+                            "InfoId": "2BC953EA-B4EE-4F19-8E51-644EB23EE689",
+                            "ParentTableGUID": "t1",
+                            "LinkedChildTableGUID": "t3",
+                            "LinkedFieldGUID": "f4"
+                        }
+                    }
+                },
+                "FieldData": [
+                    {
+                        "CellGUID": "24A15D2D-4338-4D06-873C-E921D9DC197B",
+                        "RecordGUID": "r1",
+                        "DataValue": null
+                    },
+                    {
+                        "CellGUID": "7ACDDA3E-B592-4884-AE64-798A9A93184A",
+                        "RecordGUID": "r2",
+                        "DataValue": null
+                    }
+                ],
+                "FieldDataGUIDMap": {
+                    "r1": {
+                        "CellGUID": "24A15D2D-4338-4D06-873C-E921D9DC197B",
+                        "RecordGUID": "r1"
+                    },
+                    "r2": {
+                        "CellGUID": "7ACDDA3E-B592-4884-AE64-798A9A93184A",
+                        "RecordGUID": "r2"
+                    }
+                },
+                "IsDeleted": false,
+                "CreatedOnTimestamp": 1757512210,
+                "DeletedOnTimestamp": 0
             }
         ],
         "RecordGUIDs": [
@@ -119,7 +163,8 @@
         "FieldsNameIndex": {
             "Name": 0,
             "Age": 1,
-            "test": 2
+            "test": 2,
+            "PkG": 3
         },
         "CreatedOnTimestamp": 1,
         "IsDeleted": false,

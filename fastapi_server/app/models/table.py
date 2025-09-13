@@ -9,7 +9,7 @@ from .field_data import FieldData
 from .field_meta_data import FieldMetaData
 from .table_field_type import TableFieldType
 from .record_cell import RecordCell
-
+from .field_param_relationship import FieldParamRelationship, FieldParamLinkedFieldInfo
 
 # logger = logging.getLogger(__name__)
 
@@ -218,7 +218,6 @@ class Table(BaseModel):
         # logger.info("Successfully retrieved %d RecordCells for RecordGUID %s", len(record_cells), record_guid)
         return record_cells
 
-
     def create_table_record(self) -> tuple[str, List[RecordCell]]:
         record_guid = self.append_record()
 
@@ -243,3 +242,33 @@ class Table(BaseModel):
             field.delete_record_by_record_guid(record_guid)
 
         return True
+
+    def get_linked_field_info_by_field_guid(self, field_guid: str) -> Optional[FieldParamLinkedFieldInfo]:
+        index, field = self.find_table_field_by_guid(field_guid)
+        if index == -1 or field is None:
+            return None
+
+        if field.MetaData is None:
+            raise ValueError(f"Table.get_field_data_by_field_guid. \n\tMetaData can't be None. \n\tfield: {field}")
+
+        if field.MetaData.FieldParams is None:
+            raise ValueError(f"Table.get_field_data_by_field_guid. \n\FieldParams can't be None. \n\tfield: {field}")
+
+        if field.MetaData.FieldType != TableFieldType.FieldTypeRelationship :
+            raise ValueError(f"Table.get_field_data_by_field_guid. \n\tFieldType must be Relationship. \n\tfield: {field}")
+
+        if isinstance(field.MetaData.FieldParams, dict):
+            # This is to handle the case where FieldParams is a dict (e.g., from JSON deserialization)
+            field.MetaData.FieldParams = FieldParamRelationship.init(field.MetaData.FieldParams)
+
+        return field.MetaData.FieldParams.ParamValues
+
+    def get_field_data_by_field_guid(self, field_guid: str) -> Optional[List[FieldData]]:
+        index, field = self.find_table_field_by_guid(field_guid)
+        if index == -1 or field is None:
+            return None
+
+        if field.MetaData is None:
+            raise ValueError(f"Table.get_field_data_by_field_guid. \n\tMetaData can't be None. \n\tfield: {field}")
+
+        return field.FieldData

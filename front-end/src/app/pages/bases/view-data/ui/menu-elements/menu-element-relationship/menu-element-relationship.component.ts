@@ -112,6 +112,7 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 		this.hasValidSaveState.emit(true);
 
 		const info: FieldParamLinkedFieldInfo = {
+			InfoId: "",
 			ParentTableGUID: this.parentTableGUID!,
 			LinkedChildTableGUID: this.selectedTableGUID,
 			LinkedFieldGUID: this.selectedTableFieldGUID

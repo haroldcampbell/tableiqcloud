@@ -178,3 +178,23 @@ async def delete_table_record(request: api.RequestDataDeleteRecord):
     store.save_mock_bases()
 
     return okResp(action=action_name, jsonBody=request.RecordGUID)
+
+@router.get("/api/linked-relationship/{base_guid}/{table_guid}/{field_guid}/data-values")
+async def get_linked_table_data_values(base_guid: str, table_guid: str, field_guid: str):
+    action_name = "linked-relationship-data-values"
+
+    table = store.getTableByGUID(base_guid, table_guid)
+    if table == None:
+        return errResp(action=action_name,jsonBody=table, message="Table not found")
+
+    linked_field_info = table.get_linked_field_info_by_field_guid(field_guid)
+    if linked_field_info == None:
+        return errResp(action=action_name,jsonBody=linked_field_info, message="Field not found or not a relationship field")
+
+    linked_table = store.getTableByGUID(base_guid, linked_field_info.LinkedChildTableGUID)
+    if linked_table == None:
+        return errResp(action=action_name,jsonBody=linked_table, message="Linked table not found")
+
+    field_data_list = linked_table.get_field_data_by_field_guid(linked_field_info.LinkedFieldGUID)
+
+    return okResp(action=action_name, jsonBody=field_data_list)

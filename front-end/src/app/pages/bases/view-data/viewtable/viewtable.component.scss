@@ -340,6 +340,29 @@ $grid-cell-background-color: #fff;
                             border: solid 2px $grid-active-border-color;
                             outline: none;
                         }
+
+
+                        .linked-table-relationship-input {
+                            display: flex;
+                            position: absolute;
+                            height: 100%;
+                            width: $data-item-width - 5px;
+                            z-index: 100;
+
+                            align-items: center;
+                            padding-left: 8px;
+                            border-radius: 5px;
+                            border: solid 2px $grid-active-border-color;
+                            outline: none;
+                            background-color: #fff;
+                            cursor: pointer;
+
+                            .add-button {
+                                background-color: #f0f0f0;
+                                border-radius: 2px;
+                                padding: 0px 5px;
+                            }
+                        }
                     }
                 }
             }

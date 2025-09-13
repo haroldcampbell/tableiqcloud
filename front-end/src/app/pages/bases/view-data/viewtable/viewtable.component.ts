@@ -10,6 +10,7 @@ import { FieldContextMenuOverlayComponent } from '../ui/field-context-menu-overl
 import { EditFieldContextMenuOverlayComponent } from '../ui/edit-field-context-menu-overlay/edit-field-context-menu-overlay.component';
 import { TableCellContextMenuComponent } from '../ui/table-cell-context-menu/table-cell-context-menu.component';
 import { MatSelectChange } from '@angular/material/select';
+import { AddLinkedTableOverlayComponent } from '../ui/add-linked-table-overlay/add-linked-table-overlay.component';
 
 interface KeyboardData {
 	event: KeyboardEvent
@@ -32,7 +33,8 @@ type ParamOptionIDMap = Map<OptionID, FieldParamOptionInfo>;
 
 export enum FieldInputElement {
 	Input = "Input",
-	Option = "Option"
+	Option = "Option",
+	LinkedTableRelationship = "LinkedTableRelationship"
 }
 @Component({
 	selector: 'ui-viewtable',
@@ -43,6 +45,7 @@ export enum FieldInputElement {
 		EditFieldContextMenuOverlayComponent,
 		FieldContextMenuOverlayComponent,
 		TableCellContextMenuComponent,
+		AddLinkedTableOverlayComponent
 	],
 	templateUrl: './viewtable.component.html',
 	styleUrl: './viewtable.component.scss'
@@ -71,6 +74,10 @@ export class ViewTableComponent implements OnInit {
 
 	get AddFieldAction() {
 		return "__add-field-action";
+	}
+
+	get LinkedTableAction() {
+		return "__linkedTableOverlay";
 	}
 
 	constructor(
@@ -213,6 +220,7 @@ export class ViewTableComponent implements OnInit {
 
 		return this.activeTableCellContextMenu == contextID
 	}
+
 	// @conextID either the fieldID or the value '__add-field-action'
 	onOpenFieldContextMenu(conextID: string) {
 		// console.log("did click on Add Field")
@@ -425,7 +433,7 @@ export class ViewTableComponent implements OnInit {
 	private rowItemWrapperElm!: HTMLElement;
 	/** Fired when the cell is first clicked. This set the outline indicating that it is selected. */
 	onSelectRowItem(event: MouseEvent, selectedCell: FieldData, field: FieldMetaData, colIndex: number, rowIndex: number) {
-		console.log("[onSelectRowItem]", { selectedCell, field, event });
+		// console.log("[onSelectRowItem]", { selectedCell, field, event });
 
 		event.stopPropagation();
 
@@ -612,6 +620,10 @@ export class ViewTableComponent implements OnInit {
 		switch (field.FieldType) {
 			case TableFieldType.FieldTypeOption:
 				return FieldInputElement.Option;
+
+			case TableFieldType.FieldTypeRelationship:
+				return FieldInputElement.LinkedTableRelationship;
+
 			default:
 				return FieldInputElement.Input
 		}
@@ -619,6 +631,10 @@ export class ViewTableComponent implements OnInit {
 
 	get FieldInputElement() {
 		return FieldInputElement
+	}
+
+	get TableFieldType() {
+		return TableFieldType;
 	}
 
 	isYesNoField(field: FieldMetaData) {
@@ -678,5 +694,10 @@ export class ViewTableComponent implements OnInit {
 			selectedCell.DataValue = result.DataValue
 			// console.log("[onClickedYesNoField] result: ", result);
 		});
+	}
+
+	onSelectedLinkedTableValue(event: FieldData) {
+		console.log("[onSelectedLinkedTableValue] event:", event);
+		this.onFieldOverlayDetached()
 	}
 }

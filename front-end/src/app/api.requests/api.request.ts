@@ -1,7 +1,7 @@
 import { HttpClient, HttpRequest } from "@angular/common/http";
 import { EMPTY, map, of, tap } from "rxjs";
 import { APIServerResponse, RequestDataCreateRecordResponse } from "../models/models.server";
-import { Base, BaseTableInfo, FieldData, FieldMetaData, ReqestDataDeleteField, RequestDataCreateField, RequestDataCreateRecord, RequestDataDeleteRecord, RequestDataUpdateField, RequestDataUpdateFieldDataValue, TableFieldInfo, TableInfo, TableRecordData } from "../models/models.datastore";
+import { Base, BaseTableInfo, FieldData, FieldMetaData, FieldParamLinkedFieldInfo, ReqestDataDeleteField, RequestDataCreateField, RequestDataCreateRecord, RequestDataDeleteRecord, RequestDataUpdateField, RequestDataUpdateFieldDataValue, TableFieldInfo, TableInfo, TableRecordData } from "../models/models.datastore";
 
 
 export class APIRequests {
@@ -128,11 +128,24 @@ export class APIRequests {
 			);
 	}
 
-
 	deleteTableRecord(data: RequestDataDeleteRecord) {
 		return this.postRequest<RequestDataDeleteRecord, string>(`/api/table-record/delete`, data)
 	}
 
+
+	getLikedTableDataOptions(baseGUID: string, tableGUID: string, fieldGUID: string) {
+		const url = `/api/linked-relationship/${baseGUID}/${tableGUID}/${fieldGUID}/data-values`;
+		return this.http.get<APIServerResponse<FieldData[]>>(url)
+			.pipe(
+				map(resp => {
+					if (!resp.successStatus || resp.jsonBody === null) {
+						throw resp.message;
+					}
+
+					return resp.jsonBody;
+				}),
+			);
+	}
 
 
 	private postRequest<Request, Response>(action: string, data: Request) {

@@ -1,0 +1,16 @@
+<div class="overlay-container">
+  <div class="overlay-content">
+    <div class="search-wrapper">
+      <input #searchInputElm type="text" (keyup)="onSearchInputKeyUp($event)" />
+    </div>
+    <div class="scroll-container">
+      <ul>
+        @for (item of filteredItems; track $index) {
+        <li class="column-item" (click)="selectColumnValue.emit(item)">
+          {{ item.DataValue }}
+        </li>
+        }
+      </ul>
+    </div>
+  </div>
+</div>

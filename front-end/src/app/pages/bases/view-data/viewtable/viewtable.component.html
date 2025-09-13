@@ -218,11 +218,14 @@
     (contextmenu)="onShowTableCellContextMenu(columnData.CellGUID)"
   >
     <div class="data-item">
+      <!--  -->
+      @switch (field.FieldType) {
+      <!-- Handle Yes/No checkbox input -->
+      @case (TableFieldType.FieldTypeYesNo) {
       <div
         class="value-item-container"
         [class.value-item-container-align-center]="isYesNoField(field)"
       >
-        @if(isYesNoField(field)){
         <input
           type="checkbox"
           class="field-item-yes-no"
@@ -231,8 +234,11 @@
             onClickedYesNoField($event, field, columnData, colIndex, rowIndex)
           "
         />
-        } @else {
-
+      </div>
+      }
+      <!-- Handle options -->
+      @case(TableFieldType.FieldTypeOption) {
+      <div class="value-item-container">
         <span
           *ngIf="hasColumnValue(columnData)"
           [class.option-value-container]="isOptionField(field)"
@@ -240,8 +246,25 @@
         >
           {{ presentColumnDataValue(field, columnData) }}
         </span>
-        }
       </div>
+      }
+      <!-- Handle linked table relationship input -->
+      @case(TableFieldType.FieldTypeRelationship) {
+      <div class="value-item-container">Relationship</div>
+      }
+      <!-- Handle everything else -->
+      @default {
+      <div class="value-item-container">
+        <span
+          *ngIf="hasColumnValue(columnData)"
+          [style.backgroundColor]="columnDataValueCellColor(field, columnData)"
+        >
+          {{ presentColumnDataValue(field, columnData) }}
+        </span>
+      </div>
+      }
+      <!-- End of switch -->
+      }
     </div>
   </div>
   <ng-template
@@ -317,6 +340,37 @@
             </mat-option>
             }
           </mat-select>
+          }
+          <!-- Handle linked table relationship input -->
+          @case(FieldInputElement.LinkedTableRelationship) {
+          <div
+            cdkOverlayOrigin
+            #addLinkedTableOverlay="cdkOverlayOrigin"
+            (click)="onOpenFieldContextMenu(LinkedTableAction)"
+            class="linked-table-relationship-input"
+          >
+            <span class="add-button">+</span>
+          </div>
+
+          <ng-template
+            cdkConnectedOverlay
+            [cdkConnectedOverlayOrigin]="addLinkedTableOverlay"
+            [cdkConnectedOverlayOpen]="
+              isFieldContextMenuOpen(LinkedTableAction)
+            "
+            (detach)="onFieldOverlayDetached()"
+            (overlayOutsideClick)="onFieldOverlayDetached()"
+          >
+            <add-linked-table-overlay
+              [field]="field"
+              [baseGUID]="baseGUID!"
+              [tableGUID]="selectedTableGUID!"
+              (click)="$event.stopPropagation()"
+              (selectColumnValue)="onSelectedLinkedTableValue($event)"
+              (closePanel)="onFieldOverlayDetached()"
+            >
+            </add-linked-table-overlay>
+          </ng-template>
           }
           <!-- End of switch -->
           }
