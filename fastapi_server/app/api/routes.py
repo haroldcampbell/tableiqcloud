@@ -73,7 +73,6 @@ async def get_table_by_guid(base_guid: str, table_guid: str):
 
     return okResp(action="get-table",jsonBody=records)
 
-
 @router.post("/api/field/new")
 async def create_table_field(request: api.RequestDataCreateField):
     result = store.create_table_field(request)
@@ -82,7 +81,6 @@ async def create_table_field(request: api.RequestDataCreateField):
     store.save_mock_bases()
 
     return okResp(action="create-table-field", jsonBody=result)
-
 
 @router.post("/api/field/delete")
 async def delete_table_field(request: api.RequestDataDeleteField):
@@ -97,9 +95,7 @@ async def delete_table_field(request: api.RequestDataDeleteField):
     # Save mock data
     store.save_mock_bases()
 
-
     return okResp(action="delete-table-field", jsonBody=request.TableFieldGUID)
-
 
 @router.post("/api/field/update-info")
 async def update_table_field_info(request: api.RequestDataUpdateField):
