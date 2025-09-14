@@ -1,16 +1,16 @@
 .overlay-content {
     min-width: 200px;
-    row-gap: 15px;
+    row-gap: 5px;
     background-color: #fff;
 
     .search-wrapper {
-        // border: solid 1px #e0e0e0;
         display: flex;
         flex: 1 1 auto;
 
         input {
-            // border: none;
-            // outline: none;
+            border: solid 1px #4794ff;
+            border-radius: 2px;
+            outline: none;
             font-size: 14px;
             padding: 4px 5px;
             flex: 1 1 auto;
@@ -22,9 +22,7 @@
         overflow-y: scroll;
         display: flex;
         flex-direction: column;
-        // scr
-        // row-gap: 5px;
-        // margin-top: 10px;
+        padding: 2px 0;
 
         ul {
             list-style: none;
@@ -32,8 +30,6 @@
             margin: 0;
             display: flex;
             flex-direction: column;
-            // row-gap: 2px;
-            // border: solid 1px #e0e0e0;
 
             li {
                 padding: 2px 5px;
@@ -50,30 +46,23 @@
         }
     }
 
-    // .scroll-container::-webkit-scrollbar {
-    //     width: 12px;
-    //     height: 12px;
-    //     position: absolute;
-    //     top: -12px;
-    //     left: 0;
-    //     right: 5px;
-    //     bottom: 0;
-    // }
+    .scroll-container::-webkit-scrollbar {
+        width: 12px;
+        height: 12px;
+        position: absolute;
+        margin: 0;
+        padding: 0;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+    }
 
-    // .scroll-containerr::-webkit-scrollbar-button {
-    //     display: none;
-    //     height: 0;
-    //     width: 12px;
-    // }
-
-    // .scroll-container::-webkit-scrollbar-thumb {
-    //     background-color: rgba(0, 0, 0, .35);
-    // }
-
-    // .scroll-container::-webkit-scrollbar-thumb {
-    //     background-clip: padding-box;
-    //     border: 3px solid transparent;
-    //     border-radius: 6px;
-    //     min-height: 20px;
-    // }
+    .scroll-container::-webkit-scrollbar-thumb {
+        background-clip: padding-box;
+        border: 3px solid transparent;
+        border-radius: 6px;
+        min-height: 20px;
+        background-color: rgba(0, 0, 0, .35);
+    }
 }
