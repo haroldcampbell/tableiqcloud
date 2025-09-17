@@ -228,6 +228,6 @@ async def new_linked_relationship_data_value(request: api.RequestDataAddLinkedTa
 
 
     # Save mock data
-    # store.save_mock_bases()
+    store.save_mock_bases()
 
     return okResp(action=action_name, jsonBody=target_field_data)
