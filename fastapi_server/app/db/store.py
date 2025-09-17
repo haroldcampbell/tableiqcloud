@@ -68,23 +68,13 @@ def create_table_field(req:api.RequestDataCreateField):
 def update_table_field_value(
         table: models.Table,
         table_field_guid:str,
-        recordGUID:str,
         cellGUID:str,
         linked_table: models.Table,
         linked_field_info: models.FieldParamLinkedFieldInfo,
         linked_fiel_data:models.FieldData) -> models.FieldData:
 
-    # index, field = table.find_table_field_by_guid(table_field_guid)
-    # if index == -1 or field is None:
-    #     raise ValueError(f"Store.update_table_field_value. \n\tField not found. \n\tGUID: {table_field_guid}")
-
-    # if field.MetaData is None:
-    #     raise ValueError(f"Store.update_table_field_value. \n\tMetaData can't be None. \n\tfield: {field}")
 
     target_field_data = table.get_cell_data_by_cell_guid(table_field_guid, cellGUID)
-    # for d in field.FieldData:
-    #     if d.RecordGUID == recordGUID and d.CellGUID == cellGUID:
-    #         target_field_data = d
 
     if target_field_data is None:
         raise ValueError(f"Store.update_table_field_value. \n\tFieldData not found. \n\tcellGUID: {cellGUID}")
@@ -97,8 +87,6 @@ def update_table_field_value(
     if target_field_data.DataValue is None:
         target_field_data.DataValue = []
 
-    # linked_data = models.FieldData(CellGUID=linked_field_data.CellGUID, )
-    # info = models.FieldDataGUIDInfo(CellGUID=linked_fiel_data.CellGUID, RecordGUID=linked_fiel_data.RecordGUID)
     target_field_data.DataValue.append(linked_field_data)
 
     return target_field_data

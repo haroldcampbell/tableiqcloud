@@ -219,7 +219,6 @@ async def new_linked_relationship_data_value(request: api.RequestDataAddLinkedTa
         target_field_data = store.update_table_field_value(
             table,
             request.FieldGUID,
-            request.RecordGUID,
             request.CellGUID,
             linked_table,
             linked_field_info,
