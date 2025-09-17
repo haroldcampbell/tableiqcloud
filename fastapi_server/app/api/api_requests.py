@@ -43,3 +43,10 @@ class RequestDataDeleteRecord(BaseModel):
 	TableGUID:  str
 	RecordGUID: str
 
+class RequestDataAddLinkedTableCellValue (BaseModel):
+	BaseGUID: str
+	TableGUID: str
+	FieldGUID: str
+	RecordGUID: str
+	CellGUID: str
+	LinkedFielData: models.FieldData

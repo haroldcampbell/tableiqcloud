@@ -114,45 +114,62 @@
             {
                 "MetaData": {
                     "TableGUID": "t1",
-                    "FieldGUID": "C4C978E7-7E78-4023-933F-5D739A8FC5D6",
-                    "FieldName": "PkG",
+                    "FieldGUID": "4E781B2C-5BA0-4D0D-8CE2-CC9B89879350",
+                    "FieldName": "guides",
                     "FieldType": 4,
                     "FieldTypeName": null,
                     "MetaAttributes": null,
                     "FieldParams": {
                         "ParamKey": "relationship",
                         "ParamValues": {
-                            "InfoId": "2BC953EA-B4EE-4F19-8E51-644EB23EE689",
+                            "InfoId": "D7251CC4-A287-45D5-BC9A-EDB6D3FFC404",
                             "ParentTableGUID": "t1",
-                            "LinkedChildTableGUID": "t3",
-                            "LinkedFieldGUID": "f4"
+                            "LinkedChildTableGUID": "t2",
+                            "LinkedFieldGUID": "CF9D3598-8C0C-472F-858A-CEEA916E7099"
                         }
                     }
                 },
                 "FieldData": [
                     {
-                        "CellGUID": "24A15D2D-4338-4D06-873C-E921D9DC197B",
+                        "CellGUID": "1902AA87-230C-4CF5-ADD1-7677DDD6B6EC",
                         "RecordGUID": "r1",
-                        "DataValue": null
+                        "DataValue": [
+                            {
+                                "CellGUID": "D5E4A8FC-D2A7-44F2-9FDD-829600E7D940",
+                                "RecordGUID": "r3",
+                                "DataValue": "Jan Smith"
+                            }
+                        ]
                     },
                     {
-                        "CellGUID": "7ACDDA3E-B592-4884-AE64-798A9A93184A",
+                        "CellGUID": "68E7221C-A581-4D44-83B5-0838D0BEB3C4",
                         "RecordGUID": "r2",
-                        "DataValue": null
+                        "DataValue": [
+                            {
+                                "CellGUID": "D18AFAE2-A78E-4170-98D6-042FCF98E424",
+                                "RecordGUID": "r4",
+                                "DataValue": "Willard Bart"
+                            },
+                            {
+                                "CellGUID": "8C444E37-CD35-4871-B18B-5628177F720D",
+                                "RecordGUID": "C8A8DD66-91D9-4742-BBFD-27C42602CCAC",
+                                "DataValue": "Sally Hall"
+                            }
+                        ]
                     }
                 ],
                 "FieldDataGUIDMap": {
                     "r1": {
-                        "CellGUID": "24A15D2D-4338-4D06-873C-E921D9DC197B",
+                        "CellGUID": "1902AA87-230C-4CF5-ADD1-7677DDD6B6EC",
                         "RecordGUID": "r1"
                     },
                     "r2": {
-                        "CellGUID": "7ACDDA3E-B592-4884-AE64-798A9A93184A",
+                        "CellGUID": "68E7221C-A581-4D44-83B5-0838D0BEB3C4",
                         "RecordGUID": "r2"
                     }
                 },
                 "IsDeleted": false,
-                "CreatedOnTimestamp": 1757512210,
+                "CreatedOnTimestamp": 1758033055,
                 "DeletedOnTimestamp": 0
             }
         ],
@@ -164,7 +181,7 @@
             "Name": 0,
             "Age": 1,
             "test": 2,
-            "PkG": 3
+            "guides": 3
         },
         "CreatedOnTimestamp": 1,
         "IsDeleted": false,

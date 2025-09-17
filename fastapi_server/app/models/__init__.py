@@ -1,5 +1,5 @@
 from .base import BaseInfo, BaseTableInfo, TableInfo
-from .field_data import FieldData
+from .field_data import FieldData, FieldDataGUIDInfo
 from .table import Table
 from .table_field_type import TableFieldType
 from .record_cell import RecordCell
@@ -10,7 +10,10 @@ from .field_param_relationship import FieldParamLinkedFieldInfo, FieldParamRelat
 __all__ = [
     "BaseInfo",
     "BaseTableInfo",
+
+    # Field data
     "FieldData",
+    "FieldDataGUIDInfo",
     "FieldMetaData",
     "RecordCell",
     "TableInfo",

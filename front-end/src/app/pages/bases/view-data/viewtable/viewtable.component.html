@@ -250,8 +250,16 @@
       }
       <!-- Handle linked table relationship input -->
       @case(TableFieldType.FieldTypeRelationship) {
-      <div class="value-item-container">Relationship</div>
-      }
+      @if(hasColumnValue(columnData)){
+      <div class="value-item-container relationship-value-item-container">
+        @for (data of linkedFieldDataValues(columnData); track $index; let
+        rowIndex = $index) {
+        <span class="linked-data-item">{{ data.DataValue }}</span>
+        }
+      </div>
+      } @else {
+      <span>&nbsp;--</span>
+      } }
       <!-- Handle everything else -->
       @default {
       <div class="value-item-container">
@@ -366,7 +374,15 @@
               [baseGUID]="baseGUID!"
               [tableGUID]="selectedTableGUID!"
               (click)="$event.stopPropagation()"
-              (selectColumnValue)="onSelectedLinkedTableValue($event)"
+              (selectColumnValue)="
+                onSelectedLinkedTableValue(
+                  $event,
+                  field,
+                  columnData,
+                  colIndex,
+                  rowIndex
+                )
+              "
               (closePanel)="onFieldOverlayDetached()"
             >
             </add-linked-table-overlay>

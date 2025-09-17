@@ -37,7 +37,7 @@ def getTableByGUID(base_guid:str, table_guid:str) -> models.Table | None:
     guids = [item.GUID for item in base_table_info.TableInfoArray]
 
     if table_guid not in guids:
-        print(f"[getTableByGUID] table_guid not found: {table_guid}")
+        print(f"[getTableByGUID] table_guid not found: `{table_guid}`")
         return None # the base doesn't contain the table guid so return
 
     result = list(filter((lambda item: item.GUID == table_guid), mockdb.mock_table))
@@ -65,6 +65,44 @@ def create_table_field(req:api.RequestDataCreateField):
 
     return rec_data
 
+def update_table_field_value(
+        table: models.Table,
+        table_field_guid:str,
+        recordGUID:str,
+        cellGUID:str,
+        linked_table: models.Table,
+        linked_field_info: models.FieldParamLinkedFieldInfo,
+        linked_fiel_data:models.FieldData) -> models.FieldData:
+
+    # index, field = table.find_table_field_by_guid(table_field_guid)
+    # if index == -1 or field is None:
+    #     raise ValueError(f"Store.update_table_field_value. \n\tField not found. \n\tGUID: {table_field_guid}")
+
+    # if field.MetaData is None:
+    #     raise ValueError(f"Store.update_table_field_value. \n\tMetaData can't be None. \n\tfield: {field}")
+
+    target_field_data = table.get_cell_data_by_cell_guid(table_field_guid, cellGUID)
+    # for d in field.FieldData:
+    #     if d.RecordGUID == recordGUID and d.CellGUID == cellGUID:
+    #         target_field_data = d
+
+    if target_field_data is None:
+        raise ValueError(f"Store.update_table_field_value. \n\tFieldData not found. \n\tcellGUID: {cellGUID}")
+
+    # Get the cell data from the linked child table
+    linked_field_data = linked_table.get_cell_data_by_cell_guid(linked_field_info.LinkedFieldGUID, linked_fiel_data.CellGUID)
+    if linked_field_data is None:
+        raise ValueError(f"Store.update_table_field_value. \n\tFieldData not found. \n\tLinkedFieldGUID: {linked_field_info.LinkedFieldGUID}\n\tlinked_fiel_data.cellGUID: {linked_fiel_data.CellGUID}")
+
+    if target_field_data.DataValue is None:
+        target_field_data.DataValue = []
+
+    # linked_data = models.FieldData(CellGUID=linked_field_data.CellGUID, )
+    # info = models.FieldDataGUIDInfo(CellGUID=linked_fiel_data.CellGUID, RecordGUID=linked_fiel_data.RecordGUID)
+    target_field_data.DataValue.append(linked_field_data)
+
+    return target_field_data
+
 def save_mock_bases():
-    # mockdb.save_mock_bases()
+    mockdb.save_mock_bases()
     return None

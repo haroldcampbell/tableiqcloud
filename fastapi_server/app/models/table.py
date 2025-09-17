@@ -165,6 +165,7 @@ class Table(BaseModel):
 
         return None
 
+
     def create_new_record_GUID(self) -> str:
         self._lastRecordGUID = str(uuid.uuid4()).upper()
 
@@ -259,7 +260,7 @@ class Table(BaseModel):
 
         if isinstance(field.MetaData.FieldParams, dict):
             # This is to handle the case where FieldParams is a dict (e.g., from JSON deserialization)
-            field.MetaData.FieldParams = FieldParamRelationship.init(field.MetaData.FieldParams)
+            field.MetaData.FieldParams = FieldParamRelationship(**field.MetaData.FieldParams)
 
         return field.MetaData.FieldParams.ParamValues
 
@@ -272,3 +273,18 @@ class Table(BaseModel):
             raise ValueError(f"Table.get_field_data_by_field_guid. \n\tMetaData can't be None. \n\tfield: {field}")
 
         return field.FieldData
+
+    def get_cell_data_by_cell_guid(self, field_guid: str, cell_guid:str) -> Optional[FieldData]:
+        field_data_list = self.get_field_data_by_field_guid(field_guid)
+
+        if field_data_list is None:
+            return None
+
+        target_field_data = None
+        for data in field_data_list:
+            if data.CellGUID == cell_guid:
+                target_field_data = data
+
+        return target_field_data
+
+

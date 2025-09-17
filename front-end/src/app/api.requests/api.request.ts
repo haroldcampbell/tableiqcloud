@@ -1,7 +1,7 @@
 import { HttpClient, HttpRequest } from "@angular/common/http";
 import { EMPTY, map, of, tap } from "rxjs";
 import { APIServerResponse, RequestDataCreateRecordResponse } from "../models/models.server";
-import { Base, BaseTableInfo, FieldData, FieldMetaData, FieldParamLinkedFieldInfo, ReqestDataDeleteField, RequestDataCreateField, RequestDataCreateRecord, RequestDataDeleteRecord, RequestDataUpdateField, RequestDataUpdateFieldDataValue, TableFieldInfo, TableInfo, TableRecordData } from "../models/models.datastore";
+import { Base, BaseTableInfo, FieldData, FieldMetaData, FieldParamLinkedFieldInfo, ReqestDataDeleteField, RequestDataAddLinkedTableCellValue, RequestDataCreateField, RequestDataCreateRecord, RequestDataDeleteRecord, RequestDataUpdateField, RequestDataUpdateFieldDataValue, TableFieldInfo, TableInfo, TableRecordData } from "../models/models.datastore";
 
 
 export class APIRequests {
@@ -147,6 +147,18 @@ export class APIRequests {
 			);
 	}
 
+	addLikedTableDataCellvalue(data: RequestDataAddLinkedTableCellValue) {
+		return this.http.post<APIServerResponse<FieldData>>(`/api/linked-relationship/new-data-value`, data)
+			.pipe(
+				map(resp => {
+					if (!resp.successStatus || resp.jsonBody === null) {
+						throw resp.message;
+					}
+
+					return resp.jsonBody;
+				}),
+			);
+	}
 
 	private postRequest<Request, Response>(action: string, data: Request) {
 		return this.http.post<APIServerResponse<Response>>(action, data)

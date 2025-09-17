@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../../api.services/api.service';
-import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord, RequestDataUpdateFieldDataValue, GetFieldOptionAsSelect, FieldParamOptionInfo } from '../../../../models/models.datastore';
+import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord, RequestDataUpdateFieldDataValue, GetFieldOptionAsSelect, FieldParamOptionInfo, RequestDataAddLinkedTableCellValue } from '../../../../models/models.datastore';
 import { hasString } from '../../../../core/utils';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { AddFieldOverlayComponent } from '../ui/add-field-overlay/add-field-overlay.component';
@@ -114,7 +114,7 @@ export class ViewTableComponent implements OnInit {
 		// console.log("[loadTableData] tableGUID:", this.tableGUID);
 		this.apiService.apiRequests.getTableByGUID(this.baseGUID!, this.tableGUID!).subscribe({
 			next: (data) => {
-				// console.log("[ViewTableComponent] data: ", data);
+				console.log("[ViewTableComponent] data: ", data);
 				this.tableRecordData = data;
 				this.initParamValuesMap()
 			},
@@ -129,8 +129,13 @@ export class ViewTableComponent implements OnInit {
 			&& columnData.DataValue != undefined
 			&& columnData.DataValue != "";
 	}
+
 	columnValues(field: FieldMetaData) {
 		return this.tableRecordData!.ColumnValues[field.FieldGUID];//.get(field.FieldGUID)
+	}
+
+	linkedFieldDataValues(columnData: FieldData): FieldData[] {
+		return (columnData.DataValue as FieldData[]) ?? []
 	}
 
 	fieldMap = new Map<FieldGuid, FieldMetaData>();
@@ -696,8 +701,29 @@ export class ViewTableComponent implements OnInit {
 		});
 	}
 
-	onSelectedLinkedTableValue(event: FieldData) {
-		console.log("[onSelectedLinkedTableValue] event:", event);
+	onSelectedLinkedTableValue(event: FieldData, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
+		// console.log("[onSelectedLinkedTableValue] event:", { event, field, selectedCell });
+
+		const request: RequestDataAddLinkedTableCellValue = {
+			BaseGUID: this.baseGUID!,
+			TableGUID: this.tableGUID!,
+			FieldGUID: field.FieldGUID,
+			RecordGUID: selectedCell.RecordGUID,
+			CellGUID: selectedCell.CellGUID,
+			LinkedFielData: event
+		};
+
+		this.apiService.apiRequests.addLikedTableDataCellvalue(request)
+			.subscribe({
+				next: (data) => {
+					selectedCell.DataValue = data.DataValue;
+					// console.log("[onSelectedLinkedTableValue] data: ", { data, selectedCell });
+				},
+				error: (err) => {
+					console.log("[onSelectedLinkedTableValue] err: ", err);
+				}
+			})
+
 		this.onFieldOverlayDetached()
 	}
 }

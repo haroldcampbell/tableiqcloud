@@ -1,6 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional, TypeVar, Generic
+from pprint import pprint
 
 import app.db.store as store
 import app.models as models
@@ -58,7 +59,6 @@ async def get_table_field_info_by_guid(base_guid: str, table_guid: str):
     table_fiel_info = store.get_table_field_info_by_guid(base_guid, table_guid)
     if table_fiel_info == None:
         return errResp(action="get-table-info",jsonBody=table_fiel_info, message="Table not found")
-
 
     return okResp(action="get-table-info",jsonBody=table_fiel_info)
 
@@ -194,3 +194,41 @@ async def get_linked_table_data_values(base_guid: str, table_guid: str, field_gu
     field_data_list = linked_table.get_field_data_by_field_guid(linked_field_info.LinkedFieldGUID)
 
     return okResp(action=action_name, jsonBody=field_data_list)
+
+@router.post("/api/linked-relationship/new-data-value")
+async def new_linked_relationship_data_value(request: api.RequestDataAddLinkedTableCellValue):
+    #TODO: refactor to use update_table_field_value
+    action_name = "linked_relationship_new_data_value"
+
+    # Get the parent table
+    table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
+    if table == None:
+        return errResp(action=action_name,jsonBody=table, message="Table not found")
+
+    # Get the field information
+    linked_field_info = table.get_linked_field_info_by_field_guid(request.FieldGUID)
+    if linked_field_info == None:
+        return errResp(action=action_name,jsonBody=linked_field_info, message="Field not found or not a relationship field")
+
+    # Get the linked field information associated with the parent table's field
+    linked_table = store.getTableByGUID(request.BaseGUID, linked_field_info.LinkedChildTableGUID)
+    if linked_table == None:
+        return errResp(action=action_name,jsonBody=linked_table, message="Linked table not found")
+
+    try:
+        target_field_data = store.update_table_field_value(
+            table,
+            request.FieldGUID,
+            request.RecordGUID,
+            request.CellGUID,
+            linked_table,
+            linked_field_info,
+            request.LinkedFielData)
+    except ValueError as e:
+        return errResp(action=action_name, jsonBody=None, message=str(e))
+
+
+    # Save mock data
+    # store.save_mock_bases()
+
+    return okResp(action=action_name, jsonBody=target_field_data)
