@@ -197,7 +197,6 @@ async def get_linked_table_data_values(base_guid: str, table_guid: str, field_gu
 
 @router.post("/api/linked-relationship/new-data-value")
 async def new_linked_relationship_data_value(request: api.RequestDataAddLinkedTableCellValue):
-    #TODO: refactor to use update_table_field_value
     action_name = "linked_relationship_new_data_value"
 
     # Get the parent table
@@ -226,8 +225,42 @@ async def new_linked_relationship_data_value(request: api.RequestDataAddLinkedTa
     except ValueError as e:
         return errResp(action=action_name, jsonBody=None, message=str(e))
 
-
     # Save mock data
     store.save_mock_bases()
+
+    return okResp(action=action_name, jsonBody=target_field_data)
+
+@router.post("/api/linked-relationship/delete-data-value")
+async def delete_linked_relationship_data_value(request: api.RequestDataDeleteLinkedTableCellValue):
+    action_name = "linked_relationship_delete_data_value"
+
+    # Get the parent table
+    table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
+    if table == None:
+        return errResp(action=action_name,jsonBody=table, message="Table not found")
+
+    # Get the linked field information for the parent table's field
+    linked_field_info = table.get_linked_field_info_by_field_guid(request.FieldGUID)
+    if linked_field_info == None:
+        return errResp(action=action_name,jsonBody=linked_field_info, message="Field not found or not a relationship field")
+
+    # Get the linked field information associated with the parent table's field
+    linked_table = store.getTableByGUID(request.BaseGUID, linked_field_info.LinkedChildTableGUID)
+    if linked_table == None:
+        return errResp(action=action_name,jsonBody=linked_table, message="Linked table not found")
+
+    try:
+        target_field_data = store.remove_linked_table_field_value(
+            table,
+            request.FieldGUID,
+            request.CellGUID,
+            linked_table,
+            linked_field_info.LinkedFieldGUID,
+            request.LinkedTableCellGUID)
+    except ValueError as e:
+        return errResp(action=action_name, jsonBody=None, message=str(e))
+
+    # Save mock data
+    # store.save_mock_bases()
 
     return okResp(action=action_name, jsonBody=target_field_data)

@@ -50,3 +50,11 @@ class RequestDataAddLinkedTableCellValue (BaseModel):
 	RecordGUID: str
 	CellGUID: str
 	LinkedFielData: models.FieldData
+
+class RequestDataDeleteLinkedTableCellValue (BaseModel):
+	BaseGUID: str
+	TableGUID: str
+	FieldGUID: str
+	CellGUID: str
+	LinkedTableRecordGUID: str
+	LinkedTableCellGUID: str

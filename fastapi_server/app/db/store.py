@@ -1,4 +1,4 @@
-from typing import List
+from typing import cast, List
 
 import app.db.mockdb as mockdb
 
@@ -73,7 +73,6 @@ def update_table_field_value(
         linked_field_info: models.FieldParamLinkedFieldInfo,
         linked_fiel_data:models.FieldData) -> models.FieldData:
 
-
     target_field_data = table.get_cell_data_by_cell_guid(table_field_guid, cellGUID)
 
     if target_field_data is None:
@@ -90,6 +89,51 @@ def update_table_field_value(
     target_field_data.DataValue.append(linked_field_data)
 
     return target_field_data
+
+
+def remove_linked_table_field_value(
+        table: models.Table,
+        table_field_guid:str,
+        cellGUID:str,
+        linked_table: models.Table,
+        linked_field_GUID: str,
+        linked_table_cell_GUID: str) -> models.FieldData:
+
+    target_field_data = table.get_cell_data_by_cell_guid(table_field_guid, cellGUID)
+
+    if target_field_data is None:
+        raise ValueError(f"Store.update_table_field_value. \n\tFieldData not found. \n\tcellGUID: {cellGUID}")
+
+    # Get the cell data from the linked child table
+    linked_field_data = linked_table.get_cell_data_by_cell_guid(linked_field_GUID, linked_table_cell_GUID)
+    if linked_field_data is None:
+        raise ValueError(f"Store.update_table_field_value. \n\tFieldData not found. \n\tlinked_field_GUID: {linked_field_GUID}\n\tlinked_table_cell_GUID: {linked_table_cell_GUID}")
+
+    # This should never happen but just in case
+    if target_field_data.DataValue is None:
+        target_field_data.DataValue = []
+
+    linked_data_values: List[models.FieldData] = [
+        item if isinstance(item, models.FieldData) else models.FieldData(**item) for item in target_field_data.DataValue
+    ]
+
+    # Remove at most one linked field data from the target field data
+    for d in linked_data_values:
+        if not isinstance(d, models.FieldData):
+            d = models.FieldData(**d)
+
+        if d.CellGUID == linked_table_cell_GUID:
+            linked_data_values.remove(d)
+            break
+
+    target_field_data.DataValue = linked_data_values
+
+    return target_field_data
+
+
+
+
+
 
 def save_mock_bases():
     mockdb.save_mock_bases()

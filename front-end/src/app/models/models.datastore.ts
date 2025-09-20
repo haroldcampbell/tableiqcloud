@@ -283,3 +283,12 @@ export interface RequestDataAddLinkedTableCellValue {
 
 	LinkedFielData: FieldData;
 }
+
+export interface RequestDataDeleteLinkedTableCellValue {
+	BaseGUID: string;
+	TableGUID: string;
+	FieldGUID: string;
+	CellGUID: string;
+	LinkedTableRecordGUID: string;
+	LinkedTableCellGUID: string;
+}
