@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, EventEmitter, Input, OnDestroy, OnInit, Output } from '@angular/core';
 import { APIService } from '../../../../../../api.services/api.service';
 import { hasString } from '../../../../../../core/utils';
-import { BaseTableInfo, FieldMetaData, FieldParamLinkedFieldInfo, FieldParamOptionInfo, TableFieldInfo, TableInfo } from '../../../../../../models/models.datastore';
+import { BaseTableInfo, FieldMetaData, FieldParamLinkedFieldInfo, FieldParamOptionInfo, FieldParamRelationship, TableFieldInfo, TableInfo } from '../../../../../../models/models.datastore';
 import { NgForOf } from "../../../../../../../../node_modules/@angular/common/index";
 import { CoreModule } from '../../../../../../modules/core.module';
 import { MatSelectChange } from '@angular/material/select';
@@ -21,6 +21,7 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 
 	@Input() baseGUID?: string;
 	@Input() parentTableGUID?: string;
+	@Input() existingField?: FieldMetaData;
 
 	@Output() hasValidSaveState = new EventEmitter<boolean>();
 
@@ -62,13 +63,35 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 		// console.log("[loadTableData] tableGUID:", this.tableGUID);
 		this.apiService.apiRequests.getTables(this.baseGUID!).subscribe({
 			next: (data) => {
-				console.log("[ViewTableComponent] data: ", { data });
+				console.log("[loadTableList] data: ", { data });
 				this.baseTableInfo = data;
+				if (this.existingField) {
+					this.initExistingLinkedTable();
+				}
 			},
 			error: (err) => {
-				console.log("[ViewTableComponent] err: ", err);
+				console.log("[loadTableList] err: ", err);
 			}
 		})
+	}
+
+	initExistingLinkedTable() {
+		console.log("[initExistingLinkedTable] existingField", { existingField: this.existingField })
+
+		const params: FieldParamRelationship = this.existingField?.FieldParams;
+		const linkedFieldInfo: FieldParamLinkedFieldInfo = params.ParamValues;
+
+		this.selectedTableGUID = linkedFieldInfo.LinkedChildTableGUID;
+		if (this.baseTableInfo) {
+			for (let item of this.baseTableInfo.TableInfoArray) {
+				if (item.GUID == linkedFieldInfo.LinkedChildTableGUID) {
+					this.loadTableByGUID(linkedFieldInfo.LinkedChildTableGUID, () => {
+						this.loadTableFieldByGUID(linkedFieldInfo.LinkedFieldGUID);
+					})
+					break;
+				}
+			}
+		}
 	}
 
 	selectedTableGUID: string = "";
@@ -87,28 +110,42 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 	}
 
 	onChangedLinkedTable(event: MatSelectChange) {
-		this.dirtyTableValue = event.value;
-		this.selectedTableGUID = event.value;
+		this.hasValidSaveState.emit(false);
+
+		this.loadTableByGUID(event.value);
+	}
+
+	private loadTableByGUID(linkedTableGUID: string, onSuccessfulCallback?: () => void) {
 		this.tableFieldInfo = undefined;
 
-		this.hasValidSaveState.emit(false);
+		this.dirtyTableValue = linkedTableGUID;
+		this.selectedTableGUID = linkedTableGUID;
 
 		this.apiService.apiRequests.getTableFieldInfoByGUID(this.baseGUID!, this.selectedTableGUID).subscribe({
 			next: (data) => {
-				// console.log("[onChangedLinkedTable] getTableFieldInfoByGUID data:", data);
 				this.tableFieldInfo = data;
 				this.dirtyFieldValue = "";
+
+				if (onSuccessfulCallback) {
+					onSuccessfulCallback();
+				}
 			},
 			error: (err) => {
-				console.log("[onChangedLinkedTable] getTableFieldInfoByGUID err:", err);
+				console.log("[loadTableByGUID] getTableFieldInfoByGUID err:", err);
 			}
 		});
 	}
 
 	onChangedTableField(event: MatSelectChange) {
 		console.log("[onChangedTableField] event:", event);
-		this.dirtyFieldValue = event.value;
-		this.selectedTableFieldGUID = event.value
+		this.loadTableFieldByGUID(event.value);
+	}
+
+	private loadTableFieldByGUID(linkedTableFieldGUID: string) {
+		console.log("loadTableFieldByGUID ", { linkedTableFieldGUID });
+
+		this.dirtyFieldValue = linkedTableFieldGUID;
+		this.selectedTableFieldGUID = linkedTableFieldGUID
 		this.hasValidSaveState.emit(true);
 
 		const info: FieldParamLinkedFieldInfo = {

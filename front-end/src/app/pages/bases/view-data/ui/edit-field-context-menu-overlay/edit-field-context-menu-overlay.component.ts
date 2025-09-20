@@ -1,15 +1,17 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CoreModule } from '../../../../../modules/core.module';
-import { CreateFieldOptionAsSelect, FieldMetaData, FieldOptionsType, FieldParamOption, FieldTypeToStringifiedFieldType, RequestDataCreateField, RequestDataUpdateField, StringifiedFieldType, StringifiedFieldTypeToType } from '../../../../../models/models.datastore';
+import { CreateFieldOptionAsSelect, FieldMetaData, FieldOptionsType, FieldParamLinkedFieldInfo, FieldParamOption, FieldTypeToStringifiedFieldType, RequestDataCreateField, RequestDataUpdateField, StringifiedFieldType, StringifiedFieldTypeToType } from '../../../../../models/models.datastore';
 import { MatSelect, MatSelectChange } from '@angular/material/select';
 import { MenuElementOptionComponent, OptionInfoElem } from '../menu-elements/menu-element-option/menu-element-option.component';
+import { MenuElementRelationshipComponent } from '../menu-elements/menu-element-relationship/menu-element-relationship.component';
 
 @Component({
-	selector: 'app-edit-field-context-menu-overlay',
+	selector: 'edit-field-context-menu-overlay',
 	standalone: true,
 	imports: [
 		CoreModule,
-		MenuElementOptionComponent
+		MenuElementOptionComponent,
+		MenuElementRelationshipComponent
 	],
 	templateUrl: './edit-field-context-menu-overlay.component.html',
 	styleUrl: './edit-field-context-menu-overlay.component.scss'
@@ -117,11 +119,22 @@ export class EditFieldContextMenuOverlayComponent implements OnInit {
 		this.disSelectedField = false;
 	}
 
-	isOptionFieldType(): boolean {
-		return this.selectedFieldType === StringifiedFieldType.FieldTypeOption;
-	}
+	// isOptionFieldType(): boolean {
+	// 	return this.selectedFieldType === StringifiedFieldType.FieldTypeOption;
+	// }
 
 	onOptionInfoListChanged(listItems: OptionInfoElem[]) {
 		this._optionInfoList = listItems;
+	}
+
+
+	// Track if the current state of the menu element is valid and can be saved
+	isMenuElementValid: boolean = true;
+
+	onMenuElementSaveStateChanged(isValid: boolean) {
+		this.isMenuElementValid = isValid;
+	}
+	onRelationshipInfoChanged(event: FieldParamLinkedFieldInfo) {
+		// this._relationshipInfo = event;
 	}
 }

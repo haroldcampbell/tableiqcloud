@@ -16,6 +16,7 @@
       />
     </div>
 
+    <!-- Fake dropdown list -->
     <div
       [class]="disSelectedField == false ? 'field-item-hidden' : 'field-item'"
     >
@@ -32,8 +33,9 @@
         </li>
       </ul>
     </div>
-    <!-- Select field type -->
 
+    <!-- List of field types -->
+    <!-- Select field type -->
     <ul
       [class]="
         disSelectedField == false
@@ -89,13 +91,32 @@
       </li>
     </ul>
 
+    <!-- Logic to show sub-menu elements -->
+    @switch(selectedFieldType) {
+
     <!-- UI for Option menu element -->
+    <!-- UI for Option memnu element-->
+    @case (FieldType.FieldTypeOption) {
     <menu-element-option
-      *ngIf="isOptionFieldType()"
       [field]="field"
       [optionInfoElm]="optionInfoList"
       (optionInfoList)="onOptionInfoListChanged($event)"
     ></menu-element-option>
+    }
+
+    <!-- UI for Relationsip menu element -->
+    @case (FieldType.FieldTypeRelationship) {
+    <menu-element-relationship
+      [baseGUID]="baseGUID"
+      [parentTableGUID]="tableGUID"
+      [existingField]="field"
+      (hasValidSaveState)="onMenuElementSaveStateChanged($event)"
+      (relationshipInfo)="onRelationshipInfoChanged($event)"
+    ></menu-element-relationship>
+    }
+
+    <!-- End switch -->
+    }
   </div>
 
   <div class="overlay-footer">
