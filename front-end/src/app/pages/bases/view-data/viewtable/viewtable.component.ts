@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, Input, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { APIService } from '../../../../api.services/api.service';
-import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord, RequestDataUpdateFieldDataValue, GetFieldOptionAsSelect, FieldParamOptionInfo, RequestDataAddLinkedTableCellValue } from '../../../../models/models.datastore';
+import { FieldMetaData, RequestDataCreateField, ReqestDataDeleteField, TableFieldType, TableRecordData, FieldData, RequestDataUpdateField, RequestDataCreateRecord, RecordCell, TableFieldArray, RequestDataDeleteRecord, RequestDataUpdateFieldDataValue, GetFieldOptionAsSelect, FieldParamOptionInfo, RequestDataAddLinkedTableCellValue, RequestDataDeleteLinkedTableCellValue } from '../../../../models/models.datastore';
 import { hasString } from '../../../../core/utils';
 import { ConnectedPosition, Overlay, OverlayRef } from '@angular/cdk/overlay';
 import { AddFieldOverlayComponent } from '../ui/add-field-overlay/add-field-overlay.component';
@@ -420,9 +420,17 @@ export class ViewTableComponent implements OnInit {
 		this.activeCell = null;
 	}
 
+	hack_ignore_default_action = false;
+	hack_cleanup_action?: () => void | undefined = undefined;
+
 	activeCell: { row: number, col: number, selectedElm: HTMLElement } | null = null;
 	@HostListener('document:click', ['$event'])
 	onDocumentClick(event: MouseEvent) {
+		if (this.hack_ignore_default_action) {
+			if (this.hack_cleanup_action)
+				this.hack_cleanup_action();
+			return
+		}
 		let isContained = false;
 
 		if (this.activeCell !== null) {
@@ -702,7 +710,8 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	onSelectedLinkedTableValue(event: FieldData, field: FieldMetaData, selectedCell: FieldData, colIndex: number, rowIndex: number) {
-		// console.log("[onSelectedLinkedTableValue] event:", { event, field, selectedCell });
+
+		// event.stopPropagation();
 
 		const request: RequestDataAddLinkedTableCellValue = {
 			BaseGUID: this.baseGUID!,
@@ -724,6 +733,58 @@ export class ViewTableComponent implements OnInit {
 				}
 			})
 
-		this.onFieldOverlayDetached()
+		/* HACK: I couldn't figure out how to hide the list of names after
+		* one was selected without triggering the onDocumentClick(). This hack
+		* fixes that problem.
+		* when hack_ignore_default_action is true, the onDocumentClick will
+		* not full run and it will call the hack_cleanup_action().
+		*
+		* This allows me to clear activeContextMenu which hides the overlay, but not
+		* deselect the active cell
+		*/
+		this.hack_cleanup_action = () => {
+			this.hack_ignore_default_action = false;
+		}
+		this.hack_ignore_default_action = true
+		this.activeContextMenu = "";
+	}
+
+	dismissRelationshipOverlay(event: MouseEvent) {
+		event.stopPropagation();
+
+		this.activeCellGUID = "";
+		this.onFieldOverlayDetached();
+	}
+
+	onOpenRelationshipOverlay(event: MouseEvent) {
+		event.stopPropagation();
+		this.onOpenFieldContextMenu(this.LinkedTableAction)
+	}
+
+	onDeleteRelationshipCellValue(event: MouseEvent, field: FieldMetaData, columnData: FieldData, linkedTableSelectedCell: FieldData) {
+		event.stopPropagation();
+
+		const request: RequestDataDeleteLinkedTableCellValue = {
+			BaseGUID: this.baseGUID!,
+			TableGUID: this.tableGUID!,
+			FieldGUID: field.FieldGUID,
+			CellGUID: columnData.CellGUID,
+			LinkedTableRecordGUID: linkedTableSelectedCell.RecordGUID,
+			LinkedTableCellGUID: linkedTableSelectedCell.CellGUID,
+		};
+
+		console.log("[onDeleteRelationshipCellValue] request:", request);
+
+		this.apiService.apiRequests.deleteLinkedTableDataCellvalue(request)
+			.subscribe({
+				next: (data) => {
+					columnData.DataValue = data.DataValue;
+					console.log("[onDeleteRelationshipCellValue] data: ", { data, columnData: columnData });
+				},
+				error: (err) => {
+					console.log("[onDeleteRelationshipCellValue] err: ", err);
+				}
+			})
+
 	}
 }

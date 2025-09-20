@@ -32,12 +32,30 @@
             flex-direction: column;
 
             li {
-                padding: 2px 5px;
-                border-radius: 2px;
-                cursor: pointer;
                 text-align: left;
                 font-size: 12px;
                 line-height: 1.4em;
+                column-gap: 2px;
+
+                display: flex;
+                flex-direction: row;
+            }
+
+            .indicator-item {
+                border: solid 2px transparent;
+                border-radius: 2px;
+            }
+
+            .existing-item {
+                border-color: #4794ff;
+            }
+
+            .item-value {
+                flex: 1 1 auto;
+                padding: 2px 5px;
+                border-radius: 2px;
+                border: solid 2px transparent;
+                cursor: pointer;
 
                 &:hover {
                     background-color: #e0e0e0;

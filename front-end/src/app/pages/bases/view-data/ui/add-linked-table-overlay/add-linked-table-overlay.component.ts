@@ -20,6 +20,7 @@ export class AddLinkedTableOverlayComponent implements OnInit, AfterViewInit {
 	@Input() baseGUID!: string;
 	@Input() tableGUID!: string;
 	@Input() field!: FieldMetaData;
+	@Input() existingFieldValues!: Array<FieldData>;
 
 	@Output() selectColumnValue = new EventEmitter<FieldData>();
 	@Output() closePanel = new EventEmitter();
@@ -61,16 +62,15 @@ export class AddLinkedTableOverlayComponent implements OnInit, AfterViewInit {
 		this.searchInputElm?.nativeElement.focus();
 	}
 
-	loadInitialData() {
-		console.log("[loadInitialData]", { field: this.field });
-		// const paramValues = (this.field.FieldParams as FieldParamRelationship).ParamValues;
+	private existingFieldValuesMap: Record<string, FieldData> = {}
 
-		// const request: RequestLinkedTableDataValue = {
-		// 	BaseGUID: this.baseGUID,
-		// 	TableGUID: this.tableGUID,
-		// 	FieldGUID: this.field.FieldGUID,
-		// 	ParamValues: paramValues
-		// }
+	loadInitialData() {
+		console.log("[loadInitialData]", { field: this.field, existingFieldValues: this.existingFieldValues });
+
+		// Create a dictionary of the existing values
+		this.existingFieldValues.forEach(fieldData => {
+			this.existingFieldValuesMap[fieldData.CellGUID] = fieldData;
+		});
 
 		this.apiService.apiRequests.getLikedTableDataOptions(this.baseGUID, this.tableGUID, this.field.FieldGUID)
 			.subscribe({
@@ -86,6 +86,10 @@ export class AddLinkedTableOverlayComponent implements OnInit, AfterViewInit {
 		// Placeholder for loading data from an API or service
 		// For now, we use the hardcoded items
 		// this.filteredItems = [...this.items];
+	}
+
+	isExistingitem(item: FieldData) {
+		return this.existingFieldValuesMap[item.CellGUID] !== undefined;
 	}
 	onSearchInputKeyUp(event: KeyboardEvent) {
 		// console.log("[onSelectRowItemKeyUp]");

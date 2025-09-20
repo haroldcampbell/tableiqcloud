@@ -7,7 +7,13 @@
       <ul>
         @for (item of filteredItems; track $index) {
         <li class="column-item" (click)="selectColumnValue.emit(item)">
-          {{ item.DataValue }}
+          <span
+            class="indicator-item"
+            [class.existing-item]="isExistingitem(item)"
+          ></span>
+          <span class="item-value">
+            {{ item.DataValue }}
+          </span>
         </li>
         }
       </ul>

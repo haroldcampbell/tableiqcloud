@@ -258,7 +258,7 @@
         }
       </div>
       } @else {
-      <span>&nbsp;--</span>
+      <span>&nbsp;</span>
       } }
       <!-- Handle everything else -->
       @default {
@@ -351,13 +351,48 @@
           }
           <!-- Handle linked table relationship input -->
           @case(FieldInputElement.LinkedTableRelationship) {
+          <!-- (click)="onFieldOverlayDetached()" -->
           <div
             cdkOverlayOrigin
             #addLinkedTableOverlay="cdkOverlayOrigin"
-            (click)="onOpenFieldContextMenu(LinkedTableAction)"
             class="linked-table-relationship-input"
           >
-            <span class="add-button">+</span>
+            <div
+              class="item-container"
+              (click)="dismissRelationshipOverlay($event)"
+            >
+              <span
+                class="add-button"
+                (click)="onOpenRelationshipOverlay($event)"
+                >+</span
+              >
+              @if(hasColumnValue(columnData)){
+              <!--  -->
+              @for (data of linkedFieldDataValues(columnData); track $index; let
+              rowIndex = $index) {
+              <ul class="linked-data-item-wrapper">
+                <li class="linked-data-item" (click)="$event.stopPropagation()">
+                  {{ data.DataValue }}
+                </li>
+                <li>
+                  <span
+                    class="linked-data-item-delete"
+                    (click)="
+                      onDeleteRelationshipCellValue(
+                        $event,
+                        field,
+                        columnData,
+                        data
+                      )
+                    "
+                    >x</span
+                  >
+                </li>
+              </ul>
+              }
+              <!-- End of if -->
+              }
+            </div>
           </div>
 
           <ng-template
@@ -373,6 +408,7 @@
               [field]="field"
               [baseGUID]="baseGUID!"
               [tableGUID]="selectedTableGUID!"
+              [existingFieldValues]="columnData.DataValue"
               (click)="$event.stopPropagation()"
               (selectColumnValue)="
                 onSelectedLinkedTableValue(

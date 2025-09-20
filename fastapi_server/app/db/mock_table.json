@@ -138,13 +138,7 @@
                                 "CellGUID": "D5E4A8FC-D2A7-44F2-9FDD-829600E7D940",
                                 "RecordGUID": "r3",
                                 "DataValue": "Jan Smith"
-                            }
-                        ]
-                    },
-                    {
-                        "CellGUID": "68E7221C-A581-4D44-83B5-0838D0BEB3C4",
-                        "RecordGUID": "r2",
-                        "DataValue": [
+                            },
                             {
                                 "CellGUID": "D18AFAE2-A78E-4170-98D6-042FCF98E424",
                                 "RecordGUID": "r4",
@@ -156,6 +150,11 @@
                                 "DataValue": "Sally Hall"
                             }
                         ]
+                    },
+                    {
+                        "CellGUID": "68E7221C-A581-4D44-83B5-0838D0BEB3C4",
+                        "RecordGUID": "r2",
+                        "DataValue": []
                     }
                 ],
                 "FieldDataGUIDMap": {
