@@ -82,21 +82,6 @@ class FieldMetaData(BaseModel):
         return self
 
 
-def init_FieldMetaData(table_guid:str, field_name:str, field_type:TableFieldType,field_params:Optional[Dict[str, Any]] = None )->FieldMetaData:
-    guid = str(uuid.uuid4()).upper()
-    params = init_field_params(field_type, field_params)
-
-    print("[init_FieldMetaData] params: ", params)
-
-    return FieldMetaData(
-        TableGUID=table_guid,
-        FieldGUID=guid,
-        FieldName=field_name,
-        FieldType=field_type,
-        FieldParams=params,
-    )
-
-
 def init_field_params(field_type:TableFieldType, field_params: Optional[Dict[str, Any]]) -> Optional[Any]:
     if field_params is None:
         return None
@@ -113,5 +98,14 @@ def init_field_params(field_type:TableFieldType, field_params: Optional[Dict[str
         case _:
             return None
 
+def init_FieldMetaData(table_guid:str, field_name:str, field_type:TableFieldType,field_params:Optional[Dict[str, Any]] = None )->FieldMetaData:
+    guid = str(uuid.uuid4()).upper()
+    params = init_field_params(field_type, field_params)
 
-
+    return FieldMetaData(
+        TableGUID=table_guid,
+        FieldGUID=guid,
+        FieldName=field_name,
+        FieldType=field_type,
+        FieldParams=params,
+    )

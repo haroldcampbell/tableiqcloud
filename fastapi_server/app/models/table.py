@@ -68,7 +68,7 @@ class Table(BaseModel):
                          FieldsNameIndex=self.FieldsNameIndex)
 
 
-    def add_table_field(self, field:TableField)->TableField:
+    def _add_table_field(self, field:TableField)->TableField:
         if field.MetaData == None:
             raise ValueError(f"Table.add_table_field. \n\tMetaData can't be None. \n\tfield: {field}")
 
@@ -98,7 +98,7 @@ class Table(BaseModel):
 
     def create_table_field_by_name(self, field_name:str, ftype:TableFieldType, field_params:Optional[Dict[str, str]]=None) -> TableRecordData:
         field = new_TableField(self.GUID, field_name, ftype, field_params)
-        field = self.add_table_field(field)
+        field = self._add_table_field(field)
 
         return self.get_records_for_field(field)
 
