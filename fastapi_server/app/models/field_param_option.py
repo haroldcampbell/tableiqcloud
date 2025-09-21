@@ -27,7 +27,7 @@ class FieldParamOption(BaseModel):
               OptionId = str(uuid.uuid4()).upper() ,
               OptionIndex = i,
               OptionName = o.get("OptionName", "").strip(),
-              OptionMetaData = {}
+              OptionMetaData = o.get("OptionMetaData", {})
             )
             for i, o in enumerate(options or [])
         ]
