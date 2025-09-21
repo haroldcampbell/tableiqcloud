@@ -89,6 +89,21 @@
         /></span>
         {{ FieldType.FieldTypeOption }}
       </li>
+      <li
+        class="list-item"
+        [class.selected-list-item]="
+          isSelectedListItem(FieldType.FieldTypeRelationship)
+        "
+        (click)="onSelectFieldType(FieldType.FieldTypeRelationship)"
+      >
+        <span>
+          <img
+            class="ico"
+            src="/assets/images/ico-field-relationship.png"
+            alt=""
+        /></span>
+        {{ FieldType.FieldTypeRelationship }}
+      </li>
     </ul>
 
     <!-- Logic to show sub-menu elements -->
