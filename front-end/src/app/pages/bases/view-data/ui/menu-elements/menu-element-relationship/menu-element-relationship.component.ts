@@ -63,7 +63,7 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 		// console.log("[loadTableData] tableGUID:", this.tableGUID);
 		this.apiService.apiRequests.getTables(this.baseGUID!).subscribe({
 			next: (data) => {
-				console.log("[loadTableList] data: ", { data });
+				// console.log("[loadTableList] data: ", { data });
 				this.baseTableInfo = data;
 				if (this.existingField) {
 					this.initExistingLinkedTable();
@@ -81,7 +81,7 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 	cachedInfoIDMap: Record<string, string> = {} /** LinkedFieldGUID -> InfoId*/
 
 	initExistingLinkedTable() {
-		console.log("[initExistingLinkedTable] existingField", { existingField: this.existingField })
+		// console.log("[initExistingLinkedTable] existingField", { existingField: this.existingField })
 
 		const params: FieldParamRelationship = this.existingField?.FieldParams;
 		const linkedFieldInfo: FieldParamLinkedFieldInfo = params.ParamValues;
@@ -153,7 +153,7 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 	}
 
 	private loadTableFieldByGUID(linkedTableFieldGUID: string, infoId?: string) {
-		console.log("loadTableFieldByGUID ", { linkedTableFieldGUID, infoId });
+		// console.log("loadTableFieldByGUID ", { linkedTableFieldGUID, infoId });
 
 		this.dirtyFieldValue = linkedTableFieldGUID;
 		this.selectedTableFieldGUID = linkedTableFieldGUID
