@@ -1,6 +1,7 @@
 
 from .api_requests import (
-    RequestDataCreateField, RequestDataDeleteField, RequestDataUpdateField,
+    RequestDataCreateField, RequestDataDeleteField,
+    RequestDataUpdateField, RequestDataUpdateFieldResponse,
     RequestDataUpdateFieldDataValue,RequestDataCreateRecord,
     RequestDataCreateRecordResponse, RequestDataDeleteRecord,
     RequestDataAddLinkedTableCellValue, RequestDataDeleteLinkedTableCellValue
@@ -12,6 +13,7 @@ __all__ = [
     "RequestDataCreateField",
     "RequestDataDeleteField",
     "RequestDataUpdateField",
+    "RequestDataUpdateFieldResponse",
     "RequestDataUpdateFieldDataValue",
     "RequestDataCreateRecord",
     "RequestDataCreateRecordResponse",

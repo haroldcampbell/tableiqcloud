@@ -1,6 +1,7 @@
 from .base import BaseInfo, BaseTableInfo, TableInfo
 from .field_data import FieldData, FieldDataGUIDInfo
 from .table import Table
+from .table_field import TableField
 from .table_field_type import TableFieldType
 from .record_cell import RecordCell
 from .field_meta_data import FieldMetaData
@@ -18,6 +19,7 @@ __all__ = [
     "RecordCell",
     "TableInfo",
     "Table",
+    "TableField",
     "TableFieldType",
 
     # Relationship field param types

@@ -49,6 +49,12 @@ def getTableByGUID(base_guid:str, table_guid:str) -> models.Table | None:
 
     return table
 
+def get_table_field_by_guid(base_guid:str, table_guid:str, table_field_guid:str) -> models.TableField | None:
+    table = getTableByGUID(base_guid, table_guid)
+    if table is None:
+        return None
+
+    return table.get_table_field_by_guid(table_field_guid)
 
 def create_table_field(req:api.RequestDataCreateField):
     try:
@@ -129,10 +135,6 @@ def remove_linked_table_field_value(
     target_field_data.DataValue = linked_data_values
 
     return target_field_data
-
-
-
-
 
 
 def save_mock_bases():

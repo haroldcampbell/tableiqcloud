@@ -102,6 +102,16 @@ class Table(BaseModel):
 
         return self.get_records_for_field(field)
 
+    def get_table_field_by_guid(self, table_field_guid:str) -> Optional[TableField]:
+        for i, item in enumerate(self.Fields):
+            if item.MetaData is None:
+                continue
+
+            if item.MetaData.FieldGUID == table_field_guid:
+                return item
+
+        return None
+
     def find_table_field_by_guid(self, table_field_guid:str) -> tuple[int, Optional[TableField]]:
         for i, item in enumerate(self.Fields):
             if item.MetaData is None:

@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CoreModule } from '../../../../../modules/core.module';
-import { CreateFieldOptionAsSelect, FieldMetaData, FieldOptionsType, FieldParamLinkedFieldInfo, FieldParamOption, FieldTypeToStringifiedFieldType, RequestDataCreateField, RequestDataUpdateField, StringifiedFieldType, StringifiedFieldTypeToType } from '../../../../../models/models.datastore';
+import { CreateFieldOptionAsSelect, CreateFieldRelationshipAsSelect, FieldMetaData, FieldOptionsType, FieldParamLinkedFieldInfo, FieldParamOption, FieldTypeToStringifiedFieldType, RequestDataCreateField, RequestDataUpdateField, StringifiedFieldType, StringifiedFieldTypeToType } from '../../../../../models/models.datastore';
 import { MatSelect, MatSelectChange } from '@angular/material/select';
 import { MenuElementOptionComponent, OptionInfoElem } from '../menu-elements/menu-element-option/menu-element-option.component';
 import { MenuElementRelationshipComponent } from '../menu-elements/menu-element-relationship/menu-element-relationship.component';
@@ -18,6 +18,7 @@ import { MenuElementRelationshipComponent } from '../menu-elements/menu-element-
 })
 export class EditFieldContextMenuOverlayComponent implements OnInit {
 	private _optionInfoList: OptionInfoElem[] = [];
+	private _relationshipInfo?: FieldParamLinkedFieldInfo;
 
 	disSelectedField = true; // Has an initial field been selected?
 
@@ -95,9 +96,15 @@ export class EditFieldContextMenuOverlayComponent implements OnInit {
 	onApplyChanges() {
 		let options: FieldOptionsType = {}
 
-		if (this.selectedFieldType == StringifiedFieldType.FieldTypeOption) {
-			// Convert option list to a format suitable for FieldOptionsType
-			options = CreateFieldOptionAsSelect(this._optionInfoList.map(opt => opt.OptionInfo));
+		switch (this.selectedFieldType) {
+			case StringifiedFieldType.FieldTypeOption:
+				// Convert option list to a format suitable for FieldOptionsType
+				options = CreateFieldOptionAsSelect(this._optionInfoList.map(opt => opt.OptionInfo))
+				break;
+
+			case StringifiedFieldType.FieldTypeRelationship:
+				options = CreateFieldRelationshipAsSelect(this._relationshipInfo!);
+				break;
 		}
 
 		this.didClickSave.emit({
@@ -134,7 +141,8 @@ export class EditFieldContextMenuOverlayComponent implements OnInit {
 	onMenuElementSaveStateChanged(isValid: boolean) {
 		this.isMenuElementValid = isValid;
 	}
+
 	onRelationshipInfoChanged(event: FieldParamLinkedFieldInfo) {
-		// this._relationshipInfo = event;
+		this._relationshipInfo = event;
 	}
 }

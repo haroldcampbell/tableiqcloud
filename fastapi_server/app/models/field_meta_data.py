@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pydantic import BaseModel, Field
-from typing import  Optional, Any, Dict, List, ClassVar
+from typing import cast, Optional, Any, Dict, List, ClassVar
 import uuid
 
 from .table_field_type import TableFieldType
@@ -58,13 +58,28 @@ class FieldMetaData(BaseModel):
         self.FieldType = ftype
         self.FieldName = str.strip(field_name)
 
+    def _update_field_type_relationship(self, field_options:Dict[str, Any]):
+        # ensure that we are dealing with FieldParamRelationship
+        existing_field_params = (self.FieldParams if isinstance(self.FieldParams, FieldParamRelationship) else FieldParamRelationship(**cast(Dict[str, Any], self.FieldParams)))
+        new_fieldInfo = FieldParamLinkedFieldInfo(**field_options[FieldParamRelationship._Key])
+        old_info_id = existing_field_params.ParamValues.InfoId if existing_field_params.ParamValues else ""
+
+        updated_field_params = existing_field_params.update_field_type_relationship(new_fieldInfo)
+        new_info_id = updated_field_params.ParamValues.InfoId if updated_field_params.ParamValues else ""
+        self.FieldParams = updated_field_params
+
+        return {"old_info_id":old_info_id, "new_info_id":new_info_id}
+
     def update_meta_data_field_params(self, ftype:TableFieldType, field_options:Dict[str, Any]) -> Any:
-        if ftype == TableFieldType.FieldTypeOption:
-            field_option_list:List[FieldParamOptionInfo] = [FieldParamOptionInfo(**o) for o in field_options[FieldParamOption._Key]]
-            return self._update_field_type_options(field_option_list)
+        match ftype:
+            case TableFieldType.FieldTypeOption:
+                field_option_list:List[FieldParamOptionInfo] = [FieldParamOptionInfo(**o) for o in field_options[FieldParamOption._Key]]
+                return self._update_field_type_options(field_option_list)
+
+            case TableFieldType.FieldTypeRelationship:
+                return self._update_field_type_relationship(field_options)
 
         return self
-
 
 
 def init_FieldMetaData(table_guid:str, field_name:str, field_type:TableFieldType,field_params:Optional[Dict[str, Any]] = None )->FieldMetaData:

@@ -21,8 +21,8 @@ class TableField(BaseModel):
         self.FieldData = []
         self.FieldDataGUIDMap = {}
 
-        # Create n cells and set the record guid for the cells
 
+        # Create n cells and set the record guid for the cells
         for recordGUID in RecordGUIDs:
             data = FieldData.new_field_data(recordGUID, None)
             self.FieldData.append(data)
@@ -59,11 +59,23 @@ class TableField(BaseModel):
 
         self.MetaData.update_meta_data(field_name, ftype, field_options)
 
-        if ftype == TableFieldType.FieldTypeOption:
-            deleted_ids = self.MetaData.update_meta_data_field_params(ftype, field_options)
-            for data in self.FieldData:
-                if data.DataValue in deleted_ids:
-                    data.DataValue = ""
+        match ftype:
+            case TableFieldType.FieldTypeOption:
+                deleted_ids = self.MetaData.update_meta_data_field_params(ftype, field_options)
+                for data in self.FieldData:
+                    if data.DataValue in deleted_ids:
+                        data.DataValue = ""
+
+            case TableFieldType.FieldTypeRelationship:
+                info_id_result = self.MetaData.update_meta_data_field_params(ftype, field_options)
+                print("[info_id_result] info_id_result:", info_id_result)
+
+                if info_id_result["old_info_id"] != info_id_result["new_info_id"]:
+                    for d in self.FieldData:
+                        d.DataValue = []
+                    # TODO: remove old relationships and clean up old linked data
+                else:
+                    print("ensure data values")
 
 
         return

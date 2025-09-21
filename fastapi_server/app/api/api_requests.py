@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 
 import app.models as models
 
@@ -23,6 +23,10 @@ class RequestDataUpdateField(BaseModel):
 	FieldName: str
 	FieldType: models.TableFieldType
 	FieldOptions: Dict[str, Any] = Field(default_factory=dict)
+
+class RequestDataUpdateFieldResponse(BaseModel):
+	FieldMetaData: models.FieldMetaData
+	FieldData: List[models.FieldData]
 
 class RequestDataUpdateFieldDataValue(BaseModel):
 	BaseGUID:  str

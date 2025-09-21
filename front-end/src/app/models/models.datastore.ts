@@ -256,6 +256,11 @@ export interface RequestDataUpdateField {
 	FieldOptions?: FieldOptionsType; // For dropdowns, etc.
 }
 
+export interface RequestDataUpdateFieldResponse {
+	FieldMetaData: FieldMetaData;
+	FieldData: FieldData[];
+}
+
 export interface RequestDataCreateRecord {
 	BaseGUID: string
 	TableGUID: string

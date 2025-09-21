@@ -256,9 +256,9 @@ export class ViewTableComponent implements OnInit {
 		this.onFieldOverlayDetached();
 
 		this.apiService.apiRequests.updateTableFieldInfo(r).subscribe({
-			next: (data) => {
-				console.log("[onUpdateField] data: ", data);
-				this.updateTableFieldType(data);
+			next: (resp) => {
+				console.log("[onUpdateField] resp: ", resp);
+				this.updateTableFieldType(resp.FieldMetaData, resp.FieldData);
 			},
 			error: (err) => {
 				console.log("[onUpdateField] err: ", err);
@@ -266,21 +266,27 @@ export class ViewTableComponent implements OnInit {
 		});
 	}
 
-	updateTableFieldType(data: FieldMetaData) {
-		console.log("[updateTableFieldType] data: ", data);
+	updateTableFieldType(updatedMetaData: FieldMetaData, fieldValues: FieldData[]) {
+		console.log("[updateTableFieldType] data: ", updatedMetaData);
 
-		const results = this.tableRecordData?.FieldsMetaData.filter(f => f.FieldGUID == data.FieldGUID);
+		const results = this.tableRecordData?.FieldsMetaData.filter(f => f.FieldGUID == updatedMetaData.FieldGUID);
 		if (results == undefined) {
 			return;
 		}
 
-		let field = results[0];
-		field.FieldName = data.FieldName;
-		field.FieldType = data.FieldType;
+		let existingFieldMetaData = results[0];
+		existingFieldMetaData.FieldName = updatedMetaData.FieldName;
+		existingFieldMetaData.FieldType = updatedMetaData.FieldType;
 
-		switch (field.FieldType) {
+		switch (existingFieldMetaData.FieldType) {
 			case TableFieldType.FieldTypeOption: {
-				this.updateColumnValuesForOptions(data);
+				this.updateColumnValuesForOptions(updatedMetaData);
+				break;
+			}
+
+			case TableFieldType.FieldTypeRelationship: {
+				this.updateColumnValuesForTableRelationship(existingFieldMetaData, updatedMetaData, fieldValues);
+				console.log("[updateTableFieldType] case:TableFieldType.FieldTypeRelationship ", { field: existingFieldMetaData, fieldValues })
 				break;
 			}
 		}
@@ -297,6 +303,11 @@ export class ViewTableComponent implements OnInit {
 		})
 
 		this.buildFieldParamOptionMap(data)
+	}
+
+	updateColumnValuesForTableRelationship(existingFieldMetaData: FieldMetaData, updatedMetaData: FieldMetaData, fieldValues: FieldData[]) {
+		existingFieldMetaData.FieldParams = updatedMetaData.FieldParams;
+		this.tableRecordData!.ColumnValues[existingFieldMetaData.FieldGUID] = fieldValues;
 	}
 
 	updateTableRecord(data: TableRecordData) {

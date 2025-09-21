@@ -99,17 +99,35 @@ async def delete_table_field(request: api.RequestDataDeleteField):
 
 @router.post("/api/field/update-info")
 async def update_table_field_info(request: api.RequestDataUpdateField):
+    action_name = "update-table-field-info"
+
     table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
     if table == None:
-        return errResp(action="update-info",jsonBody=table, message="Table not found")
+        return errResp(action=action_name,jsonBody=table, message="Table not found")
 
-    fieldMetaData = table.update_table_field_meta_data(
-        request.TableFieldGUID, request.FieldName, request.FieldType, request.FieldOptions)
+    try:
+        # request.TableFieldGUID
+        fieldMetaData = table.update_table_field_meta_data(
+            request.TableFieldGUID,
+            request.FieldName,
+            request.FieldType,
+            request.FieldOptions)
+    except ValueError as e:
+        return errResp(action=action_name, jsonBody=None, message=str(e))
 
+    field = store.get_table_field_by_guid(request.BaseGUID, request.TableGUID,request.TableFieldGUID)
+
+    if fieldMetaData is None:
+        return errResp(action=action_name, jsonBody=None, message="fieldMetaData failed to initialize")
+
+    resp = api.RequestDataUpdateFieldResponse(
+        FieldMetaData=fieldMetaData,
+        FieldData=(field.FieldData if field is not None else [])
+    )
     # Save mock data
     store.save_mock_bases()
 
-    return okResp(action="update-info", jsonBody=fieldMetaData)
+    return okResp(action=action_name, jsonBody=resp)
 
 @router.post("/api/field/update-value")
 async def update_table_field_value(request: api.RequestDataUpdateFieldDataValue):

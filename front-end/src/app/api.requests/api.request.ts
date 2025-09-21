@@ -1,7 +1,7 @@
 import { HttpClient, HttpRequest } from "@angular/common/http";
 import { EMPTY, map, of, tap } from "rxjs";
 import { APIServerResponse, RequestDataCreateRecordResponse } from "../models/models.server";
-import { Base, BaseTableInfo, FieldData, FieldMetaData, FieldParamLinkedFieldInfo, ReqestDataDeleteField, RequestDataAddLinkedTableCellValue, RequestDataCreateField, RequestDataCreateRecord, RequestDataDeleteLinkedTableCellValue, RequestDataDeleteRecord, RequestDataUpdateField, RequestDataUpdateFieldDataValue, TableFieldInfo, TableInfo, TableRecordData } from "../models/models.datastore";
+import { Base, BaseTableInfo, FieldData, FieldMetaData, FieldParamLinkedFieldInfo, ReqestDataDeleteField, RequestDataAddLinkedTableCellValue, RequestDataCreateField, RequestDataCreateRecord, RequestDataDeleteLinkedTableCellValue, RequestDataDeleteRecord, RequestDataUpdateField, RequestDataUpdateFieldDataValue, RequestDataUpdateFieldResponse, TableFieldInfo, TableInfo, TableRecordData } from "../models/models.datastore";
 
 
 export class APIRequests {
@@ -99,7 +99,7 @@ export class APIRequests {
 	}
 
 	updateTableFieldInfo(data: RequestDataUpdateField) {
-		return this.http.post<APIServerResponse<FieldMetaData>>(`/api/field/update-info`, data)
+		return this.http.post<APIServerResponse<RequestDataUpdateFieldResponse>>(`/api/field/update-info`, data)
 			.pipe(
 				map(resp => {
 					if (!resp.successStatus || resp.jsonBody === null) {

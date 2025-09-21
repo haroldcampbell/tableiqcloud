@@ -75,6 +75,11 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 		})
 	}
 
+	/** cachedInfoIDMap ensures that we can retain InfoId if use toggle back
+	 * and forth between a existing linked fieldName and a different field.
+	 * */
+	cachedInfoIDMap: Record<string, string> = {} /** LinkedFieldGUID -> InfoId*/
+
 	initExistingLinkedTable() {
 		console.log("[initExistingLinkedTable] existingField", { existingField: this.existingField })
 
@@ -86,7 +91,9 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 			for (let item of this.baseTableInfo.TableInfoArray) {
 				if (item.GUID == linkedFieldInfo.LinkedChildTableGUID) {
 					this.loadTableByGUID(linkedFieldInfo.LinkedChildTableGUID, () => {
-						this.loadTableFieldByGUID(linkedFieldInfo.LinkedFieldGUID);
+						// Cache the current InfoId
+						this.cachedInfoIDMap[linkedFieldInfo.LinkedFieldGUID] = linkedFieldInfo.InfoId;
+						this.loadTableFieldByGUID(linkedFieldInfo.LinkedFieldGUID, linkedFieldInfo.InfoId);
 					})
 					break;
 				}
@@ -137,19 +144,23 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 	}
 
 	onChangedTableField(event: MatSelectChange) {
-		console.log("[onChangedTableField] event:", event);
-		this.loadTableFieldByGUID(event.value);
+		const linkedTableFieldGUID = event.value
+		const infoId = this.cachedInfoIDMap[linkedTableFieldGUID]
+
+		// console.log("[onChangedTableField] event:", { event, infoId });
+
+		this.loadTableFieldByGUID(event.value, infoId);
 	}
 
-	private loadTableFieldByGUID(linkedTableFieldGUID: string) {
-		console.log("loadTableFieldByGUID ", { linkedTableFieldGUID });
+	private loadTableFieldByGUID(linkedTableFieldGUID: string, infoId?: string) {
+		console.log("loadTableFieldByGUID ", { linkedTableFieldGUID, infoId });
 
 		this.dirtyFieldValue = linkedTableFieldGUID;
 		this.selectedTableFieldGUID = linkedTableFieldGUID
 		this.hasValidSaveState.emit(true);
 
 		const info: FieldParamLinkedFieldInfo = {
-			InfoId: "",
+			InfoId: infoId ?? "",
 			ParentTableGUID: this.parentTableGUID!,
 			LinkedChildTableGUID: this.selectedTableGUID,
 			LinkedFieldGUID: this.selectedTableFieldGUID
