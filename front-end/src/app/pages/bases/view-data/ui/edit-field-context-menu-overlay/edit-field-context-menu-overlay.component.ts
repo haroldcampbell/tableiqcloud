@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CoreModule } from '../../../../../modules/core.module';
-import { CreateFieldOptionAsSelect, CreateFieldRelationshipAsSelect, FieldMetaData, FieldOptionsType, FieldParamLinkedFieldInfo, FieldParamOption, FieldTypeToStringifiedFieldType, RequestDataCreateField, RequestDataUpdateField, StringifiedFieldType, StringifiedFieldTypeToType } from '../../../../../models/models.datastore';
+import { CreateFieldOptionAsSelect, CreateFieldRelationshipAsSelect, FieldMetaData, FieldOptionsType, FieldParamLinkedFieldInfo, FieldParamOption, FieldTypeToStringifiedFieldType, RequestDataCreateField, RequestDataUpdateField, StringifiedFieldType, StringifiedFieldTypeToType, TableFieldType } from '../../../../../models/models.datastore';
 import { MatSelect, MatSelectChange } from '@angular/material/select';
 import { MenuElementOptionComponent, OptionInfoElem } from '../menu-elements/menu-element-option/menu-element-option.component';
 import { MenuElementRelationshipComponent } from '../menu-elements/menu-element-relationship/menu-element-relationship.component';
@@ -70,19 +70,22 @@ export class EditFieldContextMenuOverlayComponent implements OnInit {
 
 	initOptionInfoList() {
 		if (this.field === undefined || this.field.FieldParams === undefined) {
-			console.warn("Field or FieldParams is undefined, skipping initialization of existing options.");
+			// console.warn("Field or FieldParams is undefined, skipping initialization of existing options.");
 			return;
 		}
 
-		this._optionInfoList = [];
-		const optionInforList = (this.field.FieldParams as FieldParamOption)?.ParamValues ?? []
-		optionInforList.map(i => {
-			const itemElm = {
-				OptionInfo: i,
-				_inputElm: undefined,
-			}
-			this._optionInfoList.push(itemElm);
-		});
+		if (this.field.FieldType == TableFieldType.FieldTypeOption) {
+			this._optionInfoList = [];
+			const optionInforList = (this.field.FieldParams as FieldParamOption)?.ParamValues ?? []
+			optionInforList.map(i => {
+				const itemElm = {
+					OptionInfo: i,
+					_inputElm: undefined,
+				}
+				this._optionInfoList.push(itemElm);
+			});
+		}
+
 	}
 
 	get optionInfoList() {
@@ -126,14 +129,9 @@ export class EditFieldContextMenuOverlayComponent implements OnInit {
 		this.disSelectedField = false;
 	}
 
-	// isOptionFieldType(): boolean {
-	// 	return this.selectedFieldType === StringifiedFieldType.FieldTypeOption;
-	// }
-
 	onOptionInfoListChanged(listItems: OptionInfoElem[]) {
 		this._optionInfoList = listItems;
 	}
-
 
 	// Track if the current state of the menu element is valid and can be saved
 	isMenuElementValid: boolean = true;
