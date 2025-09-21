@@ -103,8 +103,6 @@ export class ViewTableComponent implements OnInit {
 
 	}
 
-
-
 	private loadTableData() {
 		if (!hasString(this.baseGUID) || !hasString(this.tableGUID)) {
 			// TODO: Navigate to error if tableGUID is null
@@ -181,7 +179,7 @@ export class ViewTableComponent implements OnInit {
 
 		let paramValueMap = this.fieldParamOptionIDMap.get(field.FieldGUID)
 
-		console.log("[presentColumnDataValue] field:", field, " paramValueMap:", paramValueMap, columnData.DataValue);
+		// console.log("[presentColumnDataValue] field:", field, " paramValueMap:", paramValueMap, columnData.DataValue);
 
 		return paramValueMap?.get(columnData.DataValue)?.OptionName ?? "";
 	}
@@ -193,7 +191,7 @@ export class ViewTableComponent implements OnInit {
 
 		let paramValueMap = this.fieldParamOptionIDMap.get(field.FieldGUID)
 
-		console.log("[presentColumnDataValue] field:", field, " paramValueMap:", paramValueMap, columnData.DataValue);
+		// console.log("[columnDataValueCellColor] field:", field, " paramValueMap:", paramValueMap, columnData.DataValue);
 
 		const fieldOption = paramValueMap?.get(columnData.DataValue)
 
@@ -242,9 +240,9 @@ export class ViewTableComponent implements OnInit {
 		this.onFieldOverlayDetached();
 
 		this.apiService.apiRequests.createTableField(data).subscribe({
-			next: (data) => {
-				// console.log("[onCreateField] data: ", data);
-				this.updateTableRecord(data);
+			next: (result) => {
+				// console.log("[onCreateField] result: ", result);
+				this.updateTableRecord(result);
 			},
 			error: (err) => {
 				console.log("[onCreateField] err: ", err);
@@ -257,7 +255,7 @@ export class ViewTableComponent implements OnInit {
 
 		this.apiService.apiRequests.updateTableFieldInfo(r).subscribe({
 			next: (resp) => {
-				console.log("[onUpdateField] resp: ", resp);
+				// console.log("[onUpdateField] resp: ", resp);
 				this.updateTableFieldType(resp.FieldMetaData, resp.FieldData);
 			},
 			error: (err) => {
@@ -267,7 +265,7 @@ export class ViewTableComponent implements OnInit {
 	}
 
 	updateTableFieldType(updatedMetaData: FieldMetaData, fieldValues: FieldData[]) {
-		console.log("[updateTableFieldType] data: ", updatedMetaData);
+		// console.log("[updateTableFieldType] data: ", updatedMetaData);
 
 		const results = this.tableRecordData?.FieldsMetaData.filter(f => f.FieldGUID == updatedMetaData.FieldGUID);
 		if (results == undefined) {
@@ -286,7 +284,7 @@ export class ViewTableComponent implements OnInit {
 
 			case TableFieldType.FieldTypeRelationship: {
 				this.updateColumnValuesForTableRelationship(existingFieldMetaData, updatedMetaData, fieldValues);
-				console.log("[updateTableFieldType] case:TableFieldType.FieldTypeRelationship ", { field: existingFieldMetaData, fieldValues })
+				// console.log("[updateTableFieldType] case:TableFieldType.FieldTypeRelationship ", { field: existingFieldMetaData, fieldValues })
 				break;
 			}
 		}
@@ -319,6 +317,8 @@ export class ViewTableComponent implements OnInit {
 		const metaData = data.FieldsMetaData[0];
 		this.tableRecordData.FieldsMetaData.push(metaData);
 		this.tableRecordData.ColumnValues[metaData.FieldGUID] = data.ColumnValues[metaData.FieldGUID];
+
+		this.buildFieldParamOptionMap(metaData);
 	}
 
 	deleteTableRecordField(fieldGUID: string) {
