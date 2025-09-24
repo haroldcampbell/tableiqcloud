@@ -140,7 +140,13 @@
         <button class="action-cancel" (click)="onCancel()">Discard</button>
       </li>
       <li>
-        <button class="action-create" (click)="onApplyChanges()">Save</button>
+        <button
+          class="action-create"
+          (click)="onApplyChanges()"
+          [disabled]="!isMenuElementValid"
+        >
+          Save
+        </button>
       </li>
     </ul>
   </div>
