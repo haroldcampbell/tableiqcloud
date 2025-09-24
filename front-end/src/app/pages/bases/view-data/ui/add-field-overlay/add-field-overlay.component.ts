@@ -113,6 +113,12 @@ export class AddFieldOverlayComponent implements OnInit, AfterViewInit, OnDestro
 		this._optionInfoList = listItems;
 	}
 
+	onHasValidOptionSaveState(isValid: boolean) {
+		this.isMenuElementValid = isValid;
+		// console.log("[onHasValidOptionSaveState] ", { isValid })
+	}
+
+
 	// Track if the current state of the menu element is valid and can be saved
 	isMenuElementValid: boolean = true;
 

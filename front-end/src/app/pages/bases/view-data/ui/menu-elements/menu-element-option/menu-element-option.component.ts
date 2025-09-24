@@ -33,6 +33,7 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 	@Input() optionInfoElm: OptionInfoElem[] = []; // For Option field type, holds the value of options
 
 	@Output() optionInfoList = new EventEmitter<OptionInfoElem[]>();
+	@Output() hasValidSaveState = new EventEmitter<boolean>();
 
 	constructor(
 		private overlay: Overlay,
@@ -41,6 +42,7 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 	) { }
 
 	ngOnInit(): void {
+		this.hasValidSaveState.emit(false);
 		this.initExistingOptions();
 	}
 
@@ -67,6 +69,7 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 					item._inputElm = input;
 				}
 				this.optionInfoList.emit(this.optionInfoElm); // Emit the current list of options
+				this.publishSaveStateValidity();
 			});
 
 		this.removeOption$
@@ -81,6 +84,14 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 		this.createOption$.complete();
 		this.addOption$.complete();
 		this.removeOption$.complete();
+	}
+
+	publishSaveStateValidity() {
+		if (this.optionInfoElm.length > 0) {
+			this.hasValidSaveState.emit(true);
+		} else {
+			this.hasValidSaveState.emit(false);
+		}
 	}
 
 	initExistingOptions() {
@@ -128,6 +139,7 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 	private removeOption(item: OptionInfoElem) {
 		this.optionInfoElm = this.optionInfoElm.filter(opt => opt.OptionInfo.OptionIndex !== item.OptionInfo.OptionIndex);
 		this.optionInfoList.emit(this.optionInfoElm); // Emit the current list of options
+		this.publishSaveStateValidity();
 	}
 
 	onOptionInputFocus($event: FocusEvent, item: OptionInfoElem) {
@@ -135,12 +147,12 @@ export class MenuElementOptionComponent implements OnInit, AfterViewInit, OnDest
 	}
 
 	onOptionValueBlur($event: FocusEvent, item: OptionInfoElem) {
-		console.log("[onOptionValueBlur] ", item)
+		// console.log("[onOptionValueBlur] ", item)
 		if (item._inputElm) {
 			item._inputElm.blur(); // Remove focus from the input element
 			item.OptionInfo.OptionName = item._inputElm.value.trim(); // Update the option name with trimmed value
 
-			console.log("[onOptionValueBlur] changed: ", item._inputElm.value.trim())
+			// console.log("[onOptionValueBlur] changed: ", item._inputElm.value.trim())
 			this.optionInfoList.emit(this.optionInfoElm); // Emit the current list of options
 		}
 	}

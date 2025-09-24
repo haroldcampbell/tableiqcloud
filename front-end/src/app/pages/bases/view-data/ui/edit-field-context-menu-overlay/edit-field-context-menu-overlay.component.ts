@@ -133,6 +133,11 @@ export class EditFieldContextMenuOverlayComponent implements OnInit {
 		this._optionInfoList = listItems;
 	}
 
+	onHasValidOptionSaveState(isValid: boolean) {
+		this.isMenuElementValid = isValid;
+		// console.log("[onHasValidOptionSaveState] ", { isValid })
+	}
+
 	// Track if the current state of the menu element is valid and can be saved
 	isMenuElementValid: boolean = true;
 
