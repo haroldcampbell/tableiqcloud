@@ -96,7 +96,6 @@ export class ViewTableComponent implements OnInit {
 			[TableFieldType.FieldTypeOption, "ico-field-select"],
 			[TableFieldType.FieldTypeYesNo, "ico-field-yes-no"],
 		]);
-
 	}
 
 	ngAfterViewChecked() {
@@ -112,7 +111,7 @@ export class ViewTableComponent implements OnInit {
 		// console.log("[loadTableData] tableGUID:", this.tableGUID);
 		this.apiService.apiRequests.getTableByGUID(this.baseGUID!, this.tableGUID!).subscribe({
 			next: (data) => {
-				// console.log("[ViewTableComponent] data: ", data);
+				console.log("[ViewTableComponent] data: ", data);
 				this.tableRecordData = data;
 				this.initParamValuesMap()
 			},
@@ -300,7 +299,9 @@ export class ViewTableComponent implements OnInit {
 			this.tableRecordData!.FieldsMetaData[index] = data;
 		})
 
-		this.buildFieldParamOptionMap(data)
+		if (data.FieldType == TableFieldType.FieldTypeOption) {
+			this.buildFieldParamOptionMap(data)
+		}
 	}
 
 	updateColumnValuesForTableRelationship(existingFieldMetaData: FieldMetaData, updatedMetaData: FieldMetaData, fieldValues: FieldData[]) {
@@ -318,7 +319,9 @@ export class ViewTableComponent implements OnInit {
 		this.tableRecordData.FieldsMetaData.push(metaData);
 		this.tableRecordData.ColumnValues[metaData.FieldGUID] = data.ColumnValues[metaData.FieldGUID];
 
-		this.buildFieldParamOptionMap(metaData);
+		if (metaData.FieldType == TableFieldType.FieldTypeOption) {
+			this.buildFieldParamOptionMap(metaData);
+		}
 	}
 
 	deleteTableRecordField(fieldGUID: string) {

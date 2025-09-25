@@ -53,4 +53,25 @@
       </mat-select>
     </li>
   </ul>
+
+  <ul class="selector-properties-container">
+    <li>
+      <input
+        type="checkbox"
+        [value]="allowMultipleItems"
+        [(ngModel)]="allowMultipleItems"
+      />
+      Allow multiple items
+    </li>
+    @if(allowMultipleItems) {
+    <li>
+      <input
+        type="checkbox"
+        [value]="allowDuplicates"
+        [(ngModel)]="allowDuplicates"
+      />
+      Allow duplicates
+    </li>
+    }
+  </ul>
 </div>

@@ -20,25 +20,13 @@ export class AddLinkedTableOverlayComponent implements OnInit, AfterViewInit {
 	@Input() baseGUID!: string;
 	@Input() tableGUID!: string;
 	@Input() field!: FieldMetaData;
-	@Input() existingFieldValues!: Array<FieldData>;
+	@Input() existingFieldValues?: Array<FieldData>;
 
 	@Output() selectColumnValue = new EventEmitter<FieldData>();
 	@Output() closePanel = new EventEmitter();
 
 
 	items: FieldData[] = [];
-	// 	{ CellGUID: "A1B2", RecordGUID: "9F4D3C7A", DataValue: "Hiking Backpack" },
-	// 	{ CellGUID: "C3D4", RecordGUID: "2A8F5B1C", DataValue: "Trekking Poles" },
-	// 	{ CellGUID: "E5F6", RecordGUID: "7C1B9D3E", DataValue: "Water Filter Bottle" },
-	// 	{ CellGUID: "G7H8", RecordGUID: "4E7A2B9F", DataValue: "Lightweight Tent" },
-	// 	{ CellGUID: "J9K1", RecordGUID: "B3F8D1C6", DataValue: "Sleeping Bag - 20°F" },
-	// 	{ CellGUID: "L2M3", RecordGUID: "5A7C9E2B", DataValue: "Headlamp LED" },
-	// 	{ CellGUID: "N4P5", RecordGUID: "D6B1F3A9", DataValue: "Trail Running Shoes" },
-	// 	{ CellGUID: "Q6R7", RecordGUID: "1E9C7B4D", DataValue: "Portable Camp Stove" },
-	// 	{ CellGUID: "S8T9", RecordGUID: "8B2D5F7C", DataValue: "Rainproof Jacket" },
-	// 	{ CellGUID: "U0V1", RecordGUID: "3F6A8C5E", DataValue: "Compact First Aid Kit" }
-	// ];
-
 	filteredItems: FieldData[] = this.items;
 	searchInput: string = "";
 
@@ -68,7 +56,7 @@ export class AddLinkedTableOverlayComponent implements OnInit, AfterViewInit {
 		console.log("[loadInitialData]", { field: this.field, existingFieldValues: this.existingFieldValues });
 
 		// Create a dictionary of the existing values
-		this.existingFieldValues.forEach(fieldData => {
+		this.existingFieldValues?.forEach(fieldData => {
 			this.existingFieldValuesMap[fieldData.CellGUID] = fieldData;
 		});
 
@@ -91,6 +79,7 @@ export class AddLinkedTableOverlayComponent implements OnInit, AfterViewInit {
 	isExistingitem(item: FieldData) {
 		return this.existingFieldValuesMap[item.CellGUID] !== undefined;
 	}
+
 	onSearchInputKeyUp(event: KeyboardEvent) {
 		// console.log("[onSelectRowItemKeyUp]");
 		// console.log("[onSelectRowItemKeyUp] event:", event);

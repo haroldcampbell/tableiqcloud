@@ -1,6 +1,6 @@
 from __future__ import annotations
 from pydantic import BaseModel,Field
-from typing import List, Dict, Optional,Callable, Any
+from typing import cast, List, Dict, Optional,Callable, Any
 import uuid
 import logging
 
@@ -151,6 +151,7 @@ class Table(BaseModel):
         if index == -1 or field is None:
             raise ValueError(f"Table.update_table_field_meta_data. \n\tField not found. \n\tGUID: {table_field_guid}")
 
+        # print(f"[Table.update_table_field_meta_data] updating field meta data for field: {field} \n\t field_name:'{field_name}' \n\t ftype:'{ftype}' \n\t field_options:'{field_options}'")
         field.update_meta_data(field_name, ftype, field_options)
 
         # TODO:
@@ -263,7 +264,7 @@ class Table(BaseModel):
             raise ValueError(f"Table.get_field_data_by_field_guid. \n\tMetaData can't be None. \n\tfield: {field}")
 
         if field.MetaData.FieldParams is None:
-            raise ValueError(f"Table.get_field_data_by_field_guid. \n\FieldParams can't be None. \n\tfield: {field}")
+            raise ValueError(f"Table.get_field_data_by_field_guid. \n\tFieldParams can't be None. \n\tfield: {field}")
 
         if field.MetaData.FieldType != TableFieldType.FieldTypeRelationship :
             raise ValueError(f"Table.get_field_data_by_field_guid. \n\tFieldType must be Relationship. \n\tfield: {field}")
@@ -272,7 +273,9 @@ class Table(BaseModel):
             # This is to handle the case where FieldParams is a dict (e.g., from JSON deserialization)
             field.MetaData.FieldParams = FieldParamRelationship(**field.MetaData.FieldParams)
 
-        return field.MetaData.FieldParams.ParamValues
+        relationshipParam:FieldParamRelationship = cast(FieldParamRelationship, field.MetaData.FieldParams)
+
+        return relationshipParam.ParamValues
 
     def get_field_data_by_field_guid(self, field_guid: str) -> Optional[List[FieldData]]:
         index, field = self.find_table_field_by_guid(field_guid)

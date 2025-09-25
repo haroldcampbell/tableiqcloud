@@ -2,11 +2,14 @@ from __future__ import annotations
 from pydantic import BaseModel
 from typing import List, Dict, Optional, Any
 
+from collections.abc import Iterable
+
 import time
 
 from .field_meta_data import FieldMetaData, init_FieldMetaData
 from .field_data import FieldData, FieldDataGUIDInfo
 from .table_field_type import TableFieldType
+from .field_param_relationship import FieldParamRelationship, FieldParamLinkedFieldInfo
 
 class TableField(BaseModel):
     MetaData: Optional[FieldMetaData]
@@ -53,6 +56,47 @@ class TableField(BaseModel):
 
         return True
 
+    def _enforce_field_data_contraints(self, ftype:TableFieldType):
+        # match ftype:
+        #     case TableFieldType.FieldTypeOption:
+        #     case TableFieldType.FieldTypeRelationship:
+        if ftype == TableFieldType.FieldTypeRelationship:
+            if self.MetaData is None or self.MetaData.FieldParams is None or not isinstance(self.MetaData.FieldParams, FieldParamRelationship) or self.MetaData.FieldParams.ParamValues is None:
+                raise ValueError(f"TableField._enforce_field_data_contraints. \n\tMetaData or FieldParams can't be None. \n\tfield: {self}")
+
+            # FieldParamRelationship, FieldParamLinkedFieldInfo
+            relationship_info:FieldParamLinkedFieldInfo = self.MetaData.FieldParams.ParamValues
+            # Helper function to get the GUID from FieldData or dict
+            def guid(it) -> str | None:
+                return it.CellGUID if isinstance(it, FieldData) else it.get("CellGUID")
+
+            for data in self.FieldData:
+                if data.DataValue is None:
+                    data.DataValue = []
+                    continue
+
+                # Ensure DataValue is a list
+                if not isinstance(data.DataValue, list):
+                    data.DataValue = [data.DataValue]
+
+                # Enforce single value if AllowMultipleValues is false
+                if not relationship_info.AllowMultipleValues and len(data.DataValue) > 1:
+                    data.DataValue = [data.DataValue[0]]
+
+                # Remove duplicates if not allowed
+                if not relationship_info.AllowDuplicates:
+                    # Build a mapping of CellGUID → item; keeps the *first* occurrence
+                    unique_by_guid = {}
+                    for item in data.DataValue:
+                        g = guid(item)
+                        if g and g not in unique_by_guid:
+                            unique_by_guid[g] = item
+
+                    data.DataValue = list(unique_by_guid.values())
+
+
+        return
+
     def update_meta_data(self, field_name:str, ftype:TableFieldType, field_options:Dict[str, Any]):
         if self.MetaData is None:
             raise ValueError(f"TableField.update_table_field_meta_data. \n\tMetaData can't be None. \n\tfield: {self}")
@@ -68,14 +112,15 @@ class TableField(BaseModel):
 
             case TableFieldType.FieldTypeRelationship:
                 info_id_result = self.MetaData.update_meta_data_field_params(ftype, field_options)
-                print("[info_id_result] info_id_result:", info_id_result)
+                # print("[info_id_result] info_id_result:", info_id_result)
 
                 if info_id_result["old_info_id"] != info_id_result["new_info_id"]:
                     for d in self.FieldData:
                         d.DataValue = []
                     # TODO: remove old relationships and clean up old linked data
                 else:
-                    print("ensure data values")
+                    self._enforce_field_data_contraints(ftype)
+                    print("[update_meta_data] ensure data values")
 
 
         return

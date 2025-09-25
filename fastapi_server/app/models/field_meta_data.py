@@ -15,7 +15,7 @@ class FieldMetaData(BaseModel):
     FieldType: TableFieldType
     FieldTypeName: Optional[str] = None
     MetaAttributes: Optional[Any] = None
-    FieldParams: Optional[Any] = None  # Optional field for additional options
+    FieldParams: Optional[FieldParamOption | FieldParamRelationship | Any] = None  # Optional field for additional options
 
     def _update_field_type_options(self, field_option_list:List[FieldParamOptionInfo]) -> set[str]:
         existing_params = (
@@ -66,6 +66,7 @@ class FieldMetaData(BaseModel):
 
         updated_field_params = existing_field_params.update_field_type_relationship(new_fieldInfo)
         new_info_id = updated_field_params.ParamValues.InfoId if updated_field_params.ParamValues else ""
+
         self.FieldParams = updated_field_params
 
         return {"old_info_id":old_info_id, "new_info_id":new_info_id}

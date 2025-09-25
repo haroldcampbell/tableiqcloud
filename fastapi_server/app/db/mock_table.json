@@ -53,7 +53,7 @@
                     {
                         "CellGUID": "c3",
                         "RecordGUID": "r1",
-                        "DataValue": 30
+                        "DataValue": "301"
                     },
                     {
                         "CellGUID": "c4",
@@ -114,113 +114,116 @@
             {
                 "MetaData": {
                     "TableGUID": "t1",
-                    "FieldGUID": "6F61EFB5-DE9B-4633-B8DF-8F04F297D9D5",
-                    "FieldName": "Activity",
+                    "FieldGUID": "1CF1A4A1-1DB6-484A-B982-96E8A7CF1640",
+                    "FieldName": "",
                     "FieldType": 4,
                     "FieldTypeName": null,
                     "MetaAttributes": null,
                     "FieldParams": {
                         "ParamKey": "relationship",
                         "ParamValues": {
-                            "InfoId": "2CD3A057-D69F-4E44-9A41-89B76371F181",
+                            "InfoId": "ED66365F-B481-4688-AC51-46224E7A405D",
                             "ParentTableGUID": "t1",
-                            "LinkedChildTableGUID": "t3",
-                            "LinkedFieldGUID": "f4"
+                            "LinkedChildTableGUID": "t2",
+                            "LinkedFieldGUID": "CF9D3598-8C0C-472F-858A-CEEA916E7099",
+                            "AllowMultipleValues": false,
+                            "AllowDuplicates": false
                         }
                     }
                 },
                 "FieldData": [
                     {
-                        "CellGUID": "0CE74AA1-A2C8-4E0D-BECE-FB4B36FE4EAC",
+                        "CellGUID": "A5B0D355-C776-46C6-BFD8-0D482A5C4415",
                         "RecordGUID": "r1",
                         "DataValue": [
                             {
-                                "CellGUID": "F6E897F2-E7DC-4F0F-96C3-BEECFE5C935B",
-                                "RecordGUID": "1B485DD1-C4CA-487C-8AEB-9B7272C86764",
-                                "DataValue": "Cross-country walk"
+                                "CellGUID": "23584763-93E7-4365-B52A-2CA7ED647970",
+                                "RecordGUID": "560016DD-0300-4B96-86C2-F3D28777725C",
+                                "DataValue": "March Antwort"
                             }
                         ]
                     },
                     {
-                        "CellGUID": "446415DE-329F-437A-B778-89021643D5FA",
+                        "CellGUID": "9CF69A9B-7938-45A3-901D-D6C2C62A473E",
                         "RecordGUID": "r2",
                         "DataValue": [
                             {
-                                "CellGUID": "CC56CEA6-8813-47FB-A7D6-A383C2F67986",
-                                "RecordGUID": "AD9A64CE-81A3-4BFA-8AD9-951089D23AC9",
-                                "DataValue": "Water sport"
+                                "CellGUID": "8C444E37-CD35-4871-B18B-5628177F720D",
+                                "RecordGUID": "C8A8DD66-91D9-4742-BBFD-27C42602CCAC",
+                                "DataValue": "Sally Hall"
                             }
                         ]
                     }
                 ],
                 "FieldDataGUIDMap": {
                     "r1": {
-                        "CellGUID": "0CE74AA1-A2C8-4E0D-BECE-FB4B36FE4EAC",
+                        "CellGUID": "A5B0D355-C776-46C6-BFD8-0D482A5C4415",
                         "RecordGUID": "r1"
                     },
                     "r2": {
-                        "CellGUID": "446415DE-329F-437A-B778-89021643D5FA",
+                        "CellGUID": "9CF69A9B-7938-45A3-901D-D6C2C62A473E",
                         "RecordGUID": "r2"
                     }
                 },
                 "IsDeleted": false,
-                "CreatedOnTimestamp": 1758391499,
+                "CreatedOnTimestamp": 1758804420,
                 "DeletedOnTimestamp": 0
             },
             {
                 "MetaData": {
                     "TableGUID": "t1",
-                    "FieldGUID": "776CB240-11FC-41E5-86D5-94B03702A993",
-                    "FieldName": "Team",
-                    "FieldType": 5,
+                    "FieldGUID": "70092811-4B4E-4093-8C5D-8D67EDFBED6E",
+                    "FieldName": "Skills",
+                    "FieldType": 4,
                     "FieldTypeName": null,
                     "MetaAttributes": null,
                     "FieldParams": {
-                        "ParamKey": "option",
-                        "ParamValues": [
-                            {
-                                "OptionId": "13F20D43-58A7-4458-AE6A-299F5ADC58FC",
-                                "OptionIndex": 0,
-                                "OptionName": "Red",
-                                "OptionMetaData": {
-                                    "itemColor": "#ffcdcd"
-                                }
-                            },
-                            {
-                                "OptionId": "877E65DE-DBE6-4BAC-A109-E222EB8B21A6",
-                                "OptionIndex": 1,
-                                "OptionName": "Green",
-                                "OptionMetaData": {
-                                    "itemColor": "#c5c89a"
-                                }
-                            }
-                        ]
+                        "ParamKey": "relationship",
+                        "ParamValues": {
+                            "InfoId": "5C7E0AA0-D95C-48E6-9C86-31CDF6907872",
+                            "ParentTableGUID": "t1",
+                            "LinkedChildTableGUID": "t2",
+                            "LinkedFieldGUID": "f3",
+                            "AllowMultipleValues": true,
+                            "AllowDuplicates": false
+                        }
                     }
                 },
                 "FieldData": [
                     {
-                        "CellGUID": "BD95B8DA-2A7F-4294-A078-EF108DE20D6A",
+                        "CellGUID": "39148FFD-50B2-4928-B788-A87D217CC4D0",
                         "RecordGUID": "r1",
-                        "DataValue": "13F20D43-58A7-4458-AE6A-299F5ADC58FC"
+                        "DataValue": [
+                            {
+                                "CellGUID": "EBD7FB4F-FF54-4E78-A6AE-74A405C192A2",
+                                "RecordGUID": "C8A8DD66-91D9-4742-BBFD-27C42602CCAC",
+                                "DataValue": "Bird Spotter2"
+                            },
+                            {
+                                "CellGUID": "A750EACC-C1A1-45C9-B622-4351C2D4EC18",
+                                "RecordGUID": "E5178942-4489-4F85-801A-FEB7DA3BFEC2",
+                                "DataValue": "Bird Spotter1"
+                            }
+                        ]
                     },
                     {
-                        "CellGUID": "2F885DC9-9C46-4C19-99D9-3E4D694E971D",
+                        "CellGUID": "1F26FDC6-0BC8-4FE1-ADC3-566D4CF1B554",
                         "RecordGUID": "r2",
-                        "DataValue": "877E65DE-DBE6-4BAC-A109-E222EB8B21A6"
+                        "DataValue": []
                     }
                 ],
                 "FieldDataGUIDMap": {
                     "r1": {
-                        "CellGUID": "BD95B8DA-2A7F-4294-A078-EF108DE20D6A",
+                        "CellGUID": "39148FFD-50B2-4928-B788-A87D217CC4D0",
                         "RecordGUID": "r1"
                     },
                     "r2": {
-                        "CellGUID": "2F885DC9-9C46-4C19-99D9-3E4D694E971D",
+                        "CellGUID": "1F26FDC6-0BC8-4FE1-ADC3-566D4CF1B554",
                         "RecordGUID": "r2"
                     }
                 },
                 "IsDeleted": false,
-                "CreatedOnTimestamp": 1758415943,
+                "CreatedOnTimestamp": 1758814809,
                 "DeletedOnTimestamp": 0
             }
         ],
@@ -233,7 +236,9 @@
             "Age": 1,
             "test": 2,
             "Guides": 3,
-            "re": 4
+            "re": 4,
+            "": 3,
+            "Skills": 4
         },
         "CreatedOnTimestamp": 1,
         "IsDeleted": false,
@@ -267,12 +272,12 @@
                     {
                         "CellGUID": "A750EACC-C1A1-45C9-B622-4351C2D4EC18",
                         "RecordGUID": "E5178942-4489-4F85-801A-FEB7DA3BFEC2",
-                        "DataValue": "Bird Spotter"
+                        "DataValue": "Bird Spotter1"
                     },
                     {
                         "CellGUID": "EBD7FB4F-FF54-4E78-A6AE-74A405C192A2",
                         "RecordGUID": "C8A8DD66-91D9-4742-BBFD-27C42602CCAC",
-                        "DataValue": "Bird Spotter"
+                        "DataValue": "Bird Spotter2"
                     },
                     {
                         "CellGUID": "CA05BF46-C41C-4C3E-91F4-A327D49B6208",

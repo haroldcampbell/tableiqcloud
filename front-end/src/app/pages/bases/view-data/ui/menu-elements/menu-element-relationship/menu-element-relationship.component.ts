@@ -86,14 +86,18 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 		const params: FieldParamRelationship = this.existingField?.FieldParams;
 		const linkedFieldInfo: FieldParamLinkedFieldInfo = params.ParamValues;
 
+		this._allowMultipleItems = linkedFieldInfo.AllowMultipleValues;
+		this._allowDuplicates = linkedFieldInfo.AllowDuplicates;
 		this.selectedTableGUID = linkedFieldInfo.LinkedChildTableGUID;
+
 		if (this.baseTableInfo) {
 			for (let item of this.baseTableInfo.TableInfoArray) {
 				if (item.GUID == linkedFieldInfo.LinkedChildTableGUID) {
 					this.loadTableByGUID(linkedFieldInfo.LinkedChildTableGUID, () => {
 						// Cache the current InfoId
 						this.cachedInfoIDMap[linkedFieldInfo.LinkedFieldGUID] = linkedFieldInfo.InfoId;
-						this.loadTableFieldByGUID(linkedFieldInfo.LinkedFieldGUID, linkedFieldInfo.InfoId);
+						this.selectedInfoId = linkedFieldInfo.InfoId;
+						this.loadTableFieldByGUID(linkedFieldInfo.LinkedFieldGUID);
 					})
 					break;
 				}
@@ -143,29 +147,67 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 		});
 	}
 
+	private selectedInfoId?: string;
 	onChangedTableField(event: MatSelectChange) {
 		const linkedTableFieldGUID = event.value
 		const infoId = this.cachedInfoIDMap[linkedTableFieldGUID]
 
-		// console.log("[onChangedTableField] event:", { event, infoId });
-
-		this.loadTableFieldByGUID(event.value, infoId);
+		this.selectedInfoId = infoId;
+		this.loadTableFieldByGUID(event.value);
 	}
 
-	private loadTableFieldByGUID(linkedTableFieldGUID: string, infoId?: string) {
-		// console.log("loadTableFieldByGUID ", { linkedTableFieldGUID, infoId });
+	private loadTableFieldByGUID(linkedTableFieldGUID: string) {
+		// console.log("loadTableFieldByGUID ", { linkedTableFieldGUID, infoId:this.selectedInfoI });
 
 		this.dirtyFieldValue = linkedTableFieldGUID;
 		this.selectedTableFieldGUID = linkedTableFieldGUID
 		this.hasValidSaveState.emit(true);
 
+		this.raiseRelationshipInfo();
+	}
+
+	private raiseRelationshipInfo() {
 		const info: FieldParamLinkedFieldInfo = {
-			InfoId: infoId ?? "",
+			InfoId: this.selectedInfoId ?? "",
 			ParentTableGUID: this.parentTableGUID!,
 			LinkedChildTableGUID: this.selectedTableGUID,
-			LinkedFieldGUID: this.selectedTableFieldGUID
+			LinkedFieldGUID: this.selectedTableFieldGUID,
+			AllowMultipleValues: this._allowMultipleItems,
+			AllowDuplicates: this._allowDuplicates
 		}
-
+		console.log("[raiseRelationshipInfo] emitting info:", info);
 		this.relationshipInfo.emit(info)
+	}
+
+	_allowMultipleItems = false
+
+	get allowMultipleItems() {
+		return this._allowMultipleItems
+	}
+	set allowMultipleItems(val: boolean) {
+		this._allowMultipleItems = val;
+		if (!this._allowMultipleItems) {
+			this.allowDuplicates = false;
+		}
+		// console.log("[allowMultipleItems] ",
+		// 	{
+		// 		allowMultipleItems: this._allowMultipleItems,
+		// 		allowDuplicates: this.allowDuplicates
+		// 	})
+		this.raiseRelationshipInfo();
+	}
+
+	_allowDuplicates = false;
+	get allowDuplicates() {
+		return this._allowDuplicates;
+	}
+	set allowDuplicates(val: boolean) {
+		this._allowDuplicates = val;
+		// console.log("[allowDuplicates] ",
+		// 	{
+		// 		allowMultipleItems: this._allowMultipleItems,
+		// 		allowDuplicates: this._allowDuplicates
+		// 	})
+		this.raiseRelationshipInfo();
 	}
 }

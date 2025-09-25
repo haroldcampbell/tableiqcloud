@@ -92,8 +92,13 @@ def update_table_field_value(
     if target_field_data.DataValue is None:
         target_field_data.DataValue = []
 
-    target_field_data.DataValue.append(linked_field_data)
+    print(f"[update_table_field_value] attempting to update value: \n\t linked_field_info.AllowMultipleValues:{linked_field_info.AllowMultipleValues}")
+    if linked_field_info.AllowMultipleValues:
+        target_field_data.DataValue.append(linked_field_data)
+    else:
+        target_field_data.DataValue = [linked_field_data]
 
+    print(f"[update_table_field_value] \n\t target_field_data.DataValue:{target_field_data.DataValue}");
     return target_field_data
 
 

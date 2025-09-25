@@ -9,6 +9,9 @@ class FieldParamLinkedFieldInfo(BaseModel):
     ParentTableGUID: str
     LinkedChildTableGUID: str
     LinkedFieldGUID: str
+    AllowMultipleValues: bool=False
+    AllowDuplicates: bool=False # Duplicates are only allowed if MultipleValues is true
+
 
     def _has_validGUIDs(self, updatedInfo:FieldParamLinkedFieldInfo)->bool:
         if (self.ParentTableGUID == updatedInfo.ParentTableGUID
@@ -22,14 +25,22 @@ class FieldParamLinkedFieldInfo(BaseModel):
             raise ValueError(f"[FieldParamLinkedFieldInfo.update_field_properties] Can't update properties. Guids don't match. \n\tself:'{self}'\n\tupdatedInfo:'{updatedInfo}'")
 
         # TODO: update future fields that aren't GUID related
+        self.AllowMultipleValues = updatedInfo.AllowMultipleValues
 
+        # Duplicates are only allowed if MultipleValues is true
+        if not self.AllowMultipleValues:
+            self.AllowDuplicates = False
+        else:
+            self.AllowDuplicates = updatedInfo.AllowDuplicates
+
+        # print(f"[FieldParamLinkedFieldInfo.update_field_properties] updated to: \n\t AllowMultipleValues:'{self.AllowMultipleValues}'\n\t AllowDuplicates:'{self.AllowDuplicates}' \n\t updatedInfo:'{updatedInfo}'")
         return True
 
 class FieldParamRelationship(BaseModel):
     _Key: ClassVar[str] = "relationship"
 
     ParamKey: str = _Key
-    ParamValues: FieldParamLinkedFieldInfo | None = None
+    ParamValues: Optional[FieldParamLinkedFieldInfo] = None
 
     def update_field_properties(self, updatedInfo:FieldParamLinkedFieldInfo)->bool:
         if self.ParamValues == None:
@@ -47,9 +58,7 @@ class FieldParamRelationship(BaseModel):
         if not self.has_matching_InfoId(new_fieldInfo.InfoId):
             return FieldParamRelationship.init({FieldParamRelationship._Key:new_fieldInfo.model_dump()})
 
-        # if not
         self.update_field_properties(new_fieldInfo)
-            # raise ValueError(f"[FieldParamRelationship.update_field_type_relationship] Unable to update LinkedRelationship prperties. \n\texisting_field_params:'{self.ParamValues}'\n\tnew_fieldInfo:'{new_fieldInfo}'")
 
         return self
 
@@ -64,7 +73,7 @@ class FieldParamRelationship(BaseModel):
             info = FieldParamLinkedFieldInfo(
                 ParentTableGUID="",
                 LinkedChildTableGUID="",
-                LinkedFieldGUID=""
+                LinkedFieldGUID="",
             )
         else:
             info = FieldParamLinkedFieldInfo(**options)

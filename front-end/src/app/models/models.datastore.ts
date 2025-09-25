@@ -137,6 +137,8 @@ export interface FieldParamLinkedFieldInfo {
 	ParentTableGUID: string;
 	LinkedChildTableGUID: string;
 	LinkedFieldGUID: string;
+	AllowMultipleValues: boolean;
+	AllowDuplicates: boolean; // Duplicates are only allowed if MultipleValues is true
 }
 
 export interface FieldParamRelationship {
