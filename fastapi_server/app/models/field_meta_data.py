@@ -64,7 +64,7 @@ class FieldMetaData(BaseModel):
         new_fieldInfo = FieldParamLinkedFieldInfo(**field_options[FieldParamRelationship._Key])
         old_info_id = existing_field_params.ParamValues.InfoId if existing_field_params.ParamValues else ""
 
-        updated_field_params = existing_field_params.update_field_type_relationship(new_fieldInfo)
+        updated_field_params = existing_field_params.update_field_type_relationship(self.FieldGUID, new_fieldInfo)
         new_info_id = updated_field_params.ParamValues.InfoId if updated_field_params.ParamValues else ""
 
         self.FieldParams = updated_field_params
@@ -82,31 +82,40 @@ class FieldMetaData(BaseModel):
 
         return self
 
-
-def init_field_params(field_type:TableFieldType, field_params: Optional[Dict[str, Any]]) -> Optional[Any]:
-    if field_params is None:
-        return None
-
-    match field_type:
-        case TableFieldType.FieldTypeOption:
-            # Logic for option fields (i.e. FieldTypeOption)
-            return FieldParamOption.init(field_params)
-
-        case TableFieldType.FieldTypeRelationship:
-            # Logic for linked relationships (i.e. FieldTypeRelationship)
-            return FieldParamRelationship.init(field_params)
-
-        case _:
+    @classmethod
+    def _init_field_params(cls, field_guid:str, field_type:TableFieldType, field_params: Optional[Dict[str, Any]]) -> Optional[Any]:
+        if field_params is None:
             return None
 
-def init_FieldMetaData(table_guid:str, field_name:str, field_type:TableFieldType,field_params:Optional[Dict[str, Any]] = None )->FieldMetaData:
-    guid = str(uuid.uuid4()).upper()
-    params = init_field_params(field_type, field_params)
+        match field_type:
+            case TableFieldType.FieldTypeOption:
+                # Logic for option fields (i.e. FieldTypeOption)
+                return FieldParamOption.init(field_params)
 
-    return FieldMetaData(
-        TableGUID=table_guid,
-        FieldGUID=guid,
-        FieldName=field_name,
-        FieldType=field_type,
-        FieldParams=params,
-    )
+            case TableFieldType.FieldTypeRelationship:
+                # Logic for linked relationships (i.e. FieldTypeRelationship)
+                return FieldParamRelationship.init(field_guid, field_params)
+
+            case _:
+                return None
+
+    @classmethod
+    def _generate_field_name(cls)->str:
+        return "Field_" + str(uuid.uuid4()).split("-")[0]
+
+    @classmethod
+    def init_FieldMetaData(cls, table_guid:str, field_name:str, field_type:TableFieldType, field_params:Optional[Dict[str, Any]] = None )->FieldMetaData:
+        field_guid = str(uuid.uuid4()).upper()
+
+        if field_name is None or field_name.strip() == "":
+            field_name = FieldMetaData._generate_field_name()
+
+        field = cls(
+            TableGUID=table_guid,
+            FieldGUID=field_guid,
+            FieldName=field_name,
+            FieldType=field_type,
+            FieldParams = cls._init_field_params(field_guid, field_type, field_params)
+        )
+
+        return field

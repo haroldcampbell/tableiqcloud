@@ -3,8 +3,9 @@ from pydantic import BaseModel,Field
 from typing import cast, List, Dict, Optional,Callable, Any
 import uuid
 import logging
+from pprint import pprint
 
-from .table_field import TableField, new_TableField
+from .table_field import TableField
 from .field_data import FieldData
 from .field_meta_data import FieldMetaData
 from .table_field_type import TableFieldType
@@ -16,8 +17,8 @@ from .field_param_relationship import FieldParamRelationship, FieldParamLinkedFi
 TableFieldGUID = str
 TableFieldArray = List[FieldData]
 class TableRecordData(BaseModel):
-    GUID: str
-    Name: str
+    GUID: str # Table GUID
+    Name: str # Table Name
     RecordGUIDs: List[str]=Field(default_factory=list)
     FieldsMetaData: List[FieldMetaData]=Field(default_factory=list)
     ColumnValues: Dict[TableFieldGUID, TableFieldArray]=Field(default_factory=dict)
@@ -27,6 +28,10 @@ class TableFieldInfo(BaseModel):
     Name: str
     FieldsMetaData: List[FieldMetaData]=Field(default_factory=list)
     FieldsNameIndex: Dict[str, int]  # Maps the Name to the field Index
+
+class TableFieldRecords(BaseModel):
+    Field: TableField
+    Records: TableRecordData
 
 class Table(BaseModel):
     GUID: str
@@ -39,17 +44,40 @@ class Table(BaseModel):
     DeletedOnTimestamp: int
     _lastRecordGUID: Optional[str] = None # Private/internal field, optional
 
-    def GetRecords(self) -> TableRecordData:
-        records = TableRecordData(GUID=self.GUID, Name=self.Name, RecordGUIDs=self.RecordGUIDs)
+    @classmethod
+    def new_table(cls, table_name:str)->Table:
+        if table_name is None or table_name.strip() == "":
+            table_name = "Table_" + str(uuid.uuid4()).split("-")[1]
 
-        for item in self.Fields:
-            if item.MetaData == None or item.MetaData.FieldGUID == None:
-                continue
+        guid = str(uuid.uuid4()).upper()
+        table = Table(
+            GUID=guid,
+            Name=table_name,
+            Fields=[],
+            RecordGUIDs=[],
+            FieldsNameIndex={},
+            CreatedOnTimestamp=-1, # TODO: Set the date
+            IsDeleted = False,
+            DeletedOnTimestamp = -1
+        )
 
-            records.FieldsMetaData.append(item.MetaData)
-            records.ColumnValues[item.MetaData.FieldGUID] = item.FieldData
+        # create __ID TableField. This will be a hidden field
+        table.create_table_field_by_name(TableField.REC_FIELD_NAME, TableFieldType.FieldTypeID)
 
-        return records
+        # create a default TableField
+        table.create_table_field_by_name("Field A", TableFieldType.FieldTypeString)
+
+        # add one record to the table
+        table.create_table_record()
+
+        return table
+
+    def get_REC_ID_field(self) -> Optional[TableField]:
+        index = self.FieldsNameIndex.get(TableField.REC_FIELD_NAME)
+        if index is None or index < 0 or index >= len(self.Fields):
+            raise ValueError(f"Table.get_REC_ID_field. \n\tField not found. \n\tGUID: {self.GUID}")
+
+        return self.Fields[index]
 
     def get_table_field_info(self) -> TableFieldInfo:
         # collect the field meta data
@@ -96,11 +124,20 @@ class Table(BaseModel):
 
         return records
 
-    def create_table_field_by_name(self, field_name:str, ftype:TableFieldType, field_params:Optional[Dict[str, str]]=None) -> TableRecordData:
-        field = new_TableField(self.GUID, field_name, ftype, field_params)
+    def create_table_field_by_name(self, field_name:str, ftype:TableFieldType, field_params:Optional[Dict[str, str]]=None) -> TableFieldRecords:
+        # TODO: Guard against users trying to add another field called TableField.ID_FIELD_NAME
+        field = TableField.new_TableField(self.GUID, field_name, ftype, field_params)
         field = self._add_table_field(field)
 
-        return self.get_records_for_field(field)
+        print(f"[Table.create_table_field_by_name]\n {field.model_dump_json(indent=2)}")
+
+        return TableFieldRecords(Field=field, Records=self.get_records_for_field(field))
+
+    def _create_dependent_field(self, parent_field:TableField, dependent_field_name:str):
+        if parent_field.MetaData is None or parent_field.MetaData.FieldParams is None:
+            raise ValueError(f"Table._create_dependent_field. \n\tMetaData or FieldParams can't be None. \n\tfield: {parent_field}")
+
+        pass
 
     def get_table_field_by_guid(self, table_field_guid:str) -> Optional[TableField]:
         for i, item in enumerate(self.Fields):
@@ -122,7 +159,13 @@ class Table(BaseModel):
 
         return -1, None
 
+    def find_table_field_meta_data_by_name(self, field_name:str) -> Optional[FieldMetaData]:
+        table_field_info = self.get_table_field_info()
+        field_gen = (f for f in table_field_info.FieldsMetaData if f.FieldName == field_name)
+        return next(field_gen, None)
+
     def delete_table_field(self, table_field_guid:str):
+        # TODO: protect against users deleting the TableField.ID_FIELD_NAME field
         field_name=None
         field_index=-1
 
@@ -161,13 +204,14 @@ class Table(BaseModel):
 
         return field.MetaData
 
-    def update_table_field_value(self, table_field_guid:str, field_data:FieldData) -> Optional[FieldData]:
+    # Saves basic field data value changes. Does not handle complex field types like relationships
+    def update_simple_data_value(self, table_field_guid:str, field_data:FieldData) -> Optional[FieldData]:
         index, field = self.find_table_field_by_guid(table_field_guid)
         if index == -1 or field is None:
-            raise ValueError(f"Table.update_table_field_value. \n\tField not found. \n\tGUID: {table_field_guid}")
+            raise ValueError(f"Table.update_simple_data_value. \n\tField not found. \n\tGUID: {table_field_guid}")
 
         if field.MetaData is None:
-            raise ValueError(f"Table.update_table_field_value. \n\tMetaData can't be None. \n\tfield: {field}")
+            raise ValueError(f"Table.update_simple_data_value. \n\tMetaData can't be None. \n\tfield: {field}")
 
         for d in field.FieldData:
             if d.RecordGUID == field_data.RecordGUID and d.CellGUID == field_data.CellGUID:
@@ -176,20 +220,31 @@ class Table(BaseModel):
 
         return None
 
+    def get_records(self) -> TableRecordData:
+        records = TableRecordData(GUID=self.GUID, Name=self.Name, RecordGUIDs=self.RecordGUIDs)
 
-    def create_new_record_GUID(self) -> str:
+        for item in self.Fields:
+            if item.MetaData == None or item.MetaData.FieldGUID == None:
+                continue
+
+            records.FieldsMetaData.append(item.MetaData)
+            records.ColumnValues[item.MetaData.FieldGUID] = item.FieldData
+
+        return records
+
+    def _create_new_record_GUID(self) -> str:
         self._lastRecordGUID = str(uuid.uuid4()).upper()
 
         return self._lastRecordGUID
 
-    def append_record(self) -> str:
-        record_guid = self.create_new_record_GUID()
+    def _append_record(self) -> str:
+        record_guid = self._create_new_record_GUID()
 
         self.RecordGUIDs.append(record_guid)
 
         return record_guid
 
-    def get_record_by_guid(self, record_guid: str) -> Optional[List[RecordCell]]:
+    def _get_record_by_guid(self, record_guid: str) -> Optional[List[RecordCell]]:
         # logger.debug("Looking up RecordGUID: %s", record_guid)
 
         if record_guid not in self.RecordGUIDs:
@@ -202,13 +257,13 @@ class Table(BaseModel):
             if field.MetaData is None:
                 # logger.error("MetaData is None for field index: %d", i)
                 raise ValueError(
-                    f"Table.get_record_by_guid. MetaData can't be None. \n\tfield: {field}"
+                    f"Table._get_record_by_guid. MetaData can't be None. \n\tfield: {field}"
                 )
 
             if record_guid not in field.FieldDataGUIDMap:
                 # logger.error("RecordGUID %s not found in FieldDataGUIDMap for field %d", record_guid, i)
                 raise ValueError(
-                    f"Table.get_record_by_guid. RecordGUID {record_guid} not found in FieldDataGUIDMap."
+                    f"Table._get_record_by_guid. RecordGUID {record_guid} not found in FieldDataGUIDMap."
                 )
 
             field_data = next(
@@ -218,7 +273,7 @@ class Table(BaseModel):
             if field_data is None:
                 # logger.error("No matching FieldData found for RecordGUID %s in field %d", record_guid, i)
                 raise ValueError(
-                    f"Table.get_record_by_guid. FieldData for RecordGUID {record_guid} not found in FieldData."
+                    f"Table._get_record_by_guid. FieldData for RecordGUID {record_guid} not found in FieldData."
                 )
 
             # logger.debug("Appending RecordCell for field %d", i)
@@ -231,13 +286,13 @@ class Table(BaseModel):
         return record_cells
 
     def create_table_record(self) -> tuple[str, List[RecordCell]]:
-        record_guid = self.append_record()
+        record_guid = self._append_record()
 
         fields = self.Fields
         for f in fields:
             f.append_value(record_guid)
 
-        result = self.get_record_by_guid(record_guid)
+        result = self._get_record_by_guid(record_guid)
 
         if result is None:
             raise ValueError(f"Table.create_table_record. \n\tRecord with GUID {record_guid} not found after creation.")

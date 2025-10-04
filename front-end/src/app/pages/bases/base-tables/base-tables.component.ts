@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { APIService } from '../../../api.services/api.service';
-import { BaseTableInfo, TableInfo } from '../../../models/models.datastore';
+import { BaseTableInfo, RequestDataCreateTable, TableFieldInfo, TableInfo } from '../../../models/models.datastore';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ViewTableComponent } from '../view-data/viewtable/viewtable.component';
 import { hasString } from '../../../core/utils';
@@ -91,5 +91,28 @@ export class BaseTablesComponent implements OnInit {
 
 	isSelectedNavItem(item: NavItems) {
 		return this.selectedNavItem == item;
+	}
+
+	onCreateTable() {
+		console.log("[onCreateTable] ");
+
+		const request: RequestDataCreateTable = {
+			BaseGUID: this.baseGUID!,
+			TableName: ""
+		}
+
+		this.apiService.apiRequests.createTable(request)
+			.subscribe({
+				next: (data: TableFieldInfo) => {
+					console.log("[onCreateTable] data: ", data);
+					this.tables.push({ GUID: data.GUID, Name: data.Name });
+					// this.initTableData(data);
+					this.selectedTableGUID = data.GUID
+				},
+				error: (err) => {
+					console.log("[onCreateTable] err: ", err);
+				}
+			})
+
 	}
 }

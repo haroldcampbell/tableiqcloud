@@ -3,6 +3,10 @@ from typing import List, Dict, Any, Optional
 
 import app.models as models
 
+class RequestDataCreateTable(BaseModel):
+	BaseGUID: str
+	TableName: str
+
 class RequestDataCreateField(BaseModel):
 	BaseGUID: str
 	TableGUID: str

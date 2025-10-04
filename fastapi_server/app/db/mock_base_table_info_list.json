@@ -6,16 +6,16 @@
         },
         "TableInfoArray": [
             {
-                "GUID": "t1",
-                "Name": "Guests"
+                "GUID": "D78CC316-6061-46F2-AA70-7BDB3C2760FC",
+                "Name": "Table_8944"
             },
             {
-                "GUID": "t2",
-                "Name": "Guides"
+                "GUID": "7B81C7F8-E211-45B6-A2A3-10772402F46F",
+                "Name": "Table_e04c"
             },
             {
-                "GUID": "t3",
-                "Name": "Activities"
+                "GUID": "C8AC07D7-CEE9-47AA-831F-CDF14587CBB3",
+                "Name": "Table_5814"
             }
         ]
     },
@@ -24,11 +24,6 @@
             "GUID": "def123",
             "Name": "CRM"
         },
-        "TableInfoArray": [
-            {
-                "GUID": "t3",
-                "Name": "Other thing"
-            }
-        ]
+        "TableInfoArray": []
     }
 ]

@@ -1,7 +1,7 @@
 import { HttpClient, HttpRequest } from "@angular/common/http";
 import { EMPTY, map, of, tap } from "rxjs";
 import { APIServerResponse, RequestDataCreateRecordResponse } from "../models/models.server";
-import { Base, BaseTableInfo, FieldData, FieldMetaData, FieldParamLinkedFieldInfo, ReqestDataDeleteField, RequestDataAddLinkedTableCellValue, RequestDataCreateField, RequestDataCreateRecord, RequestDataDeleteLinkedTableCellValue, RequestDataDeleteRecord, RequestDataUpdateField, RequestDataUpdateFieldDataValue, RequestDataUpdateFieldResponse, TableFieldInfo, TableInfo, TableRecordData } from "../models/models.datastore";
+import { Base, BaseTableInfo, FieldData, FieldMetaData, FieldParamLinkedFieldInfo, ReqestDataDeleteField, RequestDataAddLinkedTableCellValue, RequestDataCreateField, RequestDataCreateRecord, RequestDataCreateTable, RequestDataDeleteLinkedTableCellValue, RequestDataDeleteRecord, RequestDataUpdateField, RequestDataUpdateFieldDataValue, RequestDataUpdateFieldResponse, TableFieldInfo, TableInfo, TableRecordData } from "../models/models.datastore";
 
 
 export class APIRequests {
@@ -32,6 +32,19 @@ export class APIRequests {
 	// 			}),
 	// 		);
 	// }
+
+	createTable(data: RequestDataCreateTable) {
+		return this.http.post<APIServerResponse<TableFieldInfo>>(`/api/table/new`, data)
+			.pipe(
+				map(resp => {
+					if (!resp.successStatus || resp.jsonBody === null) {
+						throw resp.message;
+					}
+
+					return resp.jsonBody;
+				}),
+			);
+	}
 
 	getTables(baseGUID: string) {
 		return this.http.get<APIServerResponse<BaseTableInfo>>(`/api/base/${baseGUID}`)

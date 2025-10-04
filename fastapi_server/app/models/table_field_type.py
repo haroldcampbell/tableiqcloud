@@ -3,6 +3,7 @@ from typing import Dict
 from enum import IntEnum
 
 class TableFieldType(IntEnum):
+    FieldTypeID = 1000 # this is an internal ID field
     FieldTypeString = 0  # default is string
     FieldTypeNumber = 1
     FieldTypeDate = 2
@@ -23,6 +24,7 @@ class TableFieldType(IntEnum):
             )
 
 field_type_str_map:Dict[str, TableFieldType] = {
+   "__ID": TableFieldType.FieldTypeID,
    "String": TableFieldType.FieldTypeString,
    "Number": TableFieldType.FieldTypeNumber,
    "Date": TableFieldType.FieldTypeDate,

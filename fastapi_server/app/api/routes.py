@@ -56,11 +56,31 @@ async def get_tables(base_guid: str):
 # Gets a table info from a base based on the table_guid
 @router.get("/api/table/{base_guid}/{table_guid}/info")
 async def get_table_field_info_by_guid(base_guid: str, table_guid: str):
-    table_fiel_info = store.get_table_field_info_by_guid(base_guid, table_guid)
-    if table_fiel_info == None:
-        return errResp(action="get-table-info",jsonBody=table_fiel_info, message="Table not found")
+    table_field_info = store.get_table_field_info_by_guid(base_guid, table_guid)
+    if table_field_info == None:
+        return errResp(action="get-table-info",jsonBody=table_field_info, message="Table not found")
 
-    return okResp(action="get-table-info",jsonBody=table_fiel_info)
+    return okResp(action="get-table-info",jsonBody=table_field_info)
+
+# Create a new table in a base
+@router.post("/api/table/new")
+async def create_table(request:api.RequestDataCreateTable):
+    action_name="create-table"
+
+    try:
+        table = store.create_table(request.BaseGUID, request.TableName)
+    except ValueError as e:
+        return errResp(action=action_name, jsonBody=None, message=str(e))
+
+    # Save mock data
+    store.save_mock_bases()
+
+    table_field_info = store.get_table_field_info_by_guid(request.BaseGUID, table.GUID)
+    if table_field_info == None:
+        return errResp(action=action_name,jsonBody=table_field_info, message="Failed to get Table info after creation")
+
+    return okResp(action=action_name,jsonBody=table_field_info)
+
 
 # Get the table details without the records
 @router.get("/api/table/{base_guid}/{table_guid}")
@@ -69,7 +89,7 @@ async def get_table_by_guid(base_guid: str, table_guid: str):
     if table == None:
         return errResp(action="get-table",jsonBody=table, message="Table not found")
 
-    records = table.GetRecords()
+    records = table.get_records()
 
     return okResp(action="get-table",jsonBody=records)
 
@@ -131,23 +151,10 @@ async def update_table_field_info(request: api.RequestDataUpdateField):
 
 @router.post("/api/field/update-value")
 async def update_table_field_value(request: api.RequestDataUpdateFieldDataValue):
-    table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
-    if table == None:
-        return errResp(action="update-table-field-value",jsonBody=table, message="Table not found")
-
-    fd = models.FieldData(
-        CellGUID=request.FieldData.CellGUID,
-        RecordGUID=request.FieldData.RecordGUID,
-        DataValue=request.FieldData.DataValue
-    )
-
     try:
-        updatedData = table.update_table_field_value(request.FieldGUID, fd)
+        updatedData = store.update_simple_table_field_data_value(request.BaseGUID, request.TableGUID, request.FieldGUID, request.FieldData)
     except ValueError as e:
         return errResp(action="update-table-field-value", jsonBody=None, message=str(e))
-
-    if updatedData is None:
-        return errResp(action="update-table-field-value", jsonBody=updatedData, message="Field not found or update failed")
 
     # Save mock data
     store.save_mock_bases()
@@ -205,11 +212,14 @@ async def get_linked_table_data_values(base_guid: str, table_guid: str, field_gu
     if linked_field_info == None:
         return errResp(action=action_name,jsonBody=linked_field_info, message="Field not found or not a relationship field")
 
-    linked_table = store.getTableByGUID(base_guid, linked_field_info.LinkedChildTableGUID)
+    # linked_table = store.getTableByGUID(base_guid, linked_field_info.LinkedChildTableGUID)
+    pull = linked_field_info.PullOperation
+    linked_table = store.getTableByGUID(base_guid, pull.DataFromTableGUID)
     if linked_table == None:
         return errResp(action=action_name,jsonBody=linked_table, message="Linked table not found")
 
-    field_data_list = linked_table.get_field_data_by_field_guid(linked_field_info.LinkedFieldGUID)
+    # field_data_list = linked_table.get_field_data_by_field_guid(linked_field_info.LinkedFieldGUID)
+    field_data_list = linked_table.get_field_data_by_field_guid(pull.DataFromFieldGUID)
 
     return okResp(action=action_name, jsonBody=field_data_list)
 
@@ -217,29 +227,22 @@ async def get_linked_table_data_values(base_guid: str, table_guid: str, field_gu
 async def new_linked_relationship_data_value(request: api.RequestDataAddLinkedTableCellValue):
     action_name = "linked_relationship_new_data_value"
 
-    # Get the parent table
-    table = store.getTableByGUID(request.BaseGUID, request.TableGUID)
-    if table == None:
-        return errResp(action=action_name,jsonBody=table, message="Table not found")
 
-    # Get the field information
-    linked_field_info = table.get_linked_field_info_by_field_guid(request.FieldGUID)
-    if linked_field_info == None:
-        return errResp(action=action_name,jsonBody=linked_field_info, message="Field not found or not a relationship field")
 
     # Get the linked field information associated with the parent table's field
-    linked_table = store.getTableByGUID(request.BaseGUID, linked_field_info.LinkedChildTableGUID)
-    if linked_table == None:
-        return errResp(action=action_name,jsonBody=linked_table, message="Linked table not found")
+    # linked_table = store.getTableByGUID(request.BaseGUID, linked_field_info.LinkedChildTableGUID)
+    # pull = linked_field_info.PullOperation
+    # linked_table = store.getTableByGUID(request.BaseGUID, pull.DataFromTableGUID)
+    # if linked_table == None:
+    #     return errResp(action=action_name,jsonBody=linked_table, message="Linked table not found")
 
     try:
-        target_field_data = store.update_table_field_value(
-            table,
+        target_field_data = store.update_linked_table_field_value(
+            request.BaseGUID,
+            request.TableGUID,
             request.FieldGUID,
             request.CellGUID,
-            linked_table,
-            linked_field_info,
-            request.LinkedFielData)
+            request.LinkedFielData.CellGUID)
     except ValueError as e:
         return errResp(action=action_name, jsonBody=None, message=str(e))
 
@@ -263,7 +266,9 @@ async def delete_linked_relationship_data_value(request: api.RequestDataDeleteLi
         return errResp(action=action_name,jsonBody=linked_field_info, message="Field not found or not a relationship field")
 
     # Get the linked field information associated with the parent table's field
-    linked_table = store.getTableByGUID(request.BaseGUID, linked_field_info.LinkedChildTableGUID)
+    # linked_table = store.getTableByGUID(request.BaseGUID, linked_field_info.LinkedChildTableGUID)
+    pull = linked_field_info.PullOperation
+    linked_table = store.getTableByGUID(request.BaseGUID, pull.DataFromTableGUID)
     if linked_table == None:
         return errResp(action=action_name,jsonBody=linked_table, message="Linked table not found")
 
@@ -273,7 +278,7 @@ async def delete_linked_relationship_data_value(request: api.RequestDataDeleteLi
             request.FieldGUID,
             request.CellGUID,
             linked_table,
-            linked_field_info.LinkedFieldGUID,
+            pull.DataFromFieldGUID, #linked_field_info.LinkedFieldGUID,
             request.LinkedTableCellGUID)
     except ValueError as e:
         return errResp(action=action_name, jsonBody=None, message=str(e))

@@ -131,14 +131,50 @@ export function CreateFieldRelationshipAsSelect(items: FieldParamLinkedFieldInfo
 	return options
 }
 
+// PullOperation where we read data from
+export interface PullOperation {
+	DataFromTableGUID: string; // Which table are we getting the data
+	DataFromFieldGUID: string; // Which field in the ChildTable are we going to pull data
+	// DataFromCellGUID: string; // Which cell has the data
+	// DataFromRecordGUID: string; // Which record (ie. line)
+
+	DataToTableGUID: string;
+	DataToFieldGUID: string; // Which field in the parent table are we going to put the linked child data
+	// DataToRecordGUID: string;
+	// DataToCellGUID: string;
+
+	SyncToTableGUID: string;
+	SyncToFieldGUID: string;
+	SyncFromTableGUID: string;
+	SyncFromFieldGUID: string;
+
+}
+
+// PushOperation how we make the linked data
+export interface PushOperation {
+	DataFromTableGUID: string;
+	DataFromFieldGUID: string;
+	// DataFromRecordGUID: string;
+	// DataFromCellGUID: string;
+	// DataFromRecID: string; // From which Record did we get the data
+
+	DataToTableGUID: string;
+	DataToFieldGUID: string;
+	// DataToRecordGUID: string;
+	// DataToCellGUID: string;
+}
 
 export interface FieldParamLinkedFieldInfo {
 	InfoId: string;
-	ParentTableGUID: string;
-	LinkedChildTableGUID: string;
-	LinkedFieldGUID: string;
+	// ParentTableGUID: string;
+	// LinkedChildTableGUID: string;
+	// LinkedFieldGUID: string;
 	AllowMultipleValues: boolean;
 	AllowDuplicates: boolean; // Duplicates are only allowed if MultipleValues is true
+	HasPairedDependentField: boolean; // If true, a paired dependent linked field will be created in the related table
+
+	PullOperation: PullOperation;
+	PushOperation: PushOperation;
 }
 
 export interface FieldParamRelationship {
@@ -234,6 +270,12 @@ export interface BaseTableInfo {
 export type FieldOptionsType = { [key: string]: any };
 
 //////////////////////////////////////////////////////////////////////////////////////////
+export interface RequestDataCreateTable {
+	BaseGUID: string;
+	TableName: string;
+}
+
+
 export interface RequestDataCreateField {
 	BaseGUID: string;
 	TableGUID: string;

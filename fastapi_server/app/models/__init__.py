@@ -1,6 +1,6 @@
 from .base import BaseInfo, BaseTableInfo, TableInfo
 from .field_data import FieldData, FieldDataGUIDInfo
-from .table import Table
+from .table import Table, TableFieldRecords
 from .table_field import TableField
 from .table_field_type import TableFieldType
 from .record_cell import RecordCell
@@ -19,6 +19,7 @@ __all__ = [
     "RecordCell",
     "TableInfo",
     "Table",
+    "TableFieldRecords",
     "TableField",
     "TableFieldType",
 

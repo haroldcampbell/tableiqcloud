@@ -1,5 +1,6 @@
 
 from .api_requests import (
+    RequestDataCreateTable,
     RequestDataCreateField, RequestDataDeleteField,
     RequestDataUpdateField, RequestDataUpdateFieldResponse,
     RequestDataUpdateFieldDataValue,RequestDataCreateRecord,
@@ -10,6 +11,7 @@ from .api_requests import (
 from .routes import Response, okResp, errResp
 
 __all__ = [
+    "RequestDataCreateTable",
     "RequestDataCreateField",
     "RequestDataDeleteField",
     "RequestDataUpdateField",

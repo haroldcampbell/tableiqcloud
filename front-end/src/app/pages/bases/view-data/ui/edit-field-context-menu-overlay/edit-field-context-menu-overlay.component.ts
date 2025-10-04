@@ -139,7 +139,7 @@ export class EditFieldContextMenuOverlayComponent implements OnInit {
 	}
 
 	// Track if the current state of the menu element is valid and can be saved
-	isMenuElementValid: boolean = true;
+	isMenuElementValid: boolean = false;
 
 	onMenuElementSaveStateChanged(isValid: boolean) {
 		this.isMenuElementValid = isValid;

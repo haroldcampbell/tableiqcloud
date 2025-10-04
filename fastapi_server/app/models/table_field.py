@@ -1,15 +1,16 @@
 from __future__ import annotations
 from pydantic import BaseModel
-from typing import List, Dict, Optional, Any
+from typing import ClassVar, List, Dict, Optional, Any
 
 from collections.abc import Iterable
 
 import time
 
-from .field_meta_data import FieldMetaData, init_FieldMetaData
+from .field_meta_data import FieldMetaData
 from .field_data import FieldData, FieldDataGUIDInfo
 from .table_field_type import TableFieldType
 from .field_param_relationship import FieldParamRelationship, FieldParamLinkedFieldInfo
+
 
 class TableField(BaseModel):
     MetaData: Optional[FieldMetaData]
@@ -18,6 +19,8 @@ class TableField(BaseModel):
     IsDeleted: bool
     CreatedOnTimestamp: int
     DeletedOnTimestamp: int
+
+    REC_FIELD_NAME: ClassVar["str"] = "__REC"
 
     def init_field_with_record_GUIDs(self, RecordGUIDs: List[str]):
         # Initializes the field data
@@ -31,11 +34,27 @@ class TableField(BaseModel):
             self.FieldData.append(data)
             self.FieldDataGUIDMap[recordGUID] = data.to_field_data_GUID_info()
 
+    def get_cell_guid_info_by_record_guid(self, recordGUID: str) -> Optional[FieldDataGUIDInfo]:
+        if recordGUID in self.FieldDataGUIDMap:
+            return self.FieldDataGUIDMap[recordGUID]
+        return None
+
+    def get_field_data_by_record_guid(self, record_guid:str) -> Optional[FieldData]:
+        for f in self.FieldData:
+            if record_guid == f.RecordGUID:
+                return f
+
+        return None
+
     def append_value(self, recordGUID: str, newValue: Any=None) -> FieldData:
         if self.MetaData == None or self.MetaData.FieldGUID == None:
             raise ValueError("TableField.append_value. \n\tMetaData or FieldGUID can't be None.")
 
-        field_data = FieldData.new_field_data(recordGUID, newValue)
+        if self.MetaData.FieldName == TableField.REC_FIELD_NAME:
+            field_data = FieldData.new_field_data(recordGUID, recordGUID)
+        else:
+            field_data = FieldData.new_field_data(recordGUID, newValue)
+
         self.FieldData.append(field_data)
         self.FieldDataGUIDMap[recordGUID] = field_data.to_field_data_GUID_info()
 
@@ -125,14 +144,15 @@ class TableField(BaseModel):
 
         return
 
-def new_TableField(table_guid:str, field_name:str, field_type:TableFieldType, field_params:Optional[Dict[str, Any]] = None )->TableField:
-    meta_data = init_FieldMetaData(table_guid, field_name=field_name, field_type=field_type, field_params=field_params)
+    @classmethod
+    def new_TableField(cls, table_guid:str, field_name:str, field_type:TableFieldType, field_params:Optional[Dict[str, Any]] = None )->TableField:
+        meta_data = FieldMetaData.init_FieldMetaData(table_guid, field_name=field_name, field_type=field_type, field_params=field_params)
 
-    return TableField(
-        MetaData=meta_data,
-        FieldData=[],
-        FieldDataGUIDMap={},
-        IsDeleted=False,
-        CreatedOnTimestamp= int(time.time()), #time.Now().Unix(),
-        DeletedOnTimestamp=0
-    )
+        return TableField(
+            MetaData=meta_data,
+            FieldData=[],
+            FieldDataGUIDMap={},
+            IsDeleted=False,
+            CreatedOnTimestamp= int(time.time()), #time.Now().Unix(),
+            DeletedOnTimestamp=0
+        )

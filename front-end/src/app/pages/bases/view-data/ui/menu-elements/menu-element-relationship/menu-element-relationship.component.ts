@@ -63,7 +63,7 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 		// console.log("[loadTableData] tableGUID:", this.tableGUID);
 		this.apiService.apiRequests.getTables(this.baseGUID!).subscribe({
 			next: (data) => {
-				// console.log("[loadTableList] data: ", { data });
+				console.log("[loadTableList] data: ", { data });
 				this.baseTableInfo = data;
 				if (this.existingField) {
 					this.initExistingLinkedTable();
@@ -81,23 +81,28 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 	cachedInfoIDMap: Record<string, string> = {} /** LinkedFieldGUID -> InfoId*/
 
 	initExistingLinkedTable() {
-		// console.log("[initExistingLinkedTable] existingField", { existingField: this.existingField })
+		console.log("[initExistingLinkedTable] existingField", {
+			existingField: this.existingField,
+			baseTableInfo: this.baseTableInfo
+		});
 
 		const params: FieldParamRelationship = this.existingField?.FieldParams;
 		const linkedFieldInfo: FieldParamLinkedFieldInfo = params.ParamValues;
 
 		this._allowMultipleItems = linkedFieldInfo.AllowMultipleValues;
 		this._allowDuplicates = linkedFieldInfo.AllowDuplicates;
-		this.selectedTableGUID = linkedFieldInfo.LinkedChildTableGUID;
+		this.selectedTableGUID = linkedFieldInfo.PullOperation.DataFromTableGUID;//.LinkedChildTableGUID;
 
 		if (this.baseTableInfo) {
 			for (let item of this.baseTableInfo.TableInfoArray) {
-				if (item.GUID == linkedFieldInfo.LinkedChildTableGUID) {
-					this.loadTableByGUID(linkedFieldInfo.LinkedChildTableGUID, () => {
+				console.log("[initExistingLinkedTable] ", { item, result: (item.GUID == linkedFieldInfo.PullOperation.DataFromTableGUID) });
+
+				if (item.GUID == linkedFieldInfo.PullOperation.DataFromTableGUID) {
+					this.loadTableByGUID(linkedFieldInfo.PullOperation.DataFromTableGUID, () => {
 						// Cache the current InfoId
-						this.cachedInfoIDMap[linkedFieldInfo.LinkedFieldGUID] = linkedFieldInfo.InfoId;
+						this.cachedInfoIDMap[linkedFieldInfo.PullOperation.DataFromFieldGUID] = linkedFieldInfo.InfoId;
 						this.selectedInfoId = linkedFieldInfo.InfoId;
-						this.loadTableFieldByGUID(linkedFieldInfo.LinkedFieldGUID);
+						this.loadTableFieldByGUID(linkedFieldInfo.PullOperation.DataFromFieldGUID);
 					})
 					break;
 				}
@@ -132,10 +137,13 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 		this.dirtyTableValue = linkedTableGUID;
 		this.selectedTableGUID = linkedTableGUID;
 
+		console.log("[loadTableByGUID] ", { baseGUID: this.baseGUID, linkedTableGUID, })
+
 		this.apiService.apiRequests.getTableFieldInfoByGUID(this.baseGUID!, this.selectedTableGUID).subscribe({
 			next: (data) => {
 				this.tableFieldInfo = data;
 				this.dirtyFieldValue = "";
+				console.log("[loadTableByGUID] getTableFieldInfoByGUID(...):", { data })
 
 				if (onSuccessfulCallback) {
 					onSuccessfulCallback();
@@ -167,16 +175,44 @@ export class MenuElementRelationshipComponent implements OnInit, AfterViewInit, 
 	}
 
 	private raiseRelationshipInfo() {
-		const info: FieldParamLinkedFieldInfo = {
+		const relationshipInfo: FieldParamLinkedFieldInfo = {
 			InfoId: this.selectedInfoId ?? "",
-			ParentTableGUID: this.parentTableGUID!,
-			LinkedChildTableGUID: this.selectedTableGUID,
-			LinkedFieldGUID: this.selectedTableFieldGUID,
+			// ParentTableGUID: this.parentTableGUID!,
+			// LinkedChildTableGUID: this.selectedTableGUID,
+			// LinkedFieldGUID: this.selectedTableFieldGUID,
 			AllowMultipleValues: this._allowMultipleItems,
-			AllowDuplicates: this._allowDuplicates
+			AllowDuplicates: this._allowDuplicates,
+			HasPairedDependentField: true, // TODO: Add UI to toggle this?
+
+			PullOperation: {
+				DataFromTableGUID: this.selectedTableGUID, // Which table are we getting the data
+				DataFromFieldGUID: this.selectedTableFieldGUID, // Which field in the ChildTable are we going to pull data
+				// DataFromCellGUID: "", // Which cell has the data
+				// DataFromRecordGUID: "", // Which record (ie. line)
+
+				DataToTableGUID: this.parentTableGUID!,
+				// This will be the new field that is being created
+				// Which field in the parent table are we going to put the linked child data
+				DataToFieldGUID: "",
+				// DataToRecordGUID: "",
+				// DataToCellGUID: "",
+			},
+			PushOperation: {
+				DataFromTableGUID: "",
+				DataFromFieldGUID: "",
+				// DataFromRecordGUID: "",
+				// DataFromCellGUID: "",
+				// DataFromRecID: "", // From which Record did we get the data
+
+				DataToTableGUID: "",
+				DataToFieldGUID: "",
+				// DataToRecordGUID: "",
+				// DataToCellGUID: "",
+			}
 		}
-		console.log("[raiseRelationshipInfo] emitting info:", info);
-		this.relationshipInfo.emit(info)
+
+		console.log("[raiseRelationshipInfo] emitting info:", relationshipInfo);
+		this.relationshipInfo.emit(relationshipInfo)
 	}
 
 	_allowMultipleItems = false
